@@ -4,6 +4,31 @@ A modern, production-ready template for building full-stack React applications u
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
+## Project Structure
+
+```bash
+.
+├── app/ # app source
+│   ├── routes/ # app routes
+│   ├── modules/ # feature modules with related files
+│   ├── components/ # reusable components
+│   │   └── ui/ # low-level UI components (buttons, inputs, etc.)
+│   ├── hooks/
+│   ├── lib/
+│   ├── styles/
+│   ├── types/
+│   ├── app.css # tailwind + styles config (required)
+│   ├── routes.ts # react-router route defs (required)
+│   └── root.tsx # root route (required)
+├── spec/ # e2e tests
+├── build/
+├── public/
+├── package.json
+├── README.md
+└── ... # config files
+
+```
+
 ## Stack
 
 - React

@@ -5,5 +5,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <div className="pt-16 p-4 container mx-auto">Home</div>;
+  return <div className="container mx-auto p-4 pt-16">Home</div>;
 }

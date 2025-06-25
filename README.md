@@ -4,6 +4,19 @@ A modern, production-ready template for building full-stack React applications u
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
+## Stack
+
+- React
+- TypeScript
+- React Router v7
+- Tailwind v4
+- React Query
+- Zustand
+- shadcn
+- Playwright
+- ESLint
+- Prettier
+
 ## Features
 
 - 🚀 Server-side rendering

@@ -6,6 +6,7 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
+    "spec": "npx playwright test",
     "format:all": "prettier --write \"**/*\"",
     "format:src": "prettier --write \"src/**/*\"",
     "typecheck": "react-router typegen && tsc"
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@playwright/test": "^1.53.1",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
     "@types/node": "^20",

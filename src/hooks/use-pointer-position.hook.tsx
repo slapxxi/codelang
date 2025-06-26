@@ -1,34 +1,37 @@
 import './use-pointer-position.css';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type Params = { disabled: boolean };
 
-export function usePointerPosition(params?: Params) {
+export function usePointerPosition<T extends HTMLElement>(params?: Params) {
   const { disabled = false } = params || {};
+  const ref = useRef<T>(null);
 
   useEffect(() => {
-    if (disabled || document.documentElement.dataset.xy) {
+    if (disabled) {
       return;
     }
 
-    document.documentElement.dataset.xy = '';
     document.addEventListener('pointermove', handleMove);
 
     return () => {
       document.removeEventListener('pointermove', handleMove);
-      delete document.documentElement.dataset.xy;
     };
 
     function handleMove(e: PointerEvent) {
-      const docEl = document.documentElement;
-      docEl.style.setProperty(
-        '--x',
-        `${((e.clientX / (document.documentElement.clientWidth / 2) - 1) * 10).toFixed(2)}px`
-      );
-      docEl.style.setProperty(
-        '--y',
-        `${((e.clientY / (document.documentElement.clientHeight / 2) - 1) * 10).toFixed(2)}px`
-      );
+      const el = ref.current as HTMLElement;
+      if (el) {
+        el.style.setProperty(
+          '--x',
+          `${((e.clientX / (document.documentElement.clientWidth / 2) - 1) * 10).toFixed(2)}px`
+        );
+        el.style.setProperty(
+          '--y',
+          `${((e.clientY / (document.documentElement.clientHeight / 2) - 1) * 10).toFixed(2)}px`
+        );
+      }
     }
   }, [disabled]);
+
+  return ref;
 }

@@ -1,12 +1,14 @@
+import { forwardRef } from 'react';
+
 type LayoutContainerProps = {
   children?: React.ReactNode;
 };
 
-export const LayoutContainer: React.FC<LayoutContainerProps> = (props) => {
+export const LayoutContainer = forwardRef<HTMLDivElement, LayoutContainerProps>((props, ref) => {
   const { children } = props;
 
   return (
-    <div className="relative min-h-screen bg-[url('/circle.svg')] bg-position-[var(--x)_var(--y)]">
+    <div className="relative min-h-screen bg-[url('/circle.svg')] bg-position-[var(--x)_var(--y)]" ref={ref}>
       {children}
 
       <img
@@ -31,4 +33,4 @@ export const LayoutContainer: React.FC<LayoutContainerProps> = (props) => {
       />
     </div>
   );
-};
+});

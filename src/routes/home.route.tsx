@@ -7,10 +7,10 @@ export function meta({}: Route.MetaArgs) {
 }
 
 const HomeRoute = () => {
-  usePointerPosition({ disabled: true });
+  const ref = usePointerPosition<HTMLDivElement>({ disabled: false });
 
   return (
-    <LayoutContainer>
+    <LayoutContainer ref={ref}>
       <Logo />
       <Navbar className="absolute m-2" />
     </LayoutContainer>

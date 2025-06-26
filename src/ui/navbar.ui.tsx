@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, NavLink } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { NavLink } from 'react-router';
 import { Code, FileQuestionMark, Home, User, Users } from 'lucide-react';
 
 import { cn } from '~/utils';
@@ -11,13 +11,32 @@ type NavbarProps = {
 export const Navbar: React.FC<NavbarProps> = (props) => {
   const { className } = props;
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   function handleClick() {
     setOpen((o) => !o);
   }
 
+  useEffect(() => {
+    document.addEventListener('scroll', handleScroll);
+    return () => {
+      document.removeEventListener('scroll', handleScroll);
+    };
+
+    function handleScroll(e: Event) {
+      ref.current.style.top = `${e.scrollY}px`;
+    }
+  });
+
   return (
-    <div className={cn('squircle', 'flex flex-col text-zinc-50 drop-shadow-lg drop-shadow-zinc-500/30 ', className)}>
+    <div
+      ref={ref}
+      className={cn(
+        'squircle squircle-fill-zinc-950/90 backdrop-blur-[1px]',
+        'flex flex-col text-zinc-50 drop-shadow-lg drop-shadow-zinc-500/30 ',
+        className
+      )}
+    >
       <nav>
         <ul className="flex p-2 gap-4 flex-col">
           {[
@@ -43,9 +62,10 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
         </ul>
       </nav>
 
+      <div className="h-8" />
+
       <button
-        className="inline-flex gap-2 p-2 rounded-lg group cursor-pointer text-zinc-400 hover:text-zinc-50 
-        mt-[min(100px, 10px)] mb-2"
+        className="inline-flex gap-2 p-2 rounded-lg group cursor-pointer text-zinc-400 hover:text-zinc-50 mt-auto mb-2"
         onClick={handleClick}
       >
         <span className="p-2 rounded-lg group-hover:bg-zinc-800 group-active:bg-zinc-900 w-full">

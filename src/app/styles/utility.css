@@ -1,0 +1,19 @@
+@utility cap-round {
+  stroke-linecap: round;
+}
+
+@utility join-round {
+  stroke-linejoin: round;
+}
+
+/* --squircle-smooth: 1; */
+/* --squircle-radius: 14px; */
+/* --squircle-fill: var(--foreground); */
+
+@utility squircle-smooth {
+  --squircle-smooth: var(--value);
+}
+
+@utility squircle-radius {
+  --squircle-radius: var(--value);
+}

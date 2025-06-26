@@ -1,9 +1,20 @@
-import type { Route } from './+types/home.route';
+import type { Route } from './+types/home.route.tsx';
+import { usePointerPosition } from '~/hooks';
+import { LayoutContainer, Logo, Navbar } from '~/ui';
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: 'Codelang' }, { name: 'description', content: 'Codelang' }];
 }
 
-const HomeRoute = () => <div className="container mx-auto p-4 pt-16">Home</div>;
+const HomeRoute = () => {
+  usePointerPosition({ disabled: true });
+
+  return (
+    <LayoutContainer>
+      <Logo />
+      <Navbar className="absolute m-2" />
+    </LayoutContainer>
+  );
+};
 
 export default HomeRoute;

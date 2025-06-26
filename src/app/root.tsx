@@ -3,8 +3,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import type { Route } from './+types/root';
 import '~/app/styles/app.css';
 
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '~/lib';
+import { QueryProvider } from './providers';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -32,6 +31,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <script>
+          {`if ("paintWorklet" in CSS) { CSS.paintWorklet.addModule( "https://www.unpkg.com/css-houdini-squircle/squircle.min.js") }`}
+        </script>
       </body>
     </html>
   );
@@ -39,9 +41,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryProvider>
       <Outlet />
-    </QueryClientProvider>
+    </QueryProvider>
   );
 }
 

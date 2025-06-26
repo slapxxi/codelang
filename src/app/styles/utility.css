@@ -6,14 +6,15 @@
   stroke-linejoin: round;
 }
 
-/* --squircle-smooth: 1; */
-/* --squircle-radius: 14px; */
-/* --squircle-fill: var(--foreground); */
-
-@utility squircle-smooth {
-  --squircle-smooth: var(--value);
+@utility squircle-smooth-* {
+  --squircle-smooth: --value(integer);
 }
 
-@utility squircle-radius {
-  --squircle-radius: var(--value);
+@utility squircle-radius-* {
+  --squircle-radius: calc(--value(integer) * 1px);
+}
+
+@utility squircle-fill-* {
+  --squircle-fill: --value([*]);
+  --squircle-fill: --value(--color-*);
 }

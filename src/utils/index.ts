@@ -1,5 +1,5 @@
 export { cn } from './cn.util';
-export { intoColumns } from './into-columns';
-export { appendParams } from './append-params';
-export { isBrowser } from './is-browser';
-export { isNode } from './is-node';
+export { intoColumns } from './into-columns.util';
+export { appendParams } from './append-params.util';
+export { isBrowser } from './is-browser.util';
+export { isNode } from './is-node.util';

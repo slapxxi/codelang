@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { NavLink } from 'react-router';
+import { href, NavLink } from 'react-router';
 import { Code, FileQuestionMark, Home, User, Users } from 'lucide-react';
 
 import { cn } from '~/utils';
+import { useNavbar } from '~/hooks';
 
 type NavbarProps = {
   className?: string;
@@ -10,27 +10,10 @@ type NavbarProps = {
 
 export const Navbar: React.FC<NavbarProps> = (props) => {
   const { className } = props;
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  function handleClick() {
-    setOpen((o) => !o);
-  }
-
-  useEffect(() => {
-    document.addEventListener('scroll', handleScroll);
-    return () => {
-      document.removeEventListener('scroll', handleScroll);
-    };
-
-    function handleScroll(e: Event) {
-      ref.current.style.top = `${e.scrollY}px`;
-    }
-  });
+  const { open, toggle: toggleOpen } = useNavbar();
 
   return (
     <div
-      ref={ref}
       className={cn(
         'squircle squircle-fill-zinc-950/90 backdrop-blur-[1px]',
         'flex flex-col text-zinc-50 drop-shadow-lg drop-shadow-zinc-500/30 ',
@@ -48,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
           ].map((item, i) => (
             <li key={i}>
               <NavLink
-                to="/"
+                to={href('/')}
                 className="flex gap-2 hover:bg-zinc-800 p-2 rounded-lg"
                 style={{ animationDelay: `${i * 45}ms` }}
               >
@@ -66,7 +49,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
 
       <button
         className="inline-flex gap-2 p-2 rounded-lg group cursor-pointer text-zinc-400 hover:text-zinc-50 mt-auto mb-2"
-        onClick={handleClick}
+        onClick={() => toggleOpen()}
       >
         <span className="p-2 rounded-lg group-hover:bg-zinc-800 group-active:bg-zinc-900 w-full">
           <svg viewBox="0 0 24 24" className="size-6 cap-round join-round stroke-2 stroke-current fill-none">

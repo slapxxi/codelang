@@ -19,6 +19,7 @@
   --color-olive-700: hsl(140 2% 37%);
   --color-olive-800: hsl(140 2% 31%);
   --color-olive-900: hsl(140 2% 25%);
+  --color-olive-950: hsl(140 2% 19%);
 
   @keyframes slide-in {
     from {

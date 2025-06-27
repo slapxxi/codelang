@@ -6,10 +6,11 @@ import { useNavbar } from '~/hooks';
 
 type NavbarProps = {
   className?: string;
+  children?: React.ReactNode;
 };
 
 export const Navbar: React.FC<NavbarProps> = (props) => {
-  const { className } = props;
+  const { className, children } = props;
   const { open, toggle: toggleOpen } = useNavbar();
 
   return (
@@ -83,6 +84,8 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
           </svg>
         </span>
       </button>
+
+      {children}
     </div>
   );
 };

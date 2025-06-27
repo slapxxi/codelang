@@ -16,9 +16,9 @@ const HomeRoute = ({ loaderData }: Route.DataArgs) => {
   const { snippets } = loaderData;
 
   return (
-    <ul className="flex flex-col md:grid grid-cols-2 gap-2 grow max-w-[1100px]">
+    <ul className="flex flex-col md:grid grid-cols-2 gap-2.5 grow max-w-[1100px]">
       {intoColumns(snippets, 2).map((col, i) => (
-        <div key={i} className="contents md:flex flex-col gap-2 pb-12">
+        <div key={i} className="contents md:flex flex-col gap-2.5 pb-12">
           {col.map((s) => (
             <SnippetCard snippet={s} key={s.id} />
           ))}

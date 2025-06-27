@@ -31,6 +31,7 @@ export async function getSnippets(): Promise<Snippet[]> {
       user: item.user,
       likes: item.marks.reduce((acc, mark) => (mark.type === 'like' ? acc + 1 : acc), 0),
       dislikes: item.marks.reduce((acc, mark) => (mark.type === 'dislike' ? acc + 1 : acc), 0),
+      comments: item.comments,
     };
   });
 }

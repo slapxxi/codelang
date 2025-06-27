@@ -23,15 +23,15 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
       <nav>
         <ul className="flex p-2 gap-4 flex-col">
           {[
-            { Icon: Home, text: 'Home' },
-            { Icon: FileQuestionMark, text: 'Questions' },
-            { Icon: Code, text: 'Snippets' },
-            { Icon: Users, text: 'Users' },
-            { Icon: User, text: 'Profile' },
+            { Icon: Home, text: 'Home', path: href('/') },
+            { Icon: FileQuestionMark, text: 'Questions', path: href('/questions') },
+            { Icon: Code, text: 'Snippets', path: href('/snippets') },
+            { Icon: Users, text: 'Users', path: href('/users') },
+            { Icon: User, text: 'Profile', path: href('/profile') },
           ].map((item, i) => (
             <li key={i}>
               <NavLink
-                to={href('/')}
+                to={item.path}
                 className="flex gap-2 hover:bg-zinc-800 p-2 rounded-lg"
                 style={{ animationDelay: `${i * 45}ms` }}
               >

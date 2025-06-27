@@ -6,7 +6,15 @@ export type User = {
 
 export type UserRole = 'admin' | 'user';
 
-export type Snippet = { id: string; language: string; code: string; user: User; likes: number; dislikes: number };
+export type Snippet = {
+  id: string;
+  language: string;
+  code: string;
+  user: User;
+  likes: number;
+  dislikes: number;
+  comments: Comment[];
+};
 
 export type Comment = {
   id: string;

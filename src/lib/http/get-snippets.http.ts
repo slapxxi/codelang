@@ -1,4 +1,4 @@
-import type { Snippet } from '~/types';
+import { Snippet } from './schema';
 
 const URL = 'https://codelang.vercel.app/api/snippets';
 
@@ -14,7 +14,7 @@ type GetSnippetsResponse<T> = {
   links: { current: string };
 };
 
-export async function getSnippets(): Promise<Snippet[]> {
+export async function getSnippets(): Promise<(typeof Snippet)[]> {
   // try {
   //   const response = await fetch(URL);
   //   const json = await response.json();
@@ -23,15 +23,13 @@ export async function getSnippets(): Promise<Snippet[]> {
   // } catch (e) {
   //   throw new Error('Error fetching snippets', { cause: e });
   // }
-  return data.map((item) => {
+  const parsed = data.map((item) => Snippet.parse(item));
+
+  return parsed.map((item) => {
     return {
-      id: item.id,
-      code: item.code,
-      language: item.language,
-      user: item.user,
+      ...item,
       likes: item.marks.reduce((acc, mark) => (mark.type === 'like' ? acc + 1 : acc), 0),
       dislikes: item.marks.reduce((acc, mark) => (mark.type === 'dislike' ? acc + 1 : acc), 0),
-      comments: item.comments,
     };
   });
 }

@@ -18,6 +18,11 @@ type Props = {
 export const Pagination: React.FC<Props> = (props) => {
   const { numberOfPages, currentPage, maxDisplayed = 1, ...rest } = props;
   const [searchParams] = useSearchParams();
+
+  if (numberOfPages <= 1) {
+    return null;
+  }
+
   const startPage = clamp(currentPage - Math.floor(maxDisplayed / 2), 1, numberOfPages);
   const endPage = clamp(currentPage + Math.floor(maxDisplayed / 2), 1, numberOfPages);
   const prevPages = new Array(currentPage - startPage)

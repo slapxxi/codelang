@@ -7,7 +7,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
   const { users, totalItems, totalPages } = await getUsers({ page });
-  return { users, totalItems, totalPages, currentPage: parseInt(page) || 1 };
+  return { users, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
 }
 
 const UserRoute = ({ loaderData }: Route.DataArgs) => {

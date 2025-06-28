@@ -2,6 +2,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 
 import type { Route } from './+types/root';
 import '~/app/styles/app.css';
+import '~/lib/shiki';
 
 import { QueryProvider } from './providers';
 

@@ -1,24 +1,30 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { SnippetSchema, UserSchema, SnippetSchemaWithLikes, LinksSchema } from './schema';
+import { SnippetSchema, UserSchema, QuestionSchema, QuestionSchemaWithCodeHighlighted } from './schema';
 import { appendParams } from '~/utils';
-import type { Snippet } from '~/types';
+import type { Question } from '~/types';
 
-const GetSnippetsResponse = z.object({
-  data: z.array(SnippetSchema),
+const GetQuestionsResponse = z.object({
+  data: QuestionSchema.array(),
   meta: z.object({
     itemsPerPage: z.number(),
-    currentPage: z.number(),
     totalItems: z.number(),
+    currentPage: z.number(),
     totalPages: z.number(),
     sortBy: z
-      .tuple([SnippetSchema.keyof(), z.enum(['ASC', 'DESC'])])
+      .tuple([QuestionSchema.keyof(), z.enum(['ASC', 'DESC'])])
       .array()
       .optional(),
-    searchBy: SnippetSchema.keyof().array().optional(),
+    searchBy: QuestionSchema.keyof().array().optional(),
     search: z.string().optional(),
   }),
-  links: LinksSchema,
+  links: z.object({
+    first: z.string().optional(),
+    previous: z.string().optional(),
+    current: z.string().optional(),
+    next: z.string().optional(),
+    last: z.string().optional(),
+  }),
 });
 
 type Params = {
@@ -53,32 +59,34 @@ type Params = {
 
 type Result =
   | {
-      snippets: Snippet[];
+      questions: Question[];
       totalItems: number;
       totalPages: number;
-      error?: z.ZodError[];
+      error: null;
     }
   | {
-      snippets: null;
+      questions: null;
       totalItems: null;
       totalPages: null;
-      error?: ReturnType<typeof GetSnippetsResponse.safeParse>['error'];
+      error: ReturnType<typeof GetQuestionsResponse.safeParse>['error'];
     };
 
-export async function getSnippets(params?: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/snippets`);
+export async function getQuestions(params?: Params): Promise<Result> {
+  const url = new URL(`${API_URL}/questions`);
   appendParams(url, params);
   const response = await fetch(url);
   const json = await response.json();
-  const { success, data, error } = GetSnippetsResponse.safeParse(json.data);
+  const { success, data, error } = GetQuestionsResponse.safeParse(json.data);
 
   if (success) {
+    const questions = await QuestionSchemaWithCodeHighlighted.array().parseAsync(data.data);
     return {
-      snippets: SnippetSchemaWithLikes.array().parse(data.data),
+      questions,
       totalItems: data.meta.totalItems,
       totalPages: data.meta.totalPages,
+      error: null,
     };
   }
 
-  return { error, snippets: null, totalItems: null, totalPages: null };
+  return { error, questions: null, totalItems: null, totalPages: null };
 }

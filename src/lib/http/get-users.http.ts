@@ -1,7 +1,8 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { UserSchema } from './schema';
+import { LinksSchema, UserSchema } from './schema';
 import { appendParams } from '~/utils';
+import type { User } from '~/types';
 
 const GetUsersResponse = z.object({
   data: z.array(UserSchema),
@@ -17,7 +18,7 @@ const GetUsersResponse = z.object({
     searchBy: UserSchema.keyof().array().optional(),
     search: z.string().optional(),
   }),
-  links: z.object({ current: z.string() }),
+  links: LinksSchema,
 });
 
 type Params = {
@@ -48,7 +49,7 @@ type Params = {
 
 type Result =
   | {
-      users: z.infer<typeof UserSchema>[];
+      users: User[];
       totalItems: number;
       totalPages: number;
       error?: z.ZodError[];

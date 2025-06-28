@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router';
 import {
   Pagination as PaginationBase,
   PaginationContent,
@@ -5,6 +6,7 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from './base';
+import { clamp, replaceSearchParamsValue } from '~/utils';
 
 type Props = {
   numberOfPages: number;
@@ -15,53 +17,67 @@ type Props = {
 
 export const Pagination: React.FC<Props> = (props) => {
   const { numberOfPages, currentPage, maxDisplayed = 1, ...rest } = props;
-  const mappedPages = mapPages(numberOfPages, currentPage, maxDisplayed);
+  const [searchParams] = useSearchParams();
+  const startPage = clamp(currentPage - Math.floor(maxDisplayed / 2), 1, numberOfPages);
+  const endPage = clamp(currentPage + Math.floor(maxDisplayed / 2), 1, numberOfPages);
+  const prevPages = new Array(currentPage - startPage)
+    .fill(null)
+    .reverse()
+    .map((_, i) => currentPage - (i + 1))
+    .reverse();
+  const nextPages = new Array(endPage - currentPage).fill(null).map((_, i) => currentPage + (i + 1));
 
   return (
     <PaginationBase {...rest}>
       <PaginationContent>
-        {mappedPages.pages.map((p, i) => (
-          <PaginationItem key={i}>
-            <PaginationLink to={`?page=${p}`} isActive={p === currentPage}>
-              {p}
+        {prevPages.length > 0 && !prevPages.includes(1) && (
+          <>
+            <PaginationItem>
+              <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', 1) }}>
+                {startPage}
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          </>
+        )}
+
+        {prevPages.map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', page) }}>
+              {page}
             </PaginationLink>
           </PaginationItem>
         ))}
+
+        <PaginationItem>
+          <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', currentPage) }} isActive>
+            {currentPage}
+          </PaginationLink>
+        </PaginationItem>
+
+        {nextPages.map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', page) }}>
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+
+        {nextPages.length > 0 && !nextPages.includes(numberOfPages) && (
+          <>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', numberOfPages) }}>
+                {numberOfPages}
+              </PaginationLink>
+            </PaginationItem>
+          </>
+        )}
       </PaginationContent>
     </PaginationBase>
   );
 };
-
-type MappedPages = {
-  status: 'full' | 'start' | 'end' | 'middle';
-  pages: number[];
-};
-
-function mapPages(totalPages: number, currentPage: number, maxDisplayed: number): MappedPages {
-  const result: MappedPages = { status: 'middle', pages: [] };
-
-  if (totalPages <= maxDisplayed) {
-    result.pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-    result.status = 'full';
-    return result;
-  }
-
-  const midPoint = Math.ceil(maxDisplayed / 2);
-  const start = 1;
-
-  if (currentPage <= midPoint) {
-    result.pages = Array.from({ length: maxDisplayed }, (_, i) => start + i);
-    result.status = 'start';
-    return result;
-  }
-
-  if (currentPage >= totalPages - midPoint) {
-    result.pages = Array.from({ length: maxDisplayed }, (_, i) => totalPages - maxDisplayed + i + 1);
-    result.status = 'end';
-    return result;
-  }
-
-  result.pages = Array.from({ length: maxDisplayed }, (_, i) => currentPage - maxDisplayed / 2 + i + 1);
-
-  return result;
-}

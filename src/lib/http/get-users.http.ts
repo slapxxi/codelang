@@ -1,77 +1,75 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { User } from './schema';
+import { UserSchema } from './schema';
+import { appendParams } from '~/utils';
 
-const UsersResponse = z.object({
-  data: z.array(User),
+const GetUsersResponse = z.object({
+  data: z.array(UserSchema),
   meta: z.object({
     itemsPerPage: z.number(),
     currentPage: z.number(),
     totalItems: z.number(),
     totalPages: z.number(),
     sortBy: z
-      .tuple([User.keyof(), z.enum(['ASC', 'DESC'])])
+      .tuple([UserSchema.keyof(), z.enum(['ASC', 'DESC'])])
       .array()
       .optional(),
-    searchBy: User.keyof().array().optional(),
+    searchBy: UserSchema.keyof().array().optional(),
     search: z.string().optional(),
   }),
   links: z.object({ current: z.string() }),
 });
 
-type RequestParams = {
+type Params = {
   /**
    * Page number to retrieve
    * @default 1
    */
-  page?: number;
+  page?: string | number | null;
   /**
    * Number of records per page
    * @default 15
    */
-  limit?: number;
+  limit?: string | number | null;
   /**
    * Sort order
    * @default ['username', 'ASC']
    */
-  sortBy?: Partial<Record<keyof z.infer<typeof User>, 'ASC' | 'DESC'>>;
+  sortBy?: Partial<Record<keyof z.infer<typeof UserSchema>, 'ASC' | 'DESC'>> | null;
   /**
    * Search term to filter results
    */
-  search?: string;
+  search?: string | null;
   /**
    * Fields to search by
    */
-  searchBy?: (keyof z.infer<typeof User>)[];
+  searchBy?: (keyof z.infer<typeof UserSchema>)[] | null;
 };
 
-type Params = RequestParams;
+type Result =
+  | {
+      users: z.infer<typeof UserSchema>[];
+      totalItems: number;
+      totalPages: number;
+      error?: z.ZodError[];
+    }
+  | {
+      users: null;
+      totalItems: null;
+      totalPages: null;
+      error?: ReturnType<typeof GetUsersResponse.safeParse>['error'];
+    };
 
-export async function getUsers(params?: Params): Promise<z.infer<typeof User>[]> {
+export async function getUsers(params?: Params): Promise<Result> {
   const url = new URL(`${API_URL}/users`);
   appendParams(url, params);
   const response = await fetch(url);
   const json = await response.json();
-  const { data } = UsersResponse.parse(json.data);
-  return data;
-}
+  const { success, data, error } = GetUsersResponse.safeParse(json.data);
 
-function appendParams(url: URL, params?: Params) {
-  if (params) {
-    for (const [key, value] of Object.entries(params)) {
-      if (Array.isArray(value)) {
-        for (const v of value) {
-          url.searchParams.append(key, String(v));
-        }
-        continue;
-      }
-      if (typeof value === 'object') {
-        for (const [k, v] of Object.entries(value)) {
-          url.searchParams.append(key, `${k}:${v}`);
-        }
-        continue;
-      }
-      url.searchParams.append(key, String(value));
-    }
+  if (success) {
+    return { users: data.data, totalItems: data.meta.totalItems, totalPages: data.meta.totalPages };
   }
+
+  return { error, users: null, totalItems: null, totalPages: null };
 }

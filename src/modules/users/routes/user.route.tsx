@@ -1,6 +1,6 @@
 import type { Route } from './+types/user.route.tsx';
 
-export async function loader({ params }) {
+export async function loader({ params }: Route.LoaderArgs) {
   const user = { id: params.userId };
   return { user };
 }

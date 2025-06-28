@@ -8,9 +8,8 @@ export default [
     index('./routes/home.route.tsx'),
     route('/profile', './routes/profile.route.tsx'),
 
-    route('/users', '../modules/users/routes/users.route.tsx', [
-      route(':userId', '../modules/users/routes/user.route.tsx'),
-    ]),
+    route('/users', '../modules/users/routes/users.route.tsx'),
+    route('/users/:userId', '../modules/users/routes/user.route.tsx'),
 
     route('/snippets', '../modules/snippets/routes/snippets.route.tsx', [
       route(':snippetId', '../modules/snippets/routes//snippet.route.tsx'),

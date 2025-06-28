@@ -1,6 +1,4 @@
-import { Snippet } from './schema';
-
-const URL = 'https://codelang.vercel.app/api/snippets';
+import { SnippetSchema } from './schema';
 
 type GetSnippetsResponse<T> = {
   data: T;
@@ -14,7 +12,7 @@ type GetSnippetsResponse<T> = {
   links: { current: string };
 };
 
-export async function getSnippets(): Promise<(typeof Snippet)[]> {
+export async function getSnippets(): Promise<(typeof SnippetSchema)[]> {
   // try {
   //   const response = await fetch(URL);
   //   const json = await response.json();
@@ -23,7 +21,7 @@ export async function getSnippets(): Promise<(typeof Snippet)[]> {
   // } catch (e) {
   //   throw new Error('Error fetching snippets', { cause: e });
   // }
-  const parsed = data.map((item) => Snippet.parse(item));
+  const parsed = data.map((item) => SnippetSchema.parse(item));
 
   return parsed.map((item) => {
     return {

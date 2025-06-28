@@ -1,10 +1,13 @@
 type Params = {
-  [key: string]: string | number | unknown[] | { [key: string]: unknown };
+  [key: string]: null | string | number | unknown[] | { [key: string]: unknown };
 };
 
 export function appendParams(url: URL, params?: Params) {
   if (params) {
     for (const [key, value] of Object.entries(params)) {
+      if (value === null) {
+        continue;
+      }
       if (Array.isArray(value)) {
         for (const v of value) {
           url.searchParams.append(key, String(v));

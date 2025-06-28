@@ -6,4 +6,22 @@
     --squircle-fill: var(--foreground);
     background: paint(squircle);
   }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+
+    &:before {
+      @apply animate-shimmer filter blur-lg;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150%;
+      height: 150%;
+      transform: translateY(-40%) translateX(var(--pos));
+      background: radial-gradient(circle, hsla(0, 0%, 100%, 0.25) 10%, transparent 70%);
+    }
+  }
 }

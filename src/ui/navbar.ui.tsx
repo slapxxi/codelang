@@ -33,8 +33,14 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
             <li key={i}>
               <NavLink
                 to={item.path}
-                className="flex gap-2 hover:bg-zinc-800 p-2 rounded-lg"
-                style={{ animationDelay: `${i * 45}ms` }}
+                className={({ isActive, isPending }) =>
+                  cn(
+                    'flex gap-2 hover:bg-zinc-800 p-2 rounded-lg',
+                    isActive && 'bg-zinc-700 hover:bg-zinc-700 shadow-sm',
+                    isActive && 'animate-shimmer hover:bg-transparent shimmer bg-transparent'
+                  )
+                }
+                style={({ isPending }) => ({ animationDelay: isPending ? '0' : `${i * 45}ms` })}
               >
                 <item.Icon />
                 <span className={cn(open ? 'flex-1 overflow-hidden inline-flex' : 'hidden', 'delay-[inherit]')}>

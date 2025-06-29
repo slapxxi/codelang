@@ -1,5 +1,5 @@
 import type { Route } from './+types/register.route';
-import { Form, href, Link, redirect } from 'react-router';
+import { Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
 import { registerUser } from '~/lib/http';
 import { LayoutContainer, Input, Logo, FormError } from '~/ui';
@@ -42,7 +42,7 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const username = form.get('username');
   const password = form.get('password');
-  const { success, data, error } = RegisterUserSchema.safeParse({ username, password });
+  const { success, data } = RegisterUserSchema.safeParse({ username, password });
 
   if (success) {
     const result = await registerUser({ username: data.username, password: data.password });
@@ -58,16 +58,18 @@ export async function action({ request }: Route.ActionArgs) {
     return redirect('/login');
   }
 
-  return { message: error.message };
+  return { message: 'Invalid data submitted' };
 }
 
 const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
   const { message } = actionData ?? {};
   const { register, handleSubmit, formState } = useForm<TRegisterForm>({ resolver: zodResolver(RegisterFormSchema) });
   const [showPassword, setShowPassword] = useState(false);
+  const submit = useSubmit();
+  const nav = useNavigation();
 
-  const onSubmit: SubmitHandler<TRegisterForm> = (_, e) => {
-    e?.target.submit();
+  const onSubmit: SubmitHandler<TRegisterForm> = (data) => {
+    submit(data, { method: 'post' });
   };
 
   return (
@@ -87,6 +89,7 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
           placeholder="Username"
           error={!!formState.errors.username}
           className="self-center w-60"
+          disabled={nav.state === 'submitting'}
           {...register('username')}
         />
         <FormError error={formState.errors.username?.message} />
@@ -103,6 +106,7 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
           placeholder="Password"
           error={!!formState.errors.password}
           className="self-center w-60"
+          disabled={nav.state === 'submitting'}
           {...register('password')}
         />
         <FormError error={formState.errors.password?.message} />
@@ -112,11 +116,12 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
           placeholder="Confirm Password"
           error={!!formState.errors.confirmPassword}
           className="self-center w-60"
+          disabled={nav.state === 'submitting'}
           {...register('confirmPassword')}
         />
         <FormError error={formState.errors.confirmPassword?.message} />
 
-        <Button type="submit" className="self-center">
+        <Button type="submit" className="self-center" disabled={nav.state === 'submitting'}>
           Register
         </Button>
       </Form>

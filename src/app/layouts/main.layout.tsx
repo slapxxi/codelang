@@ -1,16 +1,14 @@
 import { Code, FileQuestionMark, Home, Menu, User, Users } from 'lucide-react';
-import { usePointerPosition } from '~/hooks';
 import { Avatar, LayoutContainer, Logo, Navbar } from '~/ui';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '~/ui/base';
 import { useState } from 'react';
 import { href, Link, Outlet, ScrollRestoration } from 'react-router';
 
 const MainLayout = () => {
-  const ref = usePointerPosition<HTMLDivElement>({ disabled: true });
   const [open, setOpen] = useState(false);
 
   return (
-    <LayoutContainer ref={ref}>
+    <LayoutContainer disableMotion>
       <header className="pl-4 bg-zinc-900 text-white flex items-center justify-between md:hidden">
         <Logo light />
 
@@ -44,7 +42,9 @@ const MainLayout = () => {
 
       <div className="overflow-y-auto h-screen md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:none] relative">
         <Navbar className="hidden self-start sticky top-0 md:flex">
-          <Avatar className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
+          <Link to={href('/register')}>
+            <Avatar className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
+          </Link>
         </Navbar>
 
         <Outlet />

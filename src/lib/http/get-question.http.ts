@@ -1,6 +1,6 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { QuestionSchema, QuestionSchemaWithCodeHighlighted, UserSchema } from './schema';
+import { QuestionSchema, QuestionSchemaWithCodeHighlighted } from './schema';
 import type { Question } from '~/types';
 
 const GetQuestionResponse = QuestionSchema;

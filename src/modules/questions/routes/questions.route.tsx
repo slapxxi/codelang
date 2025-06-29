@@ -6,24 +6,28 @@ import { PageTitle, Pagination } from '~/ui';
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
-  const { questions, totalItems, totalPages } = await getQuestions({ page });
-  return { questions, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
+  const { questions, totalItems, totalPages, error } = await getQuestions({ page });
+  return { questions, totalItems, totalPages, currentPage: page ? parseInt(page) : 1, error };
 }
 
-const QuestionsRoute = ({ loaderData }: Route.DataArgs) => {
-  const { questions, totalPages, currentPage } = loaderData;
+const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
+  const { error, questions, totalPages, currentPage } = loaderData;
+
+  if (error !== null) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col">
       <PageTitle>Questions</PageTitle>
       <ul>
-        {questions.map((q) => (
+        {questions!.map((q) => (
           <li key={q.id}>
             <Link to={href('/questions/:questionId', { questionId: q.id })}>{q.title}</Link>
           </li>
         ))}
       </ul>
-      <Pagination numberOfPages={totalPages} currentPage={currentPage} maxDisplayed={10} />
+      <Pagination numberOfPages={totalPages!} currentPage={currentPage} maxDisplayed={10} />
     </div>
   );
 };

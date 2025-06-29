@@ -4,7 +4,7 @@ import { SnippetSchema, UserSchema, SnippetSchemaWithLikes, LinksSchema } from '
 import { appendParams } from '~/utils';
 import type { Snippet } from '~/types';
 
-const GetSnippetsResponse = z.object({
+const RegisterUserResponse = z.object({
   data: z.array(SnippetSchema),
   meta: z.object({
     itemsPerPage: z.number(),
@@ -22,6 +22,8 @@ const GetSnippetsResponse = z.object({
 });
 
 type Params = {
+  username: string;
+  password: string;
   /**
    * ID of the snippet owner
    */
@@ -56,28 +58,27 @@ type Result =
       snippets: Snippet[];
       totalItems: number;
       totalPages: number;
-      error: null;
+      error?: z.ZodError[];
     }
   | {
       snippets: null;
       totalItems: null;
       totalPages: null;
-      error: ReturnType<typeof GetSnippetsResponse.safeParse>['error'];
+      error?: ReturnType<typeof RegisterUserResponse.safeParse>['error'];
     };
 
-export async function getSnippets(params?: Params): Promise<Result> {
+export async function registerUser(params?: Params): Promise<Result> {
   const url = new URL(`${API_URL}/snippets`);
   appendParams(url, params);
   const response = await fetch(url);
   const json = await response.json();
-  const { success, data, error } = GetSnippetsResponse.safeParse(json.data);
+  const { success, data, error } = RegisterUserResponse.safeParse(json.data);
 
   if (success) {
     return {
       snippets: SnippetSchemaWithLikes.array().parse(data.data),
       totalItems: data.meta.totalItems,
       totalPages: data.meta.totalPages,
-      error: null,
     };
   }
 

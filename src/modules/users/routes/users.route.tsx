@@ -1,4 +1,4 @@
-import type { Route } from './+types/users.route.tsx';
+import type { Route } from './+types/users.route';
 import { href, Link } from 'react-router';
 import { getUsers } from '~/lib/http';
 import { PageTitle, Pagination } from '~/ui';
@@ -6,11 +6,11 @@ import { PageTitle, Pagination } from '~/ui';
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
-  const { users, totalItems, totalPages } = await getUsers({ page });
+  const { users, totalItems, totalPages, error } = await getUsers({ page });
   return { users, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
 }
 
-const UserRoute = ({ loaderData }: Route.DataArgs) => {
+const UserRoute = ({ loaderData }: Route.ComponentProps) => {
   const { users, totalPages, currentPage } = loaderData;
 
   return (

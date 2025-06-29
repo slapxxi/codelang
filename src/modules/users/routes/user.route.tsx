@@ -1,14 +1,18 @@
 import { Avatar } from '~/ui';
-import type { Route } from './+types/user.route.tsx';
+import type { Route } from './+types/user.route';
 import { getUser } from '~/lib/http';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const { user, error } = await getUser({ id: params.userId });
-  return { user };
+  return { user, error };
 }
 
-const UserRoute = ({ loaderData }: Route.DataArgs) => {
-  const { user } = loaderData;
+const UserRoute = ({ loaderData }: Route.ComponentProps) => {
+  const { user, error } = loaderData;
+
+  if (error) {
+    return null;
+  }
 
   return (
     <div>

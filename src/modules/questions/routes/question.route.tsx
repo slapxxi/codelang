@@ -4,11 +4,15 @@ import { getQuestion } from '~/lib/http';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const { question, error } = await getQuestion({ id: params.questionId });
-  return { question };
+  return { question, error };
 }
 
-const QuestionRoute = ({ loaderData }: Route.DataArgs) => {
+const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
   const { question } = loaderData;
+
+  if (!question) {
+    return null;
+  }
 
   return (
     <div>

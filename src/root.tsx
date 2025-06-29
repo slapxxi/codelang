@@ -4,7 +4,7 @@ import type { Route } from './+types/root';
 import '~/app/styles/app.css';
 import '~/lib/shiki';
 
-import { QueryProvider } from './providers';
+import { QueryProvider } from './app/providers';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

@@ -1,4 +1,4 @@
-import type { Route } from './+types/home.route.tsx';
+import type { Route } from './+types/home.route';
 import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
@@ -10,12 +10,12 @@ export function meta({}: Route.MetaArgs) {
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
-  const { snippets, totalPages } = await getSnippets({ page });
-  return { snippets, totalPages, currentPage: page ? parseInt(page) : 1 };
+  const { snippets, totalPages, error } = await getSnippets({ page });
+  return { snippets, totalPages, currentPage: page ? parseInt(page) : 1, error };
 }
 
-const HomeRoute = ({ loaderData }: Route.DataArgs) => {
-  const { snippets, totalPages, currentPage } = loaderData;
+const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
+  const { snippets, totalPages, currentPage, error } = loaderData;
 
   return (
     <div>

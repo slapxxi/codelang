@@ -5,3 +5,4 @@ export { SnippetCard } from './snippet-card.ui';
 export { Avatar } from './avatar.ui';
 export { Pagination } from './pagination.ui';
 export { PageTitle } from './page-title.ui';
+export { Input } from './input.ui';

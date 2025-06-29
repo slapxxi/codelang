@@ -52,13 +52,13 @@ type Result =
       users: User[];
       totalItems: number;
       totalPages: number;
-      error?: z.ZodError[];
+      error: null;
     }
   | {
       users: null;
       totalItems: null;
       totalPages: null;
-      error?: ReturnType<typeof GetUsersResponse.safeParse>['error'];
+      error: ReturnType<typeof GetUsersResponse.safeParse>['error'];
     };
 
 export async function getUsers(params?: Params): Promise<Result> {
@@ -69,7 +69,7 @@ export async function getUsers(params?: Params): Promise<Result> {
   const { success, data, error } = GetUsersResponse.safeParse(json.data);
 
   if (success) {
-    return { users: data.data, totalItems: data.meta.totalItems, totalPages: data.meta.totalPages };
+    return { users: data.data, totalItems: data.meta.totalItems, totalPages: data.meta.totalPages, error: null };
   }
 
   return { error, users: null, totalItems: null, totalPages: null };

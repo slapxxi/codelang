@@ -4,4 +4,5 @@ export { getUsers } from './get-users.http';
 export { getUser } from './get-user.http';
 export { getQuestions } from './get-questions.http';
 export { getQuestion } from './get-question.http';
+export { registerUser } from './register-user.http';
 export * from './schema';

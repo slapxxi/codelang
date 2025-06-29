@@ -1,16 +1,23 @@
-import { forwardRef } from 'react';
+import { usePointerPosition } from '~/hooks';
+import { cn } from '~/utils';
 
 type LayoutContainerProps = {
+  className?: string;
   children?: React.ReactNode;
+  disableMotion?: boolean;
 };
 
-export const LayoutContainer = forwardRef<HTMLDivElement, LayoutContainerProps>((props, ref) => {
-  const { children } = props;
+export const LayoutContainer: React.FC<LayoutContainerProps> = (props) => {
+  const { children, className, disableMotion = false } = props;
+  const ref = usePointerPosition<HTMLDivElement>({ disabled: disableMotion });
 
   return (
     <div
-      className="relative min-h-screen bg-[url('/circle.svg')] bg-position-[var(--x)_var(--y)] overflow-hidden"
       ref={ref}
+      className={cn(
+        "relative min-h-screen bg-[url('/circle.svg')] bg-position-[var(--x)_var(--y)] overflow-hidden",
+        className
+      )}
     >
       {children}
 
@@ -36,4 +43,4 @@ export const LayoutContainer = forwardRef<HTMLDivElement, LayoutContainerProps>(
       />
     </div>
   );
-});
+};

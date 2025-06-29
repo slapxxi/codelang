@@ -3,7 +3,9 @@ import { API_URL } from './const';
 import { EndpointFailureSchema, UserSchema } from './schema';
 import type { User } from '~/types';
 
-const RegisterUserResponse = UserSchema;
+const LoginUserResponse = UserSchema;
+
+// const existingUser = { username: 'gigauser', password: 'Password12345$' };
 
 type Params = {
   username: string;
@@ -13,6 +15,7 @@ type Params = {
 type Result =
   | {
       user: User;
+      token: string;
       error: null;
     }
   | {
@@ -26,23 +29,29 @@ type Result =
       errors: z.infer<typeof EndpointFailureSchema>['errors'];
     };
 
-export async function registerUser(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/register`);
+export async function loginUser(params: Params): Promise<Result> {
+  const url = new URL(`${API_URL}/auth/login`);
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    // todo: remove
     body: JSON.stringify(params),
   });
   const json = await response.json();
-  const responseResult = RegisterUserResponse.safeParse(json.data);
 
-  if (responseResult.success) {
-    return {
-      user: responseResult.data,
-      error: null,
-    };
+  if (response.ok) {
+    const responseResult = LoginUserResponse.safeParse(json.data);
+    const cookie = response.headers.get('set-cookie');
+
+    if (responseResult.success && cookie) {
+      const cookie = response.headers.get('set-cookie');
+      const token = cookie.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
+      return { user: responseResult.data, error: null, token: token! };
+    } else {
+      throw new Error('Unexpected server output', responseResult.error);
+    }
   }
 
   const failureResult = EndpointFailureSchema.safeParse(json);

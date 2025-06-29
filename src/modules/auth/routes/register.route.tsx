@@ -1,5 +1,5 @@
 import type { Route } from './+types/register.route';
-import { Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
+import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
 import { registerUser } from '~/lib/http';
 import { LayoutContainer, Input, Logo, FormError } from '~/ui';
@@ -7,6 +7,7 @@ import { Button } from '~/ui/base';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
+import { commitSession, getSession } from '~/app/session.server';
 
 const RegisterUserSchema = z.object({
   username: z.string('Username is required').min(5),
@@ -28,14 +29,14 @@ const RegisterFormSchema = RegisterUserSchema.extend({
 
 type TRegisterForm = z.infer<typeof RegisterFormSchema>;
 
-export async function loader() {
-  let user;
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
 
-  if (user) {
+  if (session.has('token')) {
     return redirect('/');
   }
 
-  return {};
+  return data({ error: session.get('error') }, { headers: { 'Set-Cookie': await commitSession(session) } });
 }
 
 export async function action({ request }: Route.ActionArgs) {

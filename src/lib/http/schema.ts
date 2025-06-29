@@ -57,3 +57,18 @@ export const MetaSchema = z.object({
 });
 
 export const LinksSchema = z.object({ current: z.string() });
+
+export const EndpointFailureSchema = z.object({
+  statusCode: z.number(),
+  endpoint: z.string(),
+  message: z.string(),
+  errors: z
+    .array(
+      z.object({
+        field: z.string(),
+        receivedValue: z.string().optional(),
+        failures: z.array(z.string()),
+      })
+    )
+    .optional(),
+});

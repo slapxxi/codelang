@@ -1,8 +1,10 @@
-export { getSnippets } from './get-snippets.http';
-export { getSnippet } from './get-snippet.http';
-export { getUsers } from './get-users.http';
-export { getUser } from './get-user.http';
-export { getQuestions } from './get-questions.http';
-export { getQuestion } from './get-question.http';
-export { registerUser } from './register-user.http';
+export * from './get-snippets.http';
+export * from './get-snippet.http';
+export * from './get-users.http';
+export * from './get-user.http';
+export * from './get-questions.http';
+export * from './get-question.http';
+export * from './register-user.http';
+export * from './login-user.http';
+export * from './get-session.http';
 export * from './schema';

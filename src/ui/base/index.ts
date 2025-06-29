@@ -4,3 +4,4 @@ export * from './pagination.ui.base';
 export * from './input.ui.base';
 export * from './tooltip.ui.base';
 export * from './error-tooltip.ui.base';
+export * from './sonner.ui.base';

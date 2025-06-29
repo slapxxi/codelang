@@ -14,19 +14,19 @@
   --animate-slide-in: slide-in 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-shimmer: shimmer 1.2s ease-out infinite both;
 
-  --color-olive-50: hsl(140 17% 97%);
-  /* HSL 140° 17 93 */
-  --color-olive-100: hsl(140 17% 93%);
-  --color-olive-200: hsl(140 17% 87%);
-  --color-olive-300: hsl(140 17% 81%);
-  --color-olive-400: hsl(140 17% 75%);
-  /* HSL 140° 2 49 */
-  --color-olive-500: hsl(140 2% 49%);
-  --color-olive-600: hsl(140 2% 43%);
-  --color-olive-700: hsl(140 2% 37%);
-  --color-olive-800: hsl(140 2% 31%);
-  --color-olive-900: hsl(140 2% 25%);
-  --color-olive-950: hsl(140 2% 19%);
+  --color-olive-50: hsl(132 17% 97%);
+  /* HSL 132° 17 92 */
+  --color-olive-100: hsl(132 17% 92%);
+  --color-olive-200: hsl(132 17% 87%);
+  --color-olive-300: hsl(132 17% 81%);
+  --color-olive-400: hsl(132 17% 75%);
+  /* HSL 132° 2 49 */
+  --color-olive-500: hsl(132 2% 49%);
+  --color-olive-600: hsl(132 2% 43%);
+  --color-olive-700: hsl(132 2% 37%);
+  --color-olive-800: hsl(132 2% 31%);
+  --color-olive-900: hsl(132 2% 25%);
+  --color-olive-950: hsl(132 2% 19%);
 
   @keyframes slide-in {
     from {

@@ -2,28 +2,11 @@ import { Input as BaseInput, ErrorTooltip, ErrorTooltipContent, ErrorTooltipTrig
 import { cn } from '~/utils';
 
 type InputProps = {
-  errors?: string[];
+  error?: boolean;
 } & React.ComponentProps<typeof BaseInput>;
 
 export const Input: React.FC<InputProps> = (props) => {
-  const { errors, className, ...rest } = props;
+  const { error = false, className, ...rest } = props;
 
-  if (errors && errors.length > 0) {
-    return (
-      <ErrorTooltip>
-        <ErrorTooltipTrigger asChild>
-          <BaseInput className={cn(className, 'border-destructive')} {...rest} />
-        </ErrorTooltipTrigger>
-        <ErrorTooltipContent side="bottom">
-          <ul className="flex flex-col list-disc pl-3">
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
-        </ErrorTooltipContent>
-      </ErrorTooltip>
-    );
-  }
-
-  return <BaseInput {...rest} />;
+  return <BaseInput className={cn(className, error && 'border-destructive')} {...rest} />;
 };

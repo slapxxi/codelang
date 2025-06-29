@@ -3,6 +3,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import type { Route } from './+types/root';
 import '~/app/styles/app.css';
 import '~/lib/shiki';
+import { Toaster } from '~/ui';
 
 import { QueryProvider } from './app/providers';
 
@@ -30,6 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
         <script>

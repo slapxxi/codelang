@@ -6,3 +6,5 @@ export { Avatar } from './avatar.ui';
 export { Pagination } from './pagination.ui';
 export { PageTitle } from './page-title.ui';
 export { Input } from './input.ui';
+export { FormError } from './form-error.ui';
+export * from './toaster.ui';

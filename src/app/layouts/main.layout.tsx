@@ -2,7 +2,7 @@ import { Code, FileQuestionMark, Home, Menu, User, Users } from 'lucide-react';
 import { Avatar, LayoutContainer, Logo, Navbar } from '~/ui';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '~/ui/base';
 import { useState } from 'react';
-import { href, Link, Outlet, ScrollRestoration } from 'react-router';
+import { href, Link, Outlet } from 'react-router';
 
 const MainLayout = () => {
   const [open, setOpen] = useState(false);
@@ -48,11 +48,12 @@ const MainLayout = () => {
         </Navbar>
 
         <Outlet />
-        <aside className="hidden self-start lg:flex flex-col p-2  bg-olive-500/80 min-w-2/12 ml-auto sticky top-0 backdrop-blur-[1px] rounded-lg shadow border border-olive-500/30">
-          <h2 className="font-mono font-semibold text-olive-950 text-center">Sidebar</h2>
+
+        <aside className="hidden lg:flex flex-col flex-1 max-w-72 px-4 p-2 bg-olive-100 min-w-2/12 ml-auto sticky top-0 backdrop-blur-[1px] rounded-xl shadow border border-olive-500/30">
+          <h2 className="font-mono font-semibold text-olive-600 text-shadow-xs text-shadow-olive-50">Sidebar</h2>
         </aside>
+
         <Logo className="fixed bottom-0 right-0 hidden md:flex" />
-        <ScrollRestoration />
       </div>
     </LayoutContainer>
   );

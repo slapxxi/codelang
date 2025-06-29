@@ -1,20 +1,32 @@
 import type { Route } from './+types/register.route';
-import { Form, href, redirect } from 'react-router';
+import { Form, href, Link, redirect } from 'react-router';
 import * as z from 'zod/v4';
 import { registerUser } from '~/lib/http';
-import { LayoutContainer, Input, Logo } from '~/ui';
+import { LayoutContainer, Input, Logo, FormError } from '~/ui';
 import { Button } from '~/ui/base';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 
-const RegisterFormSchema = z
-  .object({
-    username: z.string('Username is required').min(1, 'Username must be at least 1 character long'),
-    password: z.string('Password is required').min(1, 'Password must be at least 1 character long'),
-    confirmPassword: z.string().min(1, 'Password must be at least 1 character long'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords must match',
-    path: ['confirmPassword'],
-  });
+const RegisterUserSchema = z.object({
+  username: z.string('Username is required').min(5),
+  password: z
+    .string('Password is required')
+    .nonempty()
+    .refine((v) => /\d/.test(v), 'Password must contain at least one digit')
+    .refine((v) => /\p{Ll}/u.test(v), 'Password must contain at least one lowercase letter')
+    .refine((v) => /\p{Lu}/u.test(v), 'Password must contain at least one uppercase letter')
+    .refine((v) => /[^a-zA-Z0-9]/.test(v), 'Password must contain at least one symbol'),
+});
+
+const RegisterFormSchema = RegisterUserSchema.extend({
+  confirmPassword: z.string().nonempty('Confirm password is required'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords must match',
+  path: ['confirmPassword'],
+});
+
+type TRegisterForm = z.infer<typeof RegisterFormSchema>;
 
 export async function loader() {
   let user;
@@ -30,19 +42,33 @@ export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
   const username = form.get('username');
   const password = form.get('password');
-  const confirmPassword = form.get('confirm-password');
-  const { success, data, error } = RegisterFormSchema.safeParse({ username, password, confirmPassword });
+  const { success, data, error } = RegisterUserSchema.safeParse({ username, password });
 
   if (success) {
-    await registerUser({ username: data.username, password: data.password });
-    return redirect(href('/login'));
+    const result = await registerUser({ username: data.username, password: data.password });
+
+    if (result.error === 'server') {
+      return { errors: result.errors, message: result.message };
+    }
+
+    if (result.error === 'unknown') {
+      return { errors: [{ message: 'Something went wrong' }], message: 'Something went wrong!' };
+    }
+
+    return redirect('/login');
   }
 
-  return { errors: z.flattenError(error).fieldErrors };
+  return { message: error.message };
 }
 
 const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
-  const { errors = {} } = actionData || {};
+  const { message } = actionData ?? {};
+  const { register, handleSubmit, formState } = useForm<TRegisterForm>({ resolver: zodResolver(RegisterFormSchema) });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const onSubmit: SubmitHandler<TRegisterForm> = (_, e) => {
+    e?.target.submit();
+  };
 
   return (
     <LayoutContainer className="flex flex-col justify-center gap-4">
@@ -50,14 +76,58 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
         <Logo size="lg" className="-translate-x-2" />
       </header>
 
-      <Form action={href('/register')} method="POST" className="flex flex-col gap-4 max-w-prose mx-auto">
-        <Input type="text" placeholder="Username" name="username" errors={errors.username} />
-        <Input type="password" placeholder="Password" name="password" errors={errors.password} />
-        <Input type="password" placeholder="Confirm Password" name="confirm-password" errors={errors.confirmPassword} />
+      <Form
+        action={href('/register')}
+        method="POST"
+        className="flex flex-col gap-2 max-w-prose mx-auto"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <Input
+          type="text"
+          placeholder="Username"
+          error={!!formState.errors.username}
+          className="self-center w-60"
+          {...register('username')}
+        />
+        <FormError error={formState.errors.username?.message} />
+
+        <button
+          className="text-sm text-zinc-500 hover:text-zinc-800 text-right w-60 self-center"
+          type="button"
+          onClick={() => setShowPassword((sp) => !sp)}
+        >
+          {showPassword ? 'Hide' : 'Show'} Password
+        </button>
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Password"
+          error={!!formState.errors.password}
+          className="self-center w-60"
+          {...register('password')}
+        />
+        <FormError error={formState.errors.password?.message} />
+
+        <Input
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Confirm Password"
+          error={!!formState.errors.confirmPassword}
+          className="self-center w-60"
+          {...register('confirmPassword')}
+        />
+        <FormError error={formState.errors.confirmPassword?.message} />
+
         <Button type="submit" className="self-center">
           Register
         </Button>
       </Form>
+
+      {message && <div className="text-destructive text-sm text-center">{message}</div>}
+
+      <div className="flex-1 max-h-4" />
+
+      <Link to={href('/login')} className="self-center text-sm text-zinc-500 hover:text-zinc-800">
+        Already registered? Login
+      </Link>
     </LayoutContainer>
   );
 };

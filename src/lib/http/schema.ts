@@ -33,12 +33,12 @@ export const SnippetSchemaWithCodeHighlighted = SnippetSchema.transform(async (s
 });
 
 function matchLang(lang: string) {
-  switch (lang.toLowerCase()) {
-    case 'javascript':
-      return 'javascript';
-    default:
-      return 'text';
-  }
+  const l = lang.toLowerCase();
+  const map = {
+    [l]: l,
+    'c/c++': 'cpp',
+  };
+  return ['javascript', 'typescript', 'css', 'go', 'c/c++'].includes(l) ? map[l] : 'text';
 }
 
 export const QuestionSchema = z.object({

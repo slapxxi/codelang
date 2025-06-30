@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useMemo } from 'react';
 import type { TUser } from '~/types';
 
 type AuthProviderProps = {
@@ -10,5 +10,7 @@ export const AuthContext = createContext<TUser | null>(null);
 
 export const AuthProvider: React.FC<AuthProviderProps> = (props) => {
   const { user, children } = props;
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  const userMemo = useMemo(() => user, [user?.id]);
+
+  return <AuthContext.Provider value={userMemo}>{children}</AuthContext.Provider>;
 };

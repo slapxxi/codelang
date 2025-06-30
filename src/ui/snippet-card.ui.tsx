@@ -79,7 +79,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
             </Link>
           )}
 
-          <Link to={href(`/users/:userId`, { userId: snippet.user.username })} className="link flex items-center gap-2">
+          <Link to={href(`/users/:userId`, { userId: snippet.user.id })} className="link flex items-center gap-2">
             <User size={16} />
             {snippet.user.username}
           </Link>

@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import type { CommentSchema, MarkSchema, QuestionSchema, SnippetSchema, UserSchema } from '~/lib/http';
 
-export type User = z.infer<typeof UserSchema>;
+export type TUser = z.infer<typeof UserSchema>;
 
 export type UserRole = 'admin' | 'user';
 

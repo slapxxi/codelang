@@ -3,6 +3,7 @@ export * from './get-snippet.http';
 export * from './mark-snippet.http';
 export * from './get-users.http';
 export * from './get-user.http';
+export * from './get-current-user.http';
 export * from './get-questions.http';
 export * from './get-question.http';
 export * from './register-user.http';

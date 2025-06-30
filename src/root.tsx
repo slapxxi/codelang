@@ -5,7 +5,9 @@ import '~/app/styles/app.css';
 import '~/lib/shiki';
 import { Toaster } from '~/ui';
 
-import { QueryProvider } from './app/providers';
+import { AuthProvider, QueryProvider } from './app/providers';
+import { getSession } from './app/session.server';
+import { getCurrentUser } from './lib/http';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -19,6 +21,22 @@ export const links: Route.LinksFunction = () => [
     href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
   },
 ];
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const token = session.get('token');
+
+  if (token) {
+    const { data, error } = await getCurrentUser({ token });
+    if (data) {
+      return { user: data };
+    }
+
+    return { error, user: null };
+  }
+
+  return { user: null };
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -42,10 +60,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData;
+
   return (
     <QueryProvider>
-      <Outlet />
+      <AuthProvider user={user}>
+        <Outlet />
+      </AuthProvider>
     </QueryProvider>
   );
 }

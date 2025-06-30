@@ -1,2 +1,3 @@
-export { usePointerPosition } from './use-pointer-position.hook';
-export { useNavbar } from './use-navbar.hook';
+export * from './use-pointer-position.hook';
+export * from './use-navbar.hook';
+export * from './use-auth.hook';

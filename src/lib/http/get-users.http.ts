@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { LinksSchema, UserSchema } from './schema';
 import { appendParams } from '~/utils';
-import type { User } from '~/types';
+import type { TUser } from '~/types';
 
 const GetUsersResponse = z.object({
   data: z.array(UserSchema),
@@ -50,7 +50,7 @@ type Params = {
 type Result =
   | {
       data: {
-        users: User[];
+        users: TUser[];
         totalItems: number;
         totalPages: number;
       };

@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { EndpointFailureSchema, UserSchema } from './schema';
-import type { User } from '~/types';
+import type { TUser } from '~/types';
 
 const RegisterUserResponse = UserSchema;
 
@@ -12,7 +12,7 @@ type Params = {
 
 type Result =
   | {
-      user: User;
+      user: TUser;
       error: null;
     }
   | {

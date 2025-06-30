@@ -1,6 +1,6 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { SnippetSchema, SnippetSchemaWithLikes } from './schema';
+import { SnippetSchema, SnippetSchemaWithCodeHighlighted, SnippetSchemaWithLikes } from './schema';
 import type { Snippet } from '~/types';
 
 const GetSnippetResponse = SnippetSchema;
@@ -30,8 +30,9 @@ export async function getSnippet(params: Params): Promise<Result> {
   const { success, data, error } = GetSnippetResponse.safeParse(json.data);
 
   if (success) {
+    const withCode = await SnippetSchemaWithCodeHighlighted.parseAsync(data);
     return {
-      snippet: SnippetSchemaWithLikes.parse(data),
+      snippet: SnippetSchemaWithLikes.parse(withCode),
       error: null,
     };
   }

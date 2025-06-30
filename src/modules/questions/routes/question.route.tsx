@@ -1,5 +1,5 @@
-import { PageTitle } from '~/ui';
 import type { Route } from './+types/question.route';
+import { Code, PageTitle } from '~/ui';
 import { getQuestion } from '~/lib/http';
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -17,10 +17,8 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
   return (
     <div>
       <PageTitle>Question: {question.title}</PageTitle>
-
       <p>{question.description}</p>
-
-      <pre dangerouslySetInnerHTML={{ __html: question.attachedCode }} className="*:p-2 *:rounded *:shadow" />
+      <Code code={question.attachedCode} />
     </div>
   );
 };

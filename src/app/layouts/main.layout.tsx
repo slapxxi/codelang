@@ -53,7 +53,7 @@ const MainLayout = () => {
           <h2 className="font-mono font-semibold text-olive-600 text-shadow-xs text-shadow-olive-50">Sidebar</h2>
         </aside>
 
-        <Logo className="fixed bottom-0 right-0 hidden md:flex" />
+        <Logo className="fixed bottom-0 right-0 hidden md:flex p-2" size="sm" />
       </div>
     </LayoutContainer>
   );

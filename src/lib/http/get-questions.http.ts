@@ -59,16 +59,16 @@ type Params = {
 
 type Result =
   | {
-      questions: Question[];
-      totalItems: number;
-      totalPages: number;
+      data: {
+        questions: Question[];
+        totalItems: number;
+        totalPages: number;
+      };
       error: null;
     }
   | {
-      questions: null;
-      totalItems: null;
-      totalPages: null;
-      error: ReturnType<typeof GetQuestionsResponse.safeParse>['error'];
+      data: null;
+      error: { message: string; e: unknown };
     };
 
 export async function getQuestions(params?: Params): Promise<Result> {
@@ -81,12 +81,14 @@ export async function getQuestions(params?: Params): Promise<Result> {
   if (success) {
     const questions = await QuestionSchemaWithCodeHighlighted.array().parseAsync(data.data);
     return {
-      questions,
-      totalItems: data.meta.totalItems,
-      totalPages: data.meta.totalPages,
+      data: {
+        questions,
+        totalItems: data.meta.totalItems,
+        totalPages: data.meta.totalPages,
+      },
       error: null,
     };
   }
 
-  return { error, questions: null, totalItems: null, totalPages: null };
+  return { error: { message: 'Error parsing server response', e: error }, data: null };
 }

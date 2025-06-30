@@ -6,12 +6,22 @@ import { PageTitle, Pagination } from '~/ui';
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
-  const { users, totalItems, totalPages, error } = await getUsers({ page });
-  return { users, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
+  const { data, error } = await getUsers({ page });
+
+  if (data) {
+    const { users, totalItems, totalPages } = data;
+    return { users, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
+  }
+
+  return { error };
 }
 
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { users, totalPages, currentPage } = loaderData;
+  const { users, totalPages, currentPage, error } = loaderData;
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return (
     <div className="flex flex-col">

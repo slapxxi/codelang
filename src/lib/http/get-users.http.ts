@@ -49,16 +49,16 @@ type Params = {
 
 type Result =
   | {
-      users: User[];
-      totalItems: number;
-      totalPages: number;
+      data: {
+        users: User[];
+        totalItems: number;
+        totalPages: number;
+      };
       error: null;
     }
   | {
-      users: null;
-      totalItems: null;
-      totalPages: null;
-      error: ReturnType<typeof GetUsersResponse.safeParse>['error'];
+      data: null;
+      error: { message: string; e: unknown };
     };
 
 export async function getUsers(params?: Params): Promise<Result> {
@@ -69,8 +69,10 @@ export async function getUsers(params?: Params): Promise<Result> {
   const { success, data, error } = GetUsersResponse.safeParse(json.data);
 
   if (success) {
-    return { users: data.data, totalItems: data.meta.totalItems, totalPages: data.meta.totalPages, error: null };
+    const users = data.data;
+    const { totalItems, totalPages } = data.meta;
+    return { data: { users, totalItems, totalPages }, error: null };
   }
 
-  return { error, users: null, totalItems: null, totalPages: null };
+  return { error: { message: 'Error parsing server response', e: error }, data: null };
 }

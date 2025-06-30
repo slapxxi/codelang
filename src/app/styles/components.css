@@ -24,4 +24,28 @@
       background: radial-gradient(circle, hsla(0, 0%, 100%, 0.25) 10%, transparent 70%);
     }
   }
+
+  .link {
+    @apply text-zinc-500 cursor-pointer;
+
+    @variant hover {
+      @apply text-zinc-800;
+    }
+
+    @variant active {
+      @apply text-zinc-400;
+    }
+  }
+
+  .interactive {
+    @apply text-zinc-500;
+
+    @variant hover {
+      @apply text-zinc-800;
+    }
+
+    @variant active {
+      @apply text-zinc-400;
+    }
+  }
 }

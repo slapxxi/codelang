@@ -28,9 +28,18 @@ export const SnippetSchemaWithLikes = SnippetSchema.transform((snippet) => {
 
 export const SnippetSchemaWithCodeHighlighted = SnippetSchema.transform(async (snippet) => {
   const hl = await highlighter;
-  const code = hl.codeToHtml(snippet.code, { lang: snippet.language, theme: 'vitesse-light' });
+  const code = hl.codeToHtml(snippet.code, { lang: matchLang(snippet.language), theme: 'vitesse-dark' });
   return { ...snippet, code };
 });
+
+function matchLang(lang: string) {
+  switch (lang.toLowerCase()) {
+    case 'javascript':
+      return 'javascript';
+    default:
+      return 'text';
+  }
+}
 
 export const QuestionSchema = z.object({
   id: z.string(),
@@ -44,7 +53,7 @@ export const QuestionSchema = z.object({
 
 export const QuestionSchemaWithCodeHighlighted = QuestionSchema.transform(async (question) => {
   const hl = await highlighter;
-  const attachedCode = hl.codeToHtml(question.attachedCode, { lang: 'css', theme: 'vitesse-light' });
+  const attachedCode = hl.codeToHtml(question.attachedCode, { lang: 'css', theme: 'vitesse-dark' });
   return { ...question, attachedCode };
 });
 

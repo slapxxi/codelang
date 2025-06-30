@@ -11,10 +11,9 @@ export default [
     route('/users', './modules/users/routes/users.route.tsx'),
     route('/users/:userId', './modules/users/routes/user.route.tsx'),
 
-    route('/snippets', './modules/snippets/routes/snippets.route.tsx', [
-      route(':snippetId/edit', './modules/snippets/routes/snippet-edit.route.tsx'),
-    ]),
+    route('/snippets', './modules/snippets/routes/snippets.route.tsx'),
     route('/snippets/:snippetId', './modules/snippets/routes/snippet.route.tsx'),
+    route('/snippets/:snippetId/edit', './modules/snippets/routes/snippet-edit.route.tsx'),
 
     route('/questions', './modules/questions/routes/questions.route.tsx', [
       route('new', './modules/questions/routes/questions-new.route.tsx'),

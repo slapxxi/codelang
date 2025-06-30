@@ -1,6 +1,12 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { SnippetSchema, UserSchema, SnippetSchemaWithLikes, LinksSchema } from './schema';
+import {
+  SnippetSchema,
+  UserSchema,
+  SnippetSchemaWithLikes,
+  LinksSchema,
+  SnippetSchemaWithCodeHighlighted,
+} from './schema';
 import { appendParams } from '~/utils';
 import type { Snippet } from '~/types';
 
@@ -53,16 +59,16 @@ type Params = {
 
 type Result =
   | {
-      snippets: Snippet[];
-      totalItems: number;
-      totalPages: number;
+      data: {
+        snippets: Snippet[];
+        totalItems: number;
+        totalPages: number;
+      };
       error: null;
     }
   | {
-      snippets: null;
-      totalItems: null;
-      totalPages: null;
-      error: ReturnType<typeof GetSnippetsResponse.safeParse>['error'];
+      data: null;
+      error: { message: string };
     };
 
 export async function getSnippets(params?: Params): Promise<Result> {
@@ -73,13 +79,16 @@ export async function getSnippets(params?: Params): Promise<Result> {
   const { success, data, error } = GetSnippetsResponse.safeParse(json.data);
 
   if (success) {
+    const withCode = await SnippetSchemaWithCodeHighlighted.array().parseAsync(data.data);
     return {
-      snippets: SnippetSchemaWithLikes.array().parse(data.data),
-      totalItems: data.meta.totalItems,
-      totalPages: data.meta.totalPages,
+      data: {
+        snippets: SnippetSchemaWithLikes.array().parse(withCode),
+        totalItems: data.meta.totalItems,
+        totalPages: data.meta.totalPages,
+      },
       error: null,
     };
   }
 
-  return { error, snippets: null, totalItems: null, totalPages: null };
+  return { error, data: null };
 }

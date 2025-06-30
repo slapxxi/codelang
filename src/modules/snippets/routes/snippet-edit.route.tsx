@@ -1,5 +1,5 @@
-const SnippetEditRoute = () => {
-  return <h1>Edit Snippet</h1>;
-};
+import type { Route } from './+types/snippet-edit.route';
 
-export default SnippetEditRoute;
+export async function loader({ params }: Route.LoaderArgs) {
+  return { snippetId: params.snippetId };
+}

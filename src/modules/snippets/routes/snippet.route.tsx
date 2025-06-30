@@ -1,5 +1,4 @@
 import type { Route } from './+types/snippet.route';
-import { redirect } from 'react-router';
 import { getSnippet } from '~/lib/http';
 import { SnippetCard } from '~/ui';
 
@@ -8,17 +7,21 @@ export function meta() {
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const { snippet, error } = await getSnippet({ id: params.snippetId });
+  const { data, error } = await getSnippet({ id: params.snippetId });
 
-  if (error) {
-    return redirect('/');
+  if (data) {
+    return { snippet: data.snippet };
   }
 
-  return { snippet };
+  return { error };
 }
 
 const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { snippet } = loaderData;
+  const { snippet, error } = loaderData;
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return (
     <div className="w-full">

@@ -5,7 +5,7 @@ export const UserRoleSchema = z.enum(['user', 'admin']);
 
 export const UserSchema = z.object({ id: z.string(), username: z.string(), role: UserRoleSchema });
 
-export const MarkSchema = z.object({ id: z.string(), type: z.string(), user: UserSchema });
+export const MarkSchema = z.object({ id: z.string(), type: z.enum(['like', 'dislike']), user: UserSchema });
 
 export const CommentSchema = z.object({ id: z.string(), content: z.string() });
 

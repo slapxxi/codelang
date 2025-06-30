@@ -1,5 +1,5 @@
 import * as z from 'zod/v4';
-import type { CommentSchema, QuestionSchema, SnippetSchema, UserSchema } from '~/lib/http';
+import type { CommentSchema, MarkSchema, QuestionSchema, SnippetSchema, UserSchema } from '~/lib/http';
 
 export type User = z.infer<typeof UserSchema>;
 
@@ -12,3 +12,5 @@ export type Comment = z.infer<typeof CommentSchema>;
 export type Question = z.infer<typeof QuestionSchema>;
 
 export type TFormErrors<FormSchema> = { [K in keyof FormSchema]?: string[] };
+
+export type TMark = Omit<z.infer<typeof MarkSchema>, 'type'> & { type: 'like' | 'dislike' | 'none' };

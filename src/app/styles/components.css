@@ -47,5 +47,9 @@
     @variant active {
       @apply text-zinc-400;
     }
+
+    @variant disabled {
+      @apply text-zinc-400 cursor-not-allowed;
+    }
   }
 }

@@ -14,12 +14,12 @@ type Params = {
 
 type Result =
   | {
-      snippet: Snippet;
+      data: { snippet: Snippet };
       error: null;
     }
   | {
-      snippet: null;
-      error: ReturnType<typeof GetSnippetResponse.safeParse>['error'];
+      data: null;
+      error: { message: string; e: unknown };
     };
 
 export async function getSnippet(params: Params): Promise<Result> {
@@ -32,10 +32,12 @@ export async function getSnippet(params: Params): Promise<Result> {
   if (success) {
     const withCode = await SnippetSchemaWithCodeHighlighted.parseAsync(data);
     return {
-      snippet: SnippetSchemaWithLikes.parse(withCode),
+      data: {
+        snippet: SnippetSchemaWithLikes.parse(withCode),
+      },
       error: null,
     };
   }
 
-  return { error, snippet: null };
+  return { error: { message: 'Error parsing server response', e: error }, data: null };
 }

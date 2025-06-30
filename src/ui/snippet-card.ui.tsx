@@ -10,7 +10,8 @@ type SnippetCardProps = {
 
 export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
   const { snippet, expand = false } = props;
-  const fetcher = useFetcher();
+  const likeFetcher = useFetcher();
+  const dislikeFetcher = useFetcher();
 
   return (
     <article className="border border-olive-200 rounded-xl shadow backdrop-blur-[1px] bg-olive-200/30">
@@ -29,29 +30,29 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
 
       <footer className="flex text-sm text-olive-600 justify-between items-center p-2">
         <div className="flex items-center gap-3">
-          <fetcher.Form
-            action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
-            method="post"
-            className="interactive"
-          >
-            <input type="hidden" name="like" value="true" />
-            <button className="flex items-center gap-1">
+          <likeFetcher.Form action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })} method="post">
+            <button
+              className="interactive flex items-center gap-1"
+              name="mark"
+              value="like"
+              disabled={likeFetcher.state !== 'idle'}
+            >
               <ThumbsUp size={16} />
               <span>{snippet.likes}</span>
             </button>
-          </fetcher.Form>
+          </likeFetcher.Form>
 
-          <fetcher.Form
-            action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
-            method="post"
-            className="interactive"
-          >
-            <input type="hidden" name="dislike" value="true" />
-            <button className="flex items-center gap-1">
+          <dislikeFetcher.Form action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })} method="post">
+            <button
+              className="flex items-center gap-1 interactive"
+              name="mark"
+              value="dislike"
+              disabled={dislikeFetcher.state !== 'idle'}
+            >
               <ThumbsDown size={16} />
               <span>{snippet.dislikes}</span>
             </button>
-          </fetcher.Form>
+          </dislikeFetcher.Form>
         </div>
 
         <div className="flex gap-4 items-center">

@@ -28,6 +28,9 @@
   --color-olive-900: hsl(132 2% 25%);
   --color-olive-950: hsl(132 2% 19%);
 
+  --blur-xxs: 2px;
+  --blur-px: 1px;
+
   @keyframes slide-in {
     from {
       transform: translateX(-100%);

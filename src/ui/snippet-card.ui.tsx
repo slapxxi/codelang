@@ -8,10 +8,11 @@ import { cn } from '~/utils';
 type SnippetCardProps = {
   snippet: Snippet;
   expand?: boolean;
+  className?: string;
 };
 
 export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
-  const { snippet, expand = false } = props;
+  const { snippet, expand = false, className } = props;
   const likeFetcher = useFetcher();
   const dislikeFetcher = useFetcher();
   const user = useAuth();
@@ -22,7 +23,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
   }
 
   return (
-    <article className="border border-olive-200 rounded-xl shadow backdrop-blur-[1px] bg-olive-200/30">
+    <article className={cn('border border-olive-200 rounded-xl shadow backdrop-blur-[1px] bg-olive-200/30', className)}>
       <header className="flex justify-between items-center text-xs text-olive-600 p-2 pb-0">
         {expand && (
           <Link to={href('/snippets/:snippetId', { snippetId: snippet.id })} className="link">

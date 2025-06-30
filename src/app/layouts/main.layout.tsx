@@ -47,10 +47,6 @@ const MainLayout = () => {
 
         <Outlet />
 
-        <aside className="hidden lg:flex flex-col flex-1 max-w-72 px-4 p-2 bg-olive-100 min-w-2/12 ml-auto sticky top-0 backdrop-blur-[1px] rounded-xl shadow border border-olive-500/30">
-          <h2 className="font-mono font-semibold text-olive-600 text-shadow-xs text-shadow-olive-50">Sidebar</h2>
-        </aside>
-
         <Logo className="fixed bottom-0 right-0 hidden md:flex p-2" size="sm" />
       </div>
     </LayoutContainer>

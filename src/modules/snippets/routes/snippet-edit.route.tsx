@@ -5,7 +5,8 @@ import { getSession } from '~/app/session.server';
 import type { TMark } from '~/types';
 import { href, redirect } from 'react-router';
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
+  console.log(request);
   const { data, error } = await getSnippet({ id: params.snippetId });
 
   if (data) {

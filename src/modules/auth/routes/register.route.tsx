@@ -2,7 +2,7 @@ import type { Route } from './+types/register.route';
 import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
 import { registerUser } from '~/lib/http';
-import { LayoutContainer, Input, Logo, FormError } from '~/ui';
+import { Input, FormError } from '~/ui';
 import { Button } from '~/ui/base';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,14 +46,14 @@ export async function action({ request }: Route.ActionArgs) {
   const { success, data } = RegisterUserSchema.safeParse({ username, password });
 
   if (success) {
-    const result = await registerUser({ username: data.username, password: data.password });
+    const { error } = await registerUser({ username: data.username, password: data.password });
 
-    if (result.error === 'server') {
-      return { errors: result.errors, message: result.message };
+    if (error && error.type === 'server') {
+      return { message: error.message };
     }
 
-    if (result.error === 'unknown') {
-      return { errors: [{ message: 'Something went wrong' }], message: 'Something went wrong!' };
+    if (error && error.type === 'unknown') {
+      return { message: 'Something went wrong!' };
     }
 
     return redirect('/login');
@@ -74,11 +74,7 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
   };
 
   return (
-    <LayoutContainer className="flex flex-col justify-center gap-4">
-      <header className="flex justify-center p-4">
-        <Logo size="lg" className="-translate-x-2" />
-      </header>
-
+    <>
       <Form
         action={href('/register')}
         method="POST"
@@ -134,7 +130,7 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
       <Link to={href('/login')} className="self-center text-sm text-zinc-500 hover:text-zinc-800">
         Already registered? Login
       </Link>
-    </LayoutContainer>
+    </>
   );
 };
 

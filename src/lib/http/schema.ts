@@ -5,6 +5,19 @@ export const UserRoleSchema = z.enum(['user', 'admin']);
 
 export const UserSchema = z.object({ id: z.string(), username: z.string(), role: UserRoleSchema });
 
+export const UserStatsSchema = UserSchema.extend({
+  statistic: z.object({
+    snippetsCount: z.number(),
+    rating: z.number(),
+    commentsCount: z.number(),
+    likesCount: z.number(),
+    dislikesCount: z.number(),
+    questionsCount: z.number(),
+    correctAnswersCount: z.number(),
+    regularAnswersCount: z.number(),
+  }),
+});
+
 export const MarkSchema = z.object({ id: z.string(), type: z.enum(['like', 'dislike']), user: UserSchema });
 
 export const CommentSchema = z.object({ id: z.string(), content: z.string() });

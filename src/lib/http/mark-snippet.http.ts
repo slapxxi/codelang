@@ -1,17 +1,21 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import { SnippetSchema, UserSchema } from './schema';
-import type { TUser } from '~/types';
+import { SnippetSchema } from './schema';
 
-const GetCurrentUserResponse = UserSchema;
+const MarkSnippetResponse = z.object({ mark: z.enum(['like', 'dislike', 'none']) });
 
 type Params = {
+  /**
+   * ID of the snippet
+   */
+  id: z.infer<typeof SnippetSchema>['id'] | null;
   token: string;
+  mark: 'like' | 'dislike' | 'none';
 };
 
 type Result =
   | {
-      data: TUser;
+      data: z.infer<typeof MarkSnippetResponse>;
       error: null;
     }
   | {
@@ -19,10 +23,12 @@ type Result =
       error: { message: string; e: unknown };
     };
 
-export async function getCurrentUser(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/auth`);
+export async function markSnippet(params: Params): Promise<Result> {
+  const id = SnippetSchema.shape.id.parse(params.id);
+  const url = new URL(`${API_URL}/snippets/${id}/mark`);
   const response = await fetch(url, {
-    method: 'get',
+    method: 'post',
+    body: JSON.stringify({ mark: params.mark }),
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -32,7 +38,7 @@ export async function getCurrentUser(params: Params): Promise<Result> {
 
   if (response.ok) {
     const json = await response.json();
-    const { success, data, error } = GetCurrentUserResponse.safeParse(json.data);
+    const { success, data, error } = MarkSnippetResponse.safeParse(json.data);
     if (success) {
       return {
         data,
@@ -43,5 +49,5 @@ export async function getCurrentUser(params: Params): Promise<Result> {
     return { error: { message: 'Error parsing server response', e: error }, data: null };
   }
 
-  return { error: { message: 'Error getting current user', e: response.status }, data: null };
+  return { error: { message: `Error marking snippet: ${params.mark}`, e: response.status }, data: null };
 }

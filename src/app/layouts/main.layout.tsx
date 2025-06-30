@@ -1,11 +1,13 @@
-import { Code, FileQuestionMark, Home, Menu, User, Users } from 'lucide-react';
+import { Code, FileQuestionMark, Home, LogIn, Menu, User, Users } from 'lucide-react';
 import { Avatar, LayoutContainer, Logo, Navbar } from '~/ui';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '~/ui/base';
 import { useState } from 'react';
 import { href, Link, Outlet } from 'react-router';
+import { useAuth } from '~/hooks';
 
 const MainLayout = () => {
   const [open, setOpen] = useState(false);
+  const user = useAuth();
 
   return (
     <LayoutContainer disableMotion>
@@ -41,11 +43,7 @@ const MainLayout = () => {
       </header>
 
       <div className="overflow-y-auto h-screen md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:none] relative">
-        <Navbar className="hidden self-start sticky top-0 md:flex">
-          <Link to={href('/register')}>
-            <Avatar className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
-          </Link>
-        </Navbar>
+        <Navbar className="hidden self-start sticky top-0 md:flex" />
 
         <Outlet />
 

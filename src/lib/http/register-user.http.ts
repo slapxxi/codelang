@@ -1,4 +1,3 @@
-import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { EndpointFailureSchema, UserSchema } from './schema';
 import type { TUser } from '~/types';
@@ -12,18 +11,12 @@ type Params = {
 
 type Result =
   | {
-      user: TUser;
+      data: TUser;
       error: null;
     }
   | {
-      user: null;
-      error: 'unknown';
-    }
-  | {
-      user: null;
-      error: 'server';
-      message: string;
-      errors: z.infer<typeof EndpointFailureSchema>['errors'];
+      data: null;
+      error: { type: 'server' | 'unknown'; message: string; e: unknown };
     };
 
 export async function registerUser(params: Params): Promise<Result> {
@@ -40,7 +33,7 @@ export async function registerUser(params: Params): Promise<Result> {
 
   if (responseResult.success) {
     return {
-      user: responseResult.data,
+      data: responseResult.data,
       error: null,
     };
   }
@@ -48,8 +41,8 @@ export async function registerUser(params: Params): Promise<Result> {
   const failureResult = EndpointFailureSchema.safeParse(json);
 
   if (failureResult.success) {
-    return { error: 'server', user: null, errors: failureResult.data.errors, message: failureResult.data.message };
+    return { error: { type: 'server', message: 'server', e: failureResult.data.errors }, data: null };
   }
 
-  return { error: 'unknown', user: null };
+  return { error: { type: 'unknown', message: 'Unknown error', e: response.status }, data: null };
 }

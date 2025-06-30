@@ -1,4 +1,3 @@
-import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { EndpointFailureSchema, UserSchema } from './schema';
 import type { TUser } from '~/types';
@@ -14,19 +13,15 @@ type Params = {
 
 type Result =
   | {
-      user: TUser;
-      token: string;
+      data: {
+        user: TUser;
+        token: string;
+      };
       error: null;
     }
   | {
-      user: null;
-      error: 'unknown';
-    }
-  | {
-      user: null;
-      error: 'server';
-      message: string;
-      errors: z.infer<typeof EndpointFailureSchema>['errors'];
+      data: null;
+      error: { message: string; e: unknown };
     };
 
 export async function loginUser(params: Params): Promise<Result> {
@@ -36,7 +31,6 @@ export async function loginUser(params: Params): Promise<Result> {
     headers: {
       'Content-Type': 'application/json',
     },
-    // todo: remove
     body: JSON.stringify(params),
   });
   const json = await response.json();
@@ -47,8 +41,8 @@ export async function loginUser(params: Params): Promise<Result> {
 
     if (responseResult.success && cookie) {
       const cookie = response.headers.get('set-cookie');
-      const token = cookie.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
-      return { user: responseResult.data, error: null, token: token! };
+      const token = cookie?.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
+      return { data: { user: responseResult.data, token: token! }, error: null };
     } else {
       throw new Error('Unexpected server output', responseResult.error);
     }
@@ -57,8 +51,8 @@ export async function loginUser(params: Params): Promise<Result> {
   const failureResult = EndpointFailureSchema.safeParse(json);
 
   if (failureResult.success) {
-    return { error: 'server', user: null, errors: failureResult.data.errors, message: failureResult.data.message };
+    return { error: { message: failureResult.data.message, e: failureResult.data.errors }, data: null };
   }
 
-  return { error: 'unknown', user: null };
+  return { error: { message: 'Unknown error', e: response.status }, data: null };
 }

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import * as z from 'zod/v4';
 
 import { Button } from '~/ui/base';
-import { Input, FormError, LayoutContainer, Logo } from '~/ui';
+import { Input, FormError } from '~/ui';
 import { loginUser } from '~/lib/http';
 import { commitSession, getSession } from '~/app/session.server';
 
@@ -36,18 +36,18 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (formDataParsingResult.success) {
     const { username, password } = formDataParsingResult.data;
-    const loginResult = await loginUser({ username, password });
+    const { data, error } = await loginUser({ username, password });
 
-    if (loginResult.error === 'server') {
-      return { errors: loginResult.errors, message: loginResult.message };
+    if (error && error.message === 'server') {
+      return { errors: error.e, message: error.message };
     }
 
-    if (loginResult.error === 'unknown') {
+    if (error && error.message === 'unknown') {
       return { message: 'Something went wrong!' };
     }
 
-    if (loginResult.user) {
-      session.set('token', loginResult.token);
+    if (data) {
+      session.set('token', data.token);
       return redirect(href('/'), { headers: { 'Set-Cookie': await commitSession(session) } });
     }
 
@@ -69,11 +69,7 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
   };
 
   return (
-    <LayoutContainer className="flex flex-col justify-center gap-4">
-      <header className="flex justify-center p-4">
-        <Logo size="lg" className="-translate-x-2" />
-      </header>
-
+    <>
       <Form
         action={href('/login')}
         method="POST"
@@ -120,7 +116,7 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
       <Link to={href('/register')} className="self-center text-sm text-zinc-500 hover:text-zinc-800">
         Don&apos;t have an account? Register
       </Link>
-    </LayoutContainer>
+    </>
   );
 };
 

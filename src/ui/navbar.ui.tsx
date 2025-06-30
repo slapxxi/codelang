@@ -1,8 +1,9 @@
-import { href, NavLink } from 'react-router';
-import { Code, FileQuestionMark, Home, User, Users } from 'lucide-react';
+import { href, Link, NavLink } from 'react-router';
+import { Code, FileQuestionMark, Home, LogIn, User, Users } from 'lucide-react';
 
 import { cn } from '~/utils';
-import { useNavbar } from '~/hooks';
+import { useAuth, useNavbar } from '~/hooks';
+import { Avatar } from './avatar.ui';
 
 type NavbarProps = {
   className?: string;
@@ -12,6 +13,7 @@ type NavbarProps = {
 export const Navbar: React.FC<NavbarProps> = (props) => {
   const { className, children } = props;
   const { open, toggle: toggleOpen } = useNavbar();
+  const user = useAuth();
 
   return (
     <div
@@ -28,27 +30,30 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
             { Icon: FileQuestionMark, text: 'Questions', path: href('/questions') },
             { Icon: Code, text: 'Snippets', path: href('/snippets') },
             { Icon: Users, text: 'Users', path: href('/users') },
-            { Icon: User, text: 'Profile', path: href('/profile') },
-          ].map((item, i) => (
-            <li key={i}>
-              <NavLink
-                to={item.path}
-                className={({ isActive, isPending }) =>
-                  cn(
-                    'flex gap-2 hover:bg-zinc-800 p-2 rounded-lg',
-                    isActive && 'bg-zinc-700 hover:bg-zinc-700 shadow-sm',
-                    isPending && 'animate-shimmer hover:bg-transparent shimmer bg-transparent'
-                  )
-                }
-                style={({ isPending }) => ({ animationDelay: isPending ? '0' : `${i * 45}ms` })}
-              >
-                <item.Icon />
-                <span className={cn(open ? 'flex-1 overflow-hidden inline-flex' : 'hidden', 'delay-[inherit]')}>
-                  <span className={cn(open ? 'animate-slide-in delay-[inherit]' : 'hidden')}>{item.text}</span>
-                </span>
-              </NavLink>
-            </li>
-          ))}
+            user && { Icon: User, text: 'Profile', path: href('/profile') },
+          ].map(
+            (item, i) =>
+              item !== null && (
+                <li key={i}>
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive, isPending }) =>
+                      cn(
+                        'flex gap-2 hover:bg-zinc-800 p-2 rounded-lg',
+                        isActive && 'bg-zinc-700 hover:bg-zinc-700 shadow-sm',
+                        isPending && 'animate-shimmer hover:bg-transparent shimmer bg-transparent'
+                      )
+                    }
+                    style={({ isPending }) => ({ animationDelay: isPending ? '0' : `${i * 45}ms` })}
+                  >
+                    <item.Icon />
+                    <span className={cn(open ? 'flex-1 overflow-hidden inline-flex' : 'hidden', 'delay-[inherit]')}>
+                      <span className={cn(open ? 'animate-slide-in delay-[inherit]' : 'hidden')}>{item.text}</span>
+                    </span>
+                  </NavLink>
+                </li>
+              )
+          )}
         </ul>
       </nav>
 
@@ -90,6 +95,16 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
           </svg>
         </span>
       </button>
+
+      {user ? (
+        <Link to={href('/logout')}>
+          <Avatar className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
+        </Link>
+      ) : (
+        <Link to={href('/login')}>
+          <LogIn className="absolute top-full left-1/2 -translate-x-1/2 mt-4 text-zinc-600" />
+        </Link>
+      )}
 
       {children}
     </div>

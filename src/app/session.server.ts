@@ -1,7 +1,9 @@
 import { createCookieSessionStorage } from 'react-router';
+import type { TUser } from '~/types';
 
 type SessionData = {
   token: string;
+  user: TUser;
 };
 
 type SessionFlashData = {

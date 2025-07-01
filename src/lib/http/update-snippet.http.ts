@@ -1,24 +1,25 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
 import type { TResult, TSnippet } from '~/types';
-import { SnippetSchema } from './schema';
 
-const CreateSnippetResponse = SnippetSchema.omit({ marks: true, comments: true });
+const UpdateSnippetResponse = z.object({
+  updatedCount: z.number(),
+});
 
 type Params = {
+  id: string;
   token: string;
   language: TSnippet['language'];
   code: TSnippet['code'];
 };
 
-type Result = TResult<z.infer<typeof CreateSnippetResponse>>;
+type Result = TResult<z.infer<typeof UpdateSnippetResponse>>;
 
-export async function createSnippet(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/snippets`);
+export async function updateSnippet(params: Params): Promise<Result> {
+  const url = new URL(`${API_URL}/snippets/${params.id}`);
   const response = await fetch(url, {
-    method: 'post',
+    method: 'PATCH',
     body: JSON.stringify({ language: params.language, code: params.code }),
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       Cookie: `token=${params.token}`,
@@ -27,7 +28,8 @@ export async function createSnippet(params: Params): Promise<Result> {
 
   if (response.ok) {
     const json = await response.json();
-    const { success, data } = CreateSnippetResponse.safeParse(json.data);
+    const { success, data } = UpdateSnippetResponse.safeParse(json.data);
+    console.log(response, data);
 
     if (success) {
       return {

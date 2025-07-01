@@ -31,18 +31,18 @@ export const SnippetSchema = z.object({
   comments: CommentSchema.array(),
 });
 
-export const SnippetSchemaWithLikes = SnippetSchema.transform((snippet) => {
+export const SnippetSchemaWithCodeHighlighted = SnippetSchema.transform(async (snippet) => {
+  const hl = await highlighter;
+  const code = hl.codeToHtml(snippet.code, { lang: matchLang(snippet.language), theme: 'vitesse-dark' });
+  return { ...snippet, formattedCode: code };
+});
+
+export const SnippetSchemaWithLikes = SnippetSchemaWithCodeHighlighted.transform((snippet) => {
   return {
     ...snippet,
     likes: snippet.marks.reduce((acc, mark) => (mark.type === 'like' ? acc + 1 : acc), 0),
     dislikes: snippet.marks.reduce((acc, mark) => (mark.type === 'dislike' ? acc + 1 : acc), 0),
   };
-});
-
-export const SnippetSchemaWithCodeHighlighted = SnippetSchema.transform(async (snippet) => {
-  const hl = await highlighter;
-  const code = hl.codeToHtml(snippet.code, { lang: matchLang(snippet.language), theme: 'vitesse-dark' });
-  return { ...snippet, code };
 });
 
 function matchLang(lang: string) {

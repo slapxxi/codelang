@@ -1,3 +1,5 @@
+export * from './create-snippet.http';
+export * from './update-snippet.http';
 export * from './get-snippets.http';
 export * from './get-snippet.http';
 export * from './get-current-user.http';
@@ -10,5 +12,4 @@ export * from './mark-snippet.http';
 export * from './register-user.http';
 export * from './get-supported-languages.http';
 export * from './login-user.http';
-export * from './create-snippet.http';
 export * from './schema';

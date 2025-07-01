@@ -1,16 +1,14 @@
-import { Code, FileQuestionMark, Home, LogIn, Menu, User, Users } from 'lucide-react';
-import { Avatar, LayoutContainer, Logo, Navbar } from '~/ui';
+import { Code, FileQuestionMark, Home, Menu, User, Users } from 'lucide-react';
+import { LayoutContainer, Logo, Navbar } from '~/ui';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '~/ui/base';
 import { useState } from 'react';
 import { href, Link, Outlet } from 'react-router';
-import { useAuth } from '~/hooks';
 
 const MainLayout = () => {
   const [open, setOpen] = useState(false);
-  const user = useAuth();
 
   return (
-    <LayoutContainer disableMotion>
+    <LayoutContainer>
       <header className="pl-4 bg-zinc-900 text-white flex items-center justify-between md:hidden">
         <Logo light />
 

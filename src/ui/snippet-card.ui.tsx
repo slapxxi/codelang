@@ -58,7 +58,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
       <div className="my-2 m-1 flex flex-col gap-2 overflow-hidden">
         <Code
           ref={codeRef}
-          code={snippet.code}
+          code={snippet.formattedCode}
           className={cn('overflow-y-auto w-full min-w-0', ex ? 'max-h-[600px]' : 'max-h-[300px]')}
         />
         {showMore && <Button onClick={handleClick}>Show {ex ? 'less' : 'more'}</Button>}

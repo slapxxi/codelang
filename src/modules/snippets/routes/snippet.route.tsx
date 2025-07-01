@@ -1,14 +1,15 @@
 import type { Route } from './+types/snippet.route';
-import { data, useFetcher, redirect } from 'react-router';
+import { data, useFetcher, redirect, href, Link } from 'react-router';
 import { useAuth } from '~/hooks';
 import { getSnippet } from '~/lib/http';
 import { Button, Label, SnippetCard, Title } from '~/ui';
 import * as z from 'zod/v4';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { useEffect, useId } from 'react';
+import { useId } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { postComment } from '~/lib/http/post-comment.http';
 import { getSession } from '~/app/session.server';
+import { Pencil } from 'lucide-react';
 
 export function meta() {
   return [{ title: 'Codelang | Snippet' }, { name: 'description', content: 'Codelang snippet' }];
@@ -18,7 +19,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const { data, error } = await getSnippet({ id: params.snippetId });
 
   if (data) {
-    return { snippet: data.snippet };
+    return { snippet: data };
   }
 
   return { error };
@@ -75,16 +76,22 @@ const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
     return null;
   }
 
-  useEffect(() => {
-    if (fetcher.data) {
-      console.log(fetcher.data);
-    }
-  }, [fetcher.data]);
-
   return (
-    <div className="overflow-x-hidden w-full flex flex-col gap-8 mt-4 md:mt-0 lg:flex-row">
+    <div className="overflow-x-hidden w-full flex flex-col gap-8 mt-4 px-1 md:mt-0 lg:flex-row">
       <div className="top-0 self-center w-full lg:flex-1 md:self-start gap-8 flex flex-col lg:w-1/2 lg:sticky">
-        <SnippetCard snippet={snippet} expand={false} className="max-w-full min-w-0" />
+        <div className="flex flex-col gap-4">
+          {user && snippet.user.id === user.id && (
+            <Link
+              to={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
+              className="flex gap-2 items-center text-sm text-olive-900 hover:text-olive-600"
+            >
+              <Pencil size={16} />
+              <span>Edit Snippet</span>
+            </Link>
+          )}
+
+          <SnippetCard snippet={snippet} expand={false} className="max-w-full min-w-0" />
+        </div>
 
         {user && (
           <section className="flex flex-col gap-2">

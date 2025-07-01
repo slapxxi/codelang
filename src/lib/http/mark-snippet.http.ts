@@ -5,10 +5,7 @@ import { SnippetSchema } from './schema';
 const MarkSnippetResponse = z.object({ mark: z.enum(['like', 'dislike', 'none']) });
 
 type Params = {
-  /**
-   * ID of the snippet
-   */
-  id: z.infer<typeof SnippetSchema>['id'] | null;
+  id: string;
   token: string;
   mark: 'like' | 'dislike' | 'none';
 };
@@ -29,7 +26,6 @@ export async function markSnippet(params: Params): Promise<Result> {
   const response = await fetch(url, {
     method: 'post',
     body: JSON.stringify({ mark: params.mark }),
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       Cookie: `token=${params.token}`,

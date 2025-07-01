@@ -76,21 +76,26 @@ export async function getSnippets(params?: Params): Promise<Result> {
   const url = new URL(`${API_URL}/snippets`);
   appendParams(url, params);
   const response = await fetch(url);
-  const json = await response.json();
-  const { success, data, error } = GetSnippetsResponse.safeParse(json.data);
 
-  if (success) {
-    const withCode = await SnippetSchemaWithCodeHighlighted.array().parseAsync(data.data);
-    return {
-      data: {
-        snippets: SnippetSchemaWithLikes.array().parse(withCode),
-        totalItems: data.meta.totalItems,
-        totalPages: data.meta.totalPages,
-        currentPage: data.meta.currentPage,
-      },
-      error: null,
-    };
+  if (response.ok) {
+    const json = await response.json();
+    const { success, data } = GetSnippetsResponse.safeParse(json.data);
+
+    if (success) {
+      return {
+        data: {
+          snippets: await SnippetSchemaWithLikes.array().parseAsync(data.data),
+          totalItems: data.meta.totalItems,
+          totalPages: data.meta.totalPages,
+          currentPage: data.meta.currentPage,
+        },
+        error: null,
+      };
+    }
+
+    return { error: { message: 'Error parsing server response' }, data: null };
   }
 
-  return { error, data: null };
+  console.log(response);
+  return { error: { message: 'Something went wrong' }, data: null };
 }

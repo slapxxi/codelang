@@ -6,7 +6,7 @@ export type TUserStats = z.infer<typeof UserStatsSchema>;
 
 export type UserRole = 'admin' | 'user';
 
-export type TSnippet = z.infer<typeof SnippetSchema> & { likes: number; dislikes: number };
+export type TSnippet = z.infer<typeof SnippetSchema> & { likes: number; dislikes: number; formattedCode: string };
 
 export type TComment = z.infer<typeof CommentSchema>;
 

@@ -1,9 +1,17 @@
 import type { Route } from './+types/snippet.route';
+import { data, useFetcher, redirect } from 'react-router';
+import { useAuth } from '~/hooks';
 import { getSnippet } from '~/lib/http';
-import { SnippetCard } from '~/ui';
+import { Button, Label, SnippetCard, Title } from '~/ui';
+import * as z from 'zod/v4';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useEffect, useId } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { postComment } from '~/lib/http/post-comment.http';
+import { getSession } from '~/app/session.server';
 
 export function meta() {
-  return [{ title: 'Codelang | Snippets' }, { name: 'description', content: 'Codelang' }];
+  return [{ title: 'Codelang | Snippet' }, { name: 'description', content: 'Codelang snippet' }];
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
@@ -16,28 +24,91 @@ export async function loader({ params }: Route.LoaderArgs) {
   return { error };
 }
 
-const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { snippet, error } = loaderData;
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const token = session.get('token');
 
-  if (error) {
-    throw new Error(error.message);
+  if (!token) {
+    return redirect('/login');
   }
+
+  const formData = await request.formData();
+  const form = Object.fromEntries(formData);
+  const parseResult = PostCommentFormSchema.safeParse(form);
+
+  if (parseResult.success) {
+    const { comment } = parseResult.data;
+    const postResult = await postComment({ comment, token });
+
+    if (postResult.data) {
+      return { data: postResult.data, error: null };
+    }
+
+    if (postResult.error.type === 'server') {
+      const { message, status } = postResult.error;
+      return data({ error: { message: message, status: status } }, { status: status });
+    }
+
+    const { message, e } = postResult.error;
+    return data({ error: { message, e } }, { status: 400 });
+  }
+
+  return data({ error: { message: 'Invalid data submitted' } }, { status: 400 });
+}
+
+const PostCommentFormSchema = z.object({ comment: z.string().nonempty() });
+
+type TPostCommentForm = z.infer<typeof PostCommentFormSchema>;
+
+const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
+  const { snippet } = loaderData;
+  const commentId = useId();
+  const fetcher = useFetcher();
+  const { register, handleSubmit } = useForm<TPostCommentForm>({ resolver: zodResolver(PostCommentFormSchema) });
+  const user = useAuth();
+
+  const onSubmit: SubmitHandler<TPostCommentForm> = (data) => {
+    fetcher.submit(data, { method: 'post' });
+  };
+
+  if (!snippet) {
+    return null;
+  }
+
+  useEffect(() => {
+    if (fetcher.data) {
+      console.log(fetcher.data);
+    }
+  }, [fetcher.data]);
 
   return (
     <div className="w-full flex flex-col gap-8 mt-4 md:mt-0 lg:flex-row">
-      <SnippetCard
-        snippet={snippet}
-        expand={false}
-        className="lg:w-1/2 max-w-prose lg:sticky top-0 self-center w-full md:flex-1 md:self-start"
-      />
+      <div className="top-0 self-center w-full lg:flex-1 md:self-start gap-8 flex flex-col lg:w-1/2 lg:sticky">
+        <SnippetCard snippet={snippet} expand={false} className="max-w-full" />
+
+        {user && (
+          <section className="flex flex-col gap-2">
+            <Label htmlFor={commentId}>Leave a Comment</Label>
+            <fetcher.Form method="post" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+              <textarea
+                id={commentId}
+                placeholder="Comment..."
+                className="border rounded bg-white p-2"
+                {...register('comment')}
+              ></textarea>
+              <Button disabled={fetcher.state === 'loading' || fetcher.state === 'submitting'}>Post</Button>
+            </fetcher.Form>
+          </section>
+        )}
+      </div>
 
       <section className="flex-1 mt-8 md:mt-0 flex flex-col gap-4 max-w-prose mx-auto md:mx-0 w-full">
-        <h2 className="font-bold font-mono text-lg text-olive-900 flex gap-2">
+        <Title level={3} className="font-bold font-mono text-lg text-olive-900 flex gap-2">
           <span>Comments</span>
           <span className="leading-none p-1.5 bg-olive-700 text-white rounded-sm px-2 inline-flex items-center justify-center text-sm">
             {snippet.comments.length}
           </span>
-        </h2>
+        </Title>
 
         <ul className="flex flex-col gap-4 pl-2 lg:w-full">
           {snippet.comments.map((comment) => (

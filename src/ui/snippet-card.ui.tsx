@@ -1,29 +1,51 @@
-import type { Snippet, TMark } from '~/types';
+import type { TSnippet, TMark } from '~/types';
 import { Expand, MessageCircle, ThumbsDown, ThumbsUp, User } from 'lucide-react';
 import { href, Link, useFetcher } from 'react-router';
 import { Code } from './code.ui';
 import { useAuth } from '~/hooks';
 import { cn } from '~/utils';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { Button } from './base';
 
 type SnippetCardProps = {
-  snippet: Snippet;
+  snippet: TSnippet;
   expand?: boolean;
   className?: string;
 };
 
 export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
   const { snippet, expand = false, className } = props;
+  const [showMore, setShowMore] = useState(false);
+  const [ex, setExpand] = useState(false);
   const likeFetcher = useFetcher();
   const dislikeFetcher = useFetcher();
   const user = useAuth();
+  const codeRef = useRef<HTMLPreElement>(null);
   let mark: TMark | undefined;
 
   if (user) {
     mark = snippet.marks.find((m) => m.user.id === user.id);
   }
 
+  useLayoutEffect(() => {
+    const rect = codeRef.current?.getBoundingClientRect();
+
+    if (rect && rect.height >= 300) {
+      setShowMore(true);
+    }
+  });
+
+  function handleClick() {
+    setExpand((e) => !e);
+  }
+
   return (
-    <article className={cn('border border-olive-200 rounded-xl shadow backdrop-blur-[1px] bg-olive-200/30', className)}>
+    <article
+      className={cn(
+        'border border-olive-200 rounded-xl shadow backdrop-blur-[1px] bg-olive-200/30 overflow-hidden',
+        className
+      )}
+    >
       <header className="flex justify-between items-center text-xs text-olive-600 p-2 pb-0">
         {expand && (
           <Link to={href('/snippets/:snippetId', { snippetId: snippet.id })} className="link">
@@ -33,9 +55,10 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
         <span className="ml-auto">{snippet.language}</span>
       </header>
 
-      <pre className="relative m-1 my-2">
-        <Code code={snippet.code} />
-      </pre>
+      <div className="my-2 m-1 flex flex-col gap-2">
+        <Code ref={codeRef} code={snippet.code} className="max-h-[300px] overflow-y-auto w-full" />
+        {showMore && <Button onClick={handleClick}>Show {ex ? 'less' : 'more'}</Button>}
+      </div>
 
       <footer className="flex text-sm text-olive-600 justify-between items-center p-2">
         <div className="flex items-center gap-3">

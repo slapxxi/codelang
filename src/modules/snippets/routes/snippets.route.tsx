@@ -1,5 +1,18 @@
+import { href, Link } from 'react-router';
+import { PageTitle } from '~/ui';
+import { Button } from '~/ui';
+
 const SnippetsRoute = () => {
-  return <h1>Snippets</h1>;
+  return (
+    <div>
+      <PageTitle className="flex gap-2 items-center">
+        Snippets
+        <Button>
+          <Link to={href('/snippets/new')}>Create Snippet</Link>
+        </Button>
+      </PageTitle>
+    </div>
+  );
 };
 
 export default SnippetsRoute;

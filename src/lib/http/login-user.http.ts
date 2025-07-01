@@ -16,6 +16,7 @@ type Result =
       data: {
         user: TUser;
         token: string;
+        cookie: string;
       };
       error: null;
     }
@@ -42,7 +43,7 @@ export async function loginUser(params: Params): Promise<Result> {
     if (responseResult.success && cookie) {
       const cookie = response.headers.get('set-cookie');
       const token = cookie?.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
-      return { data: { user: responseResult.data, token: token! }, error: null };
+      return { data: { user: responseResult.data, token: token!, cookie: cookie! }, error: null };
     } else {
       throw new Error('Unexpected server output', responseResult.error);
     }

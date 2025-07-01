@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { SnippetSchema, SnippetSchemaWithCodeHighlighted, SnippetSchemaWithLikes } from './schema';
-import type { Snippet } from '~/types';
+import type { TSnippet } from '~/types';
 
 const GetSnippetResponse = SnippetSchema;
 
@@ -14,7 +14,7 @@ type Params = {
 
 type Result =
   | {
-      data: { snippet: Snippet };
+      data: { snippet: TSnippet };
       error: null;
     }
   | {

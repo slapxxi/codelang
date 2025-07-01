@@ -4,5 +4,5 @@ import { createHighlighter } from 'shiki';
 // loads the themes and languages specified.
 export const highlighter = createHighlighter({
   themes: ['vitesse-dark'],
-  langs: ['javascript', 'css', 'html', 'c', 'cpp', 'typescript', 'go'],
+  langs: ['javascript', 'java', 'kotlin', 'python', 'go', 'ruby', 'cpp', 'c#'],
 });

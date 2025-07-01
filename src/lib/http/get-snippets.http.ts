@@ -8,7 +8,7 @@ import {
   SnippetSchemaWithCodeHighlighted,
 } from './schema';
 import { appendParams } from '~/utils';
-import type { Snippet } from '~/types';
+import type { TSnippet } from '~/types';
 
 const GetSnippetsResponse = z.object({
   data: z.array(SnippetSchema),
@@ -60,7 +60,7 @@ type Params = {
 type Result =
   | {
       data: {
-        snippets: Snippet[];
+        snippets: TSnippet[];
         totalItems: number;
         totalPages: number;
         currentPage: number;

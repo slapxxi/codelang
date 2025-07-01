@@ -15,6 +15,7 @@ export default [
     route('/users/:userId', './modules/users/routes/user.route.tsx'),
 
     route('/snippets', './modules/snippets/routes/snippets.route.tsx'),
+    route('/snippets/new', './modules/snippets/routes/snippets-new.route.tsx'),
     route('/snippets/:snippetId', './modules/snippets/routes/snippet.route.tsx'),
     route('/snippets/:snippetId/edit', './modules/snippets/routes/snippet-edit.route.tsx'),
 

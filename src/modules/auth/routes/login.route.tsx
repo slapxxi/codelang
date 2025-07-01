@@ -49,7 +49,12 @@ export async function action({ request }: Route.ActionArgs) {
     if (data) {
       session.set('token', data.token);
       session.set('user', data.user);
-      return redirect(href('/'), { headers: { 'Set-Cookie': await commitSession(session) } });
+      return redirect(href('/'), {
+        headers: [
+          ['Set-Cookie', await commitSession(session)],
+          ['Set-Cookie', data.cookie],
+        ],
+      });
     }
 
     throw new Error('Something went wrong');

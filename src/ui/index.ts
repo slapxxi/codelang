@@ -9,3 +9,7 @@ export * from './input.ui';
 export * from './form-error.ui';
 export * from './toaster.ui';
 export * from './code.ui';
+export * from './button.ui';
+export * from './title.ui';
+export * from './label.ui';
+export * from './select.ui';

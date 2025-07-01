@@ -1,13 +1,26 @@
+import { forwardRef } from 'react';
+import { cn } from '~/utils';
+
 type CodeProps = {
   code?: string;
-};
+} & React.ComponentProps<'pre'>;
 
-export const Code: React.FC<CodeProps> = (props) => {
-  const { code } = props;
+export const Code = forwardRef<HTMLPreElement, CodeProps>((props, ref) => {
+  const { code, className, ...rest } = props;
 
   if (!code) {
     return null;
   }
 
-  return <pre dangerouslySetInnerHTML={{ __html: code }} className="*:p-2 *:rounded *:shadow" />;
-};
+  return (
+    <pre
+      ref={ref}
+      dangerouslySetInnerHTML={{ __html: code }}
+      className={cn(
+        'max-w-full *:p-2 *:rounded *:shadow overflow-hidden *:overflow-hidden *:overflow-x-auto',
+        className
+      )}
+      {...rest}
+    />
+  );
+});

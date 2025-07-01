@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, Fragment } from 'react';
 import { cn } from '~/utils';
 
 type CodeProps = {
@@ -16,10 +16,7 @@ export const Code = forwardRef<HTMLPreElement, CodeProps>((props, ref) => {
     <pre
       ref={ref}
       dangerouslySetInnerHTML={{ __html: code }}
-      className={cn(
-        'max-w-full *:p-2 *:rounded *:shadow overflow-hidden *:overflow-hidden *:overflow-x-auto',
-        className
-      )}
+      className={cn('max-w-full min-w-0 *:p-2 *:rounded *:shadow *:overflow-x-auto', className)}
       {...rest}
     />
   );

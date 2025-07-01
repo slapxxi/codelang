@@ -9,6 +9,7 @@ const PostCommentResponse = z.object({
 });
 
 type Params = {
+  snippetId: string;
   comment: string;
   token: string;
 };
@@ -19,7 +20,7 @@ export async function postComment(params: Params): Promise<Result> {
   const url = new URL(`${API_URL}/comments`);
   const response = await fetch(url, {
     method: 'post',
-    body: JSON.stringify({ commentId: 195, content: params.comment }),
+    body: JSON.stringify({ snippetId: params.snippetId, content: params.comment }),
     headers: {
       'Content-Type': 'application/json',
       Cookie: `token=${params.token}`,

@@ -1,5 +1,5 @@
 import type { Route } from './+types/snippet.route';
-import { data, useFetcher, redirect, href, Link } from 'react-router';
+import { data, useFetcher, redirect, href, Link, useSubmit, Form, useNavigation } from 'react-router';
 import { useAuth } from '~/hooks';
 import { getSnippet } from '~/lib/http';
 import { Button, Label, SnippetCard, Title } from '~/ui';
@@ -16,6 +16,7 @@ export function meta() {
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
+  console.log('loader');
   const { data, error } = await getSnippet({ id: params.snippetId });
 
   if (data) {
@@ -25,7 +26,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   return { error };
 }
 
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
 
@@ -39,7 +40,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (parseResult.success) {
     const { comment } = parseResult.data;
-    const postResult = await postComment({ comment, token });
+    const postResult = await postComment({ snippetId: params.snippetId, comment, token });
 
     if (postResult.data) {
       return { data: postResult.data, error: null };
@@ -61,16 +62,9 @@ const PostCommentFormSchema = z.object({ comment: z.string().nonempty() });
 
 type TPostCommentForm = z.infer<typeof PostCommentFormSchema>;
 
-const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
+const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { snippet } = loaderData;
-  const commentId = useId();
-  const fetcher = useFetcher();
-  const { register, handleSubmit } = useForm<TPostCommentForm>({ resolver: zodResolver(PostCommentFormSchema) });
   const user = useAuth();
-
-  const onSubmit: SubmitHandler<TPostCommentForm> = (data) => {
-    fetcher.submit(data, { method: 'post' });
-  };
 
   if (!snippet) {
     return null;
@@ -93,20 +87,7 @@ const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
           <SnippetCard snippet={snippet} expand={false} className="max-w-full min-w-0" />
         </div>
 
-        {user && (
-          <section className="flex flex-col gap-2">
-            <Label htmlFor={commentId}>Leave a Comment</Label>
-            <fetcher.Form method="post" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-              <textarea
-                id={commentId}
-                placeholder="Comment..."
-                className="border rounded bg-white p-2"
-                {...register('comment')}
-              ></textarea>
-              <Button disabled={fetcher.state === 'loading' || fetcher.state === 'submitting'}>Post</Button>
-            </fetcher.Form>
-          </section>
-        )}
+        {user && <PostCommentForm key={actionData?.data?.id} />}
       </div>
 
       <section className="flex-1 mt-8 md:mt-0 flex flex-col gap-4 max-w-prose mx-auto md:mx-0 w-full">
@@ -129,5 +110,31 @@ const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
     </div>
   );
 };
+
+function PostCommentForm() {
+  const { register, handleSubmit } = useForm<TPostCommentForm>({ resolver: zodResolver(PostCommentFormSchema) });
+  const submit = useSubmit();
+  const commentId = useId();
+  const nav = useNavigation();
+
+  const onSubmit: SubmitHandler<TPostCommentForm> = (data) => {
+    submit(data, { method: 'post' });
+  };
+
+  return (
+    <section className="flex flex-col gap-2">
+      <Label htmlFor={commentId}>Leave a Comment</Label>
+      <Form method="post" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+        <textarea
+          id={commentId}
+          placeholder="Comment..."
+          className="border rounded bg-white p-2"
+          {...register('comment')}
+        ></textarea>
+        <Button disabled={nav.state === 'loading' || nav.state === 'submitting'}>Post</Button>
+      </Form>
+    </section>
+  );
+}
 
 export default SnippetRoute;

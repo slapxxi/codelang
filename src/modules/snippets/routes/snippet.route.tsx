@@ -1,5 +1,5 @@
 import type { Route } from './+types/snippet.route';
-import { data, useFetcher, redirect, href, Link, useSubmit, Form, useNavigation } from 'react-router';
+import { data, redirect, href, Link, useSubmit, Form, useNavigation } from 'react-router';
 import { useAuth } from '~/hooks';
 import { getSnippet } from '~/lib/http';
 import { Button, Label, SnippetCard, Title } from '~/ui';
@@ -16,7 +16,6 @@ export function meta() {
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
-  console.log('loader');
   const { data, error } = await getSnippet({ id: params.snippetId });
 
   if (data) {

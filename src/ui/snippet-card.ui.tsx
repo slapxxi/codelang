@@ -55,8 +55,12 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
         <span className="ml-auto">{snippet.language}</span>
       </header>
 
-      <div className="my-2 m-1 flex flex-col gap-2">
-        <Code ref={codeRef} code={snippet.code} className="max-h-[300px] overflow-y-auto w-full" />
+      <div className="my-2 m-1 flex flex-col gap-2 overflow-hidden">
+        <Code
+          ref={codeRef}
+          code={snippet.code}
+          className={cn('overflow-y-auto w-full min-w-0', ex ? 'max-h-[600px]' : 'max-h-[300px]')}
+        />
         {showMore && <Button onClick={handleClick}>Show {ex ? 'less' : 'more'}</Button>}
       </div>
 

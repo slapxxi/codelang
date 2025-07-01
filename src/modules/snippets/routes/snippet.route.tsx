@@ -82,9 +82,9 @@ const SnippetRoute = ({ loaderData }: Route.ComponentProps) => {
   }, [fetcher.data]);
 
   return (
-    <div className="w-full flex flex-col gap-8 mt-4 md:mt-0 lg:flex-row">
+    <div className="overflow-x-hidden w-full flex flex-col gap-8 mt-4 md:mt-0 lg:flex-row">
       <div className="top-0 self-center w-full lg:flex-1 md:self-start gap-8 flex flex-col lg:w-1/2 lg:sticky">
-        <SnippetCard snippet={snippet} expand={false} className="max-w-full" />
+        <SnippetCard snippet={snippet} expand={false} className="max-w-full min-w-0" />
 
         {user && (
           <section className="flex flex-col gap-2">

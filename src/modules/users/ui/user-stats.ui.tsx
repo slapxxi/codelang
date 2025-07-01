@@ -17,7 +17,8 @@ export const UserStats: React.FC<UserStatsProps> = (props) => {
             <th className="px-6 py-3 text-left">Value</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-olive-200 text-olive-800 text-sm">
+
+        <tbody className="divide-y divide-olive-200 text-olive-800 text-sm *:even:bg-olive-100/40">
           {Object.entries(stats.statistic).map(([key, value]) => (
             <tr className="hover:bg-olive-100/50" key={key}>
               <td className="px-6 py-4 font-medium">

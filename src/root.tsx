@@ -7,7 +7,6 @@ import { Toaster } from '~/ui';
 
 import { AuthProvider, QueryProvider } from './app/providers';
 import { getSession } from './app/session.server';
-import { getCurrentUser } from './lib/http';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -24,18 +23,8 @@ export const links: Route.LinksFunction = () => [
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get('Cookie'));
-  const token = session.get('token');
-
-  if (token) {
-    const { data, error } = await getCurrentUser({ token });
-    if (data) {
-      return { user: data };
-    }
-
-    return { error, user: null };
-  }
-
-  return { user: null };
+  const user = session.get('user');
+  return { user: user ?? null };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {

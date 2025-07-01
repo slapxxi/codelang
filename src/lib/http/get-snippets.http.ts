@@ -63,6 +63,7 @@ type Result =
         snippets: Snippet[];
         totalItems: number;
         totalPages: number;
+        currentPage: number;
       };
       error: null;
     }
@@ -85,6 +86,7 @@ export async function getSnippets(params?: Params): Promise<Result> {
         snippets: SnippetSchemaWithLikes.array().parse(withCode),
         totalItems: data.meta.totalItems,
         totalPages: data.meta.totalPages,
+        currentPage: data.meta.currentPage,
       },
       error: null,
     };

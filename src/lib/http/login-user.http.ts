@@ -21,7 +21,7 @@ type Result =
     }
   | {
       data: null;
-      error: { message: string; e: unknown };
+      error: { type: 'server' | 'unknown'; message: string; e: unknown };
     };
 
 export async function loginUser(params: Params): Promise<Result> {
@@ -51,8 +51,8 @@ export async function loginUser(params: Params): Promise<Result> {
   const failureResult = EndpointFailureSchema.safeParse(json);
 
   if (failureResult.success) {
-    return { error: { message: failureResult.data.message, e: failureResult.data.errors }, data: null };
+    return { error: { type: 'server', message: failureResult.data.message, e: failureResult.data.errors }, data: null };
   }
 
-  return { error: { message: 'Unknown error', e: response.status }, data: null };
+  return { error: { type: 'unknown', message: 'Unknown error', e: response.status }, data: null };
 }

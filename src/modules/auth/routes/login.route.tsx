@@ -38,16 +38,17 @@ export async function action({ request }: Route.ActionArgs) {
     const { username, password } = formDataParsingResult.data;
     const { data, error } = await loginUser({ username, password });
 
-    if (error && error.message === 'server') {
+    if (error?.type === 'server') {
       return { errors: error.e, message: error.message };
     }
 
-    if (error && error.message === 'unknown') {
+    if (error?.type === 'unknown') {
       return { message: 'Something went wrong!' };
     }
 
     if (data) {
       session.set('token', data.token);
+      session.set('user', data.user);
       return redirect(href('/'), { headers: { 'Set-Cookie': await commitSession(session) } });
     }
 

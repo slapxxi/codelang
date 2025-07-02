@@ -22,6 +22,66 @@ import { useMemo, useId } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import * as z from 'zod/v4';
 
+const SnippetEditRoute = ({ loaderData }: Route.ComponentProps) => {
+  const { supportedLangs = [], snippet } = loaderData ?? {};
+  const schema = useMemo(() => createSchema(supportedLangs), [...supportedLangs]);
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      language: snippet!.language,
+      code: snippet!.code,
+    },
+  });
+  const codeId = useId();
+  const submit = useSubmit();
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (data) => {
+    submit(data, { method: 'post' });
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-2 max-w-prose">
+      <PageTitle>Update Snippet</PageTitle>
+
+      <Form method="post" onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-2">
+          <Select name="language" onValueChange={(v) => form.setValue('language', v)} value={form.watch('language')}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Language</SelectLabel>
+                {supportedLangs.map((lang) => (
+                  <SelectItem key={lang} value={lang}>
+                    {lang}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          {form.formState.errors.language && <FormError error={form.formState.errors.language.message} />}
+        </div>
+
+        <div className="flex flex-col gap-2 p-2">
+          <Label htmlFor={codeId}>Code</Label>
+          <textarea
+            {...form.register('code')}
+            id={codeId}
+            placeholder="Your code goes here..."
+            className="p-2 min-h-[150px]"
+          ></textarea>
+          {form.formState.errors.code && <FormError error={form.formState.errors.code.message} />}
+        </div>
+
+        <div className="p-2">
+          <Button>Update Snippet</Button>
+        </div>
+      </Form>
+    </div>
+  );
+};
+
 export async function loader({ params, request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
@@ -96,65 +156,5 @@ function createSchema(langs: string[]) {
   });
   return CreateSnippetFormSchema;
 }
-
-const SnippetEditRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { supportedLangs = [], snippet } = loaderData ?? {};
-  const schema = useMemo(() => createSchema(supportedLangs), [...supportedLangs]);
-  const form = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      language: snippet!.language,
-      code: snippet!.code,
-    },
-  });
-  const codeId = useId();
-  const submit = useSubmit();
-
-  const onSubmit: SubmitHandler<z.infer<typeof schema>> = (data) => {
-    submit(data, { method: 'post' });
-  };
-
-  return (
-    <div className="w-full flex flex-col gap-2 max-w-prose">
-      <PageTitle>Update Snippet</PageTitle>
-
-      <Form method="post" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-2">
-          <Select name="language" onValueChange={(v) => form.setValue('language', v)} value={form.watch('language')}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select Language" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Language</SelectLabel>
-                {supportedLangs.map((lang) => (
-                  <SelectItem key={lang} value={lang}>
-                    {lang}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {form.formState.errors.language && <FormError error={form.formState.errors.language.message} />}
-        </div>
-
-        <div className="flex flex-col gap-2 p-2">
-          <Label htmlFor={codeId}>Code</Label>
-          <textarea
-            {...form.register('code')}
-            id={codeId}
-            placeholder="Your code goes here..."
-            className="p-2 min-h-[150px]"
-          ></textarea>
-          {form.formState.errors.code && <FormError error={form.formState.errors.code.message} />}
-        </div>
-
-        <div className="p-2">
-          <Button>Update Snippet</Button>
-        </div>
-      </Form>
-    </div>
-  );
-};
 
 export default SnippetEditRoute;

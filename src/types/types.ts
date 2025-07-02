@@ -23,10 +23,17 @@ export type TResult<T> =
     }
   | { data: null; error: TResultError };
 
-export type TResultError =
-  | {
-      type: 'unknown';
-      message: string;
-      e: unknown;
-    }
-  | { type: 'server'; message: string; status: number };
+export type TResultError = TServerError | TExceptionError;
+
+export type TServerError = {
+  type: 'server';
+  status: number;
+  message: string;
+  e?: unknown;
+};
+
+export type TExceptionError = {
+  type: 'exception';
+  message: string;
+  e: unknown;
+};

@@ -1,17 +1,9 @@
 import { Avatar, PageTitle } from '~/ui';
 import type { Route } from './+types/user.route';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
+import { data } from 'react-router';
+import { STATUS_NOT_FOUND } from '~/app/const';
 import { UserStats } from '../ui';
-
-export async function loader({ params }: Route.LoaderArgs) {
-  const { data, error } = await getUserStats({ id: params.userId });
-
-  if (data) {
-    return { stats: data };
-  }
-
-  return { error };
-}
 
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
   const { stats } = loaderData;
@@ -31,5 +23,15 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
 
   return null;
 };
+
+export async function loader({ params }: Route.LoaderArgs) {
+  const userStatsResult = await getUserStats({ id: params.userId });
+
+  if (userStatsResult.data) {
+    return { stats: userStatsResult.data };
+  }
+
+  throw data(null, { status: STATUS_NOT_FOUND });
+}
 
 export default UserRoute;

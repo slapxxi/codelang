@@ -1,6 +1,7 @@
+import { ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK, STATUS_SERVER } from '~/app/const';
 import { API_URL } from './const';
-import { EndpointFailureSchema, UserSchema } from './schema';
-import type { TUser } from '~/types';
+import { UserSchema } from './schema';
+import type { TResult, TUser } from '~/types';
 
 const RegisterUserResponse = UserSchema;
 
@@ -9,15 +10,7 @@ type Params = {
   password: string;
 };
 
-type Result =
-  | {
-      data: TUser;
-      error: null;
-    }
-  | {
-      data: null;
-      error: { type: 'server' | 'unknown'; message: string; e: unknown };
-    };
+type Result = TResult<TUser>;
 
 export async function registerUser(params: Params): Promise<Result> {
   const url = new URL(`${API_URL}/register`);
@@ -28,21 +21,20 @@ export async function registerUser(params: Params): Promise<Result> {
     },
     body: JSON.stringify(params),
   });
-  const json = await response.json();
-  const responseResult = RegisterUserResponse.safeParse(json.data);
 
-  if (responseResult.success) {
-    return {
-      data: responseResult.data,
-      error: null,
-    };
+  if (response.ok) {
+    const json = await response.json();
+    const responseResult = RegisterUserResponse.safeParse(json.data);
+
+    if (responseResult.success) {
+      return {
+        data: responseResult.data,
+        error: null,
+      };
+    }
+
+    return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER }, data: null };
   }
 
-  const failureResult = EndpointFailureSchema.safeParse(json);
-
-  if (failureResult.success) {
-    return { error: { type: 'server', message: 'server', e: failureResult.data.errors }, data: null };
-  }
-
-  return { error: { type: 'unknown', message: 'Unknown error', e: response.status }, data: null };
+  return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status }, data: null };
 }

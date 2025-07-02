@@ -1,6 +1,7 @@
+import { ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK, STATUS_SERVER } from '~/app/const';
 import { API_URL } from './const';
 import { EndpointFailureSchema, UserSchema } from './schema';
-import type { TUser } from '~/types';
+import type { TResult, TUser } from '~/types';
 
 const LoginUserResponse = UserSchema;
 
@@ -11,19 +12,7 @@ type Params = {
   password: string;
 };
 
-type Result =
-  | {
-      data: {
-        user: TUser;
-        token: string;
-        cookie: string;
-      };
-      error: null;
-    }
-  | {
-      data: null;
-      error: { type: 'server' | 'unknown'; message: string; e: unknown };
-    };
+type Result = TResult<{ user: TUser; token: string; cookie: string }>;
 
 export async function loginUser(params: Params): Promise<Result> {
   const url = new URL(`${API_URL}/auth/login`);
@@ -45,15 +34,12 @@ export async function loginUser(params: Params): Promise<Result> {
       const token = cookie?.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
       return { data: { user: responseResult.data, token: token!, cookie: cookie! }, error: null };
     } else {
-      throw new Error('Unexpected server output', responseResult.error);
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER },
+        data: null,
+      };
     }
   }
 
-  const failureResult = EndpointFailureSchema.safeParse(json);
-
-  if (failureResult.success) {
-    return { error: { type: 'server', message: failureResult.data.message, e: failureResult.data.errors }, data: null };
-  }
-
-  return { error: { type: 'unknown', message: 'Unknown error', e: response.status }, data: null };
+  return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status }, data: null };
 }

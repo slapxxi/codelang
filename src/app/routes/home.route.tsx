@@ -2,30 +2,11 @@ import type { Route } from './+types/home.route';
 import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
-
-export function meta() {
-  return [{ title: 'Codelang' }, { name: 'description', content: 'Codelang' }];
-}
-
-export async function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url);
-  const page = url.searchParams.get('page');
-  const { data, error } = await getSnippets({ page });
-
-  if (data) {
-    const { snippets, totalPages } = data;
-    return { snippets, totalPages, currentPage: page ? parseInt(page) : 1 };
-  }
-
-  return { error };
-}
+import { STATUS_NOT_FOUND } from '../const';
+import { data } from 'react-router';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage, error } = loaderData;
-
-  if (error) {
-    throw new Error(error.message);
-  }
 
   return (
     <div>
@@ -43,5 +24,22 @@ const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
     </div>
   );
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const page = url.searchParams.get('page');
+  const snippetsResult = await getSnippets({ page });
+
+  if (snippetsResult.data) {
+    const { snippets, totalPages } = snippetsResult.data;
+    return { snippets, totalPages, currentPage: page ? parseInt(page) : 1 };
+  }
+
+  throw data(null, { status: STATUS_NOT_FOUND });
+}
+
+export function meta() {
+  return [{ title: 'Codelang' }, { name: 'description', content: 'Codelang' }];
+}
 
 export default HomeRoute;

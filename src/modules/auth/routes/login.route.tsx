@@ -9,6 +9,7 @@ import { Button } from '~/ui/base';
 import { Input, FormError } from '~/ui';
 import { loginUser } from '~/lib/http';
 import { commitSession, getSession } from '~/app/session.server';
+import { STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
 
 const LoginFormSchema = z.object({
   username: z.string().nonempty('Username is required'),
@@ -16,52 +17,6 @@ const LoginFormSchema = z.object({
 });
 
 type TLoginForm = z.infer<typeof LoginFormSchema>;
-
-export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
-
-  if (session.has('token')) {
-    return redirect('/');
-  }
-
-  return data({ error: session.get('error') }, { headers: { 'Set-Cookie': await commitSession(session) } });
-}
-
-export async function action({ request }: Route.ActionArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
-  const form = await request.formData();
-  const username = form.get('username');
-  const password = form.get('password');
-  const formDataParsingResult = LoginFormSchema.safeParse({ username, password });
-
-  if (formDataParsingResult.success) {
-    const { username, password } = formDataParsingResult.data;
-    const { data, error } = await loginUser({ username, password });
-
-    if (error?.type === 'server') {
-      return { errors: error.e, message: error.message };
-    }
-
-    if (error?.type === 'unknown') {
-      return { message: 'Something went wrong!' };
-    }
-
-    if (data) {
-      session.set('token', data.token);
-      session.set('user', data.user);
-      return redirect(href('/'), {
-        headers: [
-          ['Set-Cookie', await commitSession(session)],
-          ['Set-Cookie', data.cookie],
-        ],
-      });
-    }
-
-    throw new Error('Something went wrong');
-  }
-
-  return { message: 'Invalid credentials' };
-}
 
 const LoginRoute = ({ actionData }: Route.ComponentProps) => {
   const { message } = actionData ?? {};
@@ -125,5 +80,50 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
     </>
   );
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+
+  if (session.has('token')) {
+    return redirect('/');
+  }
+
+  return data({ error: session.get('error') }, { headers: { 'Set-Cookie': await commitSession(session) } });
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const form = await request.formData();
+  const username = form.get('username');
+  const password = form.get('password');
+  const formDataParsingResult = LoginFormSchema.safeParse({ username, password });
+
+  if (formDataParsingResult.success) {
+    const { username, password } = formDataParsingResult.data;
+    const loginResult = await loginUser({ username, password });
+    const { error } = loginResult;
+
+    if (loginResult.data) {
+      session.set('token', loginResult.data.token);
+      session.set('user', loginResult.data.user);
+      return redirect(href('/'), {
+        headers: [
+          ['Set-Cookie', await commitSession(session)],
+          ['Set-Cookie', loginResult.data.cookie],
+        ],
+      });
+    }
+
+    if (error?.type === 'server') {
+      return data({ errors: error.e, message: error.message }, { status: STATUS_SERVER });
+    }
+
+    if (error?.type === 'exception') {
+      return data({ errors: error.e, message: error.message }, { status: STATUS_SERVER });
+    }
+  }
+
+  return data({ message: 'Invalid credentials' }, { status: STATUS_NOT_FOUND });
+}
 
 export default LoginRoute;

@@ -3,15 +3,6 @@ import type { Route } from './+types/logout.route';
 import { Form, href, Link, redirect } from 'react-router';
 import { Button } from '~/ui/base';
 
-export async function action({ request }: Route.ActionArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
-  return redirect('/login', {
-    headers: {
-      'Set-Cookie': await destroySession(session),
-    },
-  });
-}
-
 const LogoutRoute = () => {
   return (
     <div className="flex flex-col gap-4 items-center">
@@ -25,5 +16,14 @@ const LogoutRoute = () => {
     </div>
   );
 };
+
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  return redirect('/login', {
+    headers: {
+      'Set-Cookie': await destroySession(session),
+    },
+  });
+}
 
 export default LogoutRoute;

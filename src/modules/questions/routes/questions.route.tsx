@@ -3,19 +3,6 @@ import { href, Link } from 'react-router';
 import { getQuestions } from '~/lib/http';
 import { PageTitle, Pagination } from '~/ui';
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url);
-  const page = url.searchParams.get('page');
-  const { data, error } = await getQuestions({ page });
-
-  if (data) {
-    const { questions, totalItems, totalPages } = data;
-    return { questions, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
-  }
-
-  return { error };
-}
-
 const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
   const { error, questions, totalPages, currentPage } = loaderData;
 
@@ -39,5 +26,18 @@ const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
     </div>
   );
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const page = url.searchParams.get('page');
+  const { data, error } = await getQuestions({ page });
+
+  if (data) {
+    const { questions, totalItems, totalPages } = data;
+    return { questions, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
+  }
+
+  return { error };
+}
 
 export default QuestionsRoute;

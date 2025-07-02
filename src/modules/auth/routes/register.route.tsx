@@ -7,7 +7,8 @@ import { Button } from '~/ui/base';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { commitSession, getSession } from '~/app/session.server';
+import { getSession } from '~/app/session.server';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, STATUS_SERVER, STATUS_VALIDATION } from '~/app/const';
 
 const RegisterUserSchema = z.object({
   username: z.string('Username is required').min(5),
@@ -20,47 +21,17 @@ const RegisterUserSchema = z.object({
     .refine((v) => /[^a-zA-Z0-9]/.test(v), 'Password must contain at least one symbol'),
 });
 
-const RegisterFormSchema = RegisterUserSchema.extend({
-  confirmPassword: z.string().nonempty('Confirm password is required'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords must match',
-  path: ['confirmPassword'],
-});
+const RegisterFormSchema = z
+  .object({
+    ...RegisterUserSchema.shape,
+    confirmPassword: z.string().nonempty('Confirm password is required'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords must match',
+    path: ['confirmPassword'],
+  });
 
 type TRegisterForm = z.infer<typeof RegisterFormSchema>;
-
-export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
-
-  if (session.has('token')) {
-    return redirect('/');
-  }
-
-  return data({ error: session.get('error') }, { headers: { 'Set-Cookie': await commitSession(session) } });
-}
-
-export async function action({ request }: Route.ActionArgs) {
-  const form = await request.formData();
-  const username = form.get('username');
-  const password = form.get('password');
-  const { success, data } = RegisterUserSchema.safeParse({ username, password });
-
-  if (success) {
-    const { error } = await registerUser({ username: data.username, password: data.password });
-
-    if (error && error.type === 'server') {
-      return { message: error.message };
-    }
-
-    if (error && error.type === 'unknown') {
-      return { message: 'Something went wrong!' };
-    }
-
-    return redirect('/login');
-  }
-
-  return { message: 'Invalid data submitted' };
-}
 
 const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
   const { message } = actionData ?? {};
@@ -133,5 +104,36 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
     </>
   );
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+
+  if (session.has('token')) {
+    return redirect('/');
+  }
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const form = await request.formData();
+  const username = form.get('username');
+  const password = form.get('password');
+  const { success, data: parseData } = RegisterUserSchema.safeParse({ username, password });
+
+  if (success) {
+    const { error } = await registerUser({ username: parseData.username, password: parseData.password });
+
+    if (error && error.type === ERROR_TYPE_SERVER) {
+      return data({ message: error.message }, { status: error.status });
+    }
+
+    if (error && error.type === ERROR_TYPE_EXCEPTION) {
+      return data({ message: error.message }, { status: STATUS_SERVER });
+    }
+
+    return redirect('/login');
+  }
+
+  return data({ message: 'Invalid data submitted' }, { status: STATUS_VALIDATION });
+}
 
 export default RegisterRoute;

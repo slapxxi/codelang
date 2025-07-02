@@ -1,27 +1,12 @@
 import type { Route } from './+types/profile.route';
-import { Form, href, redirect } from 'react-router';
+import { data, Form, href, redirect } from 'react-router';
 import { LogOut } from 'lucide-react';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
 import { getUserFromSession } from '~/app/get-user-from-session.server';
 import { Avatar, PageTitle } from '~/ui';
 import { Button } from '~/ui/base';
 import { UserStats } from '../ui';
-
-export async function loader({ request }: Route.LoaderArgs) {
-  const user = await getUserFromSession(request);
-
-  if (user === null) {
-    return redirect('/login');
-  }
-
-  const { data, error } = await getUserStats({ id: user.id });
-
-  if (data) {
-    return { stats: data };
-  }
-
-  return { error };
-}
+import { STATUS_NOT_FOUND, STATUS_UNAUTHORIZED } from '~/app/const';
 
 const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
   const { stats } = loaderData;
@@ -47,5 +32,21 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
 
   return null;
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getUserFromSession(request);
+
+  if (user === null) {
+    return redirect('/login', { status: STATUS_UNAUTHORIZED });
+  }
+
+  const userStatsResult = await getUserStats({ id: user.id });
+
+  if (userStatsResult.data) {
+    return { stats: userStatsResult.data };
+  }
+
+  throw data(null, { status: STATUS_NOT_FOUND });
+}
 
 export default ProfileRoute;

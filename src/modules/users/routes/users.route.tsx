@@ -1,27 +1,11 @@
 import type { Route } from './+types/users.route';
-import { href, Link } from 'react-router';
+import { data, href, Link } from 'react-router';
+import { STATUS_NOT_FOUND } from '~/app/const';
 import { getUsers } from '~/lib/http';
 import { PageTitle, Pagination } from '~/ui';
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url);
-  const page = url.searchParams.get('page');
-  const { data, error } = await getUsers({ page });
-
-  if (data) {
-    const { users, totalItems, totalPages } = data;
-    return { users, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
-  }
-
-  return { error };
-}
-
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { users, totalPages, currentPage, error } = loaderData;
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  const { users, totalPages, currentPage } = loaderData;
 
   return (
     <div className="flex flex-col">
@@ -37,5 +21,18 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
     </div>
   );
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const page = url.searchParams.get('page');
+  const usersResult = await getUsers({ page });
+
+  if (usersResult.data) {
+    const { users, totalItems, totalPages } = usersResult.data;
+    return { users, totalItems, totalPages, currentPage: page ? parseInt(page) : 1 };
+  }
+
+  throw data(null, { status: STATUS_NOT_FOUND });
+}
 
 export default UserRoute;

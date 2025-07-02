@@ -2,11 +2,6 @@ import type { Route } from './+types/question.route';
 import { Code, PageTitle } from '~/ui';
 import { getQuestion } from '~/lib/http';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const { question, error } = await getQuestion({ id: params.questionId });
-  return { question, error };
-}
-
 const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
   const { question } = loaderData;
 
@@ -22,5 +17,10 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
     </div>
   );
 };
+
+export async function loader({ params }: Route.LoaderArgs) {
+  const { question, error } = await getQuestion({ id: params.questionId });
+  return { question, error };
+}
 
 export default QuestionRoute;

@@ -1,11 +1,11 @@
-import { forwardRef, Fragment } from 'react';
+import { forwardRef } from 'react';
 import { cn } from '~/utils';
 
 type CodeProps = {
   code?: string;
-} & React.ComponentProps<'pre'>;
+} & React.ComponentProps<'div'>;
 
-export const Code = forwardRef<HTMLPreElement, CodeProps>((props, ref) => {
+export const Code = forwardRef<HTMLDivElement, CodeProps>((props, ref) => {
   const { code, className, ...rest } = props;
 
   if (!code) {
@@ -13,10 +13,13 @@ export const Code = forwardRef<HTMLPreElement, CodeProps>((props, ref) => {
   }
 
   return (
-    <pre
+    <div
       ref={ref}
       dangerouslySetInnerHTML={{ __html: code }}
-      className={cn('max-w-full min-w-0 *:p-2 *:rounded *:shadow *:overflow-x-auto', className)}
+      className={cn(
+        'flex max-w-full min-w-0 *:w-full *:max-w-full *:min-w-0 *:p-2 *:rounded *:shadow *:overflow-auto',
+        className
+      )}
       {...rest}
     />
   );

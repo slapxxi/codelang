@@ -8,7 +8,7 @@ const MainLayout = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <LayoutContainer>
+    <LayoutContainer disableMotion>
       <header className="pl-4 bg-zinc-900 text-white flex items-center justify-between md:hidden">
         <Logo light />
 

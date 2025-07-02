@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { SnippetSchema, SnippetSchemaWithLikes } from './schema';
 import type { TResult, TSnippet } from '~/types';
-import { SERVER_ERROR } from '~/app/const';
+import { STATUS_SERVER } from '~/app/const';
 
 const GetSnippetResponse = SnippetSchema;
 
@@ -27,7 +27,10 @@ export async function getSnippet(params: Params): Promise<Result> {
       };
     }
 
-    return { error: { type: 'server', message: 'Error parsing server response', status: SERVER_ERROR }, data: null };
+    return {
+      error: { type: 'server', message: 'Error parsing server response', status: STATUS_SERVER },
+      data: null,
+    };
   } catch (e) {
     return { error: { type: 'exception', message: 'Exception occured', e }, data: null };
   }

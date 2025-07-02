@@ -1,30 +1,51 @@
 import type { Route } from './+types/snippet.route';
-import { data, redirect, href, Link } from 'react-router';
+import { data, redirect, href, Link, Form, useNavigation } from 'react-router';
 import { useAuth } from '~/hooks';
-import { getSnippet } from '~/lib/http';
-import { SnippetCard, Title } from '~/ui';
+import { deleteSnippet, getSnippet } from '~/lib/http';
+import { Button, SnippetCard, Title } from '~/ui';
 import { postComment } from '~/lib/http/post-comment.http';
 import { getSession } from '~/app/session.server';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { PostCommentForm, PostCommentFormSchema } from '../forms';
-import { MESSAGE_INVALID_DATA, STATUS_NOT_FOUND, STATUS_VALIDATION } from '~/app/const';
+import {
+  ERROR_TYPE_SERVER,
+  MESSAGE_INVALID_DATA,
+  STATUS_BAD_REQUEST,
+  STATUS_NOT_FOUND,
+  STATUS_SERVER,
+} from '~/app/const';
 
 const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { snippet } = loaderData;
   const user = useAuth();
 
+  function handleDelete(e: React.FormEvent<HTMLFormElement>) {
+    if (!confirm('Are you sure you want to delete this snippet?')) {
+      e.preventDefault();
+    }
+  }
+
   return (
-    <div className="overflow-x-hidden w-full flex flex-col gap-8 mt-4 px-1 md:mt-0 lg:flex-row">
-      <div className="top-0 self-center w-full lg:flex-1 md:self-start gap-8 flex flex-col lg:w-1/2 lg:sticky">
+    <div className="overflow-x-hidden w-full flex flex-col gap-8 mt-4 px-1 md:mt-0">
+      <div className="md:min-w-128 max-w-full top-0 self-center md:self-start gap-8 flex flex-col">
         <div className="flex flex-col gap-4">
           {user && snippet.user.id === user.id && (
-            <Link
-              to={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
-              className="flex gap-2 items-center text-sm text-olive-900 hover:text-olive-600"
-            >
-              <Pencil size={16} />
-              <span>Edit Snippet</span>
-            </Link>
+            <div className="flex gap-2">
+              <Link
+                to={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
+                className="flex gap-2 items-center text-sm text-olive-900 hover:text-olive-600"
+              >
+                <Pencil size={16} />
+                <span>Edit Snippet</span>
+              </Link>
+
+              <Form method="post" onSubmit={handleDelete}>
+                <input type="hidden" name="method" value="delete" />
+                <Button variant="destructive">
+                  Delete Snippet <Trash2 size={16} />
+                </Button>
+              </Form>
+            </div>
           )}
 
           <SnippetCard snippet={snippet} expand={false} className="max-w-full min-w-0" />
@@ -45,7 +66,7 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
           </span>
         </Title>
 
-        <ul className="flex flex-col gap-4 pl-2 lg:w-full">
+        <ul className="flex flex-col gap-4 pl-2">
           {snippet.comments.map((comment) => (
             <li key={comment.id} className="bg-gray-50 shadow rounded-lg p-4 border border-gray-200">
               {comment.content}
@@ -80,6 +101,16 @@ export async function action({ request, params }: Route.ActionArgs) {
   const form = Object.fromEntries(formData);
   const parseResult = PostCommentFormSchema.safeParse(form);
 
+  if (form.method === 'delete') {
+    const deleteResult = await deleteSnippet({ id: params.snippetId, token });
+
+    if (deleteResult.data) {
+      return redirect(href('/snippets'));
+    }
+
+    return data(null, { status: STATUS_SERVER });
+  }
+
   if (parseResult.success) {
     const { comment } = parseResult.data;
     const postResult = await postComment({ snippetId: params.snippetId, comment, token });
@@ -88,16 +119,16 @@ export async function action({ request, params }: Route.ActionArgs) {
       return { data: postResult.data, error: null };
     }
 
-    if (postResult.error.type === 'server') {
+    if (postResult.error.type === ERROR_TYPE_SERVER) {
       const { message, status } = postResult.error;
       return data({ error: { message: message, status: status } }, { status: status });
     }
 
     const { message, e } = postResult.error;
-    return data({ error: { message, e } }, { status: STATUS_VALIDATION });
+    return data({ error: { message, e } }, { status: STATUS_BAD_REQUEST });
   }
 
-  return data({ error: { message: MESSAGE_INVALID_DATA } }, { status: STATUS_VALIDATION });
+  return data({ error: { message: MESSAGE_INVALID_DATA } }, { status: STATUS_BAD_REQUEST });
 }
 
 export function meta() {

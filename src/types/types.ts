@@ -30,6 +30,7 @@ export type TServerError = {
   status: number;
   message: string;
   e?: unknown;
+  response?: Response;
 };
 
 export type TExceptionError = {

@@ -8,7 +8,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { getSession } from '~/app/session.server';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, STATUS_SERVER, STATUS_VALIDATION } from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_SERVER } from '~/app/const';
 
 const RegisterUserSchema = z.object({
   username: z.string('Username is required').min(5),
@@ -133,7 +133,7 @@ export async function action({ request }: Route.ActionArgs) {
     return redirect('/login');
   }
 
-  return data({ message: 'Invalid data submitted' }, { status: STATUS_VALIDATION });
+  return data({ message: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
 }
 
 export default RegisterRoute;

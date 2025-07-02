@@ -1,5 +1,6 @@
 export * from './create-snippet.http';
 export * from './update-snippet.http';
+export * from './delete-snippet.http';
 export * from './get-snippets.http';
 export * from './get-snippet.http';
 export * from './get-current-user.http';

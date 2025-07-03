@@ -4,7 +4,7 @@ import { data, href, Link } from 'react-router';
 import { STATUS_SERVER } from '~/app/const/status-codes.js';
 import { useAuth } from '~/hooks/use-auth.hook.js';
 import { getQuestions } from '~/lib/http';
-import { PageTitle, Pagination } from '~/ui';
+import { PageTitle, Pagination, QuestionCard } from '~/ui';
 
 const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
   const { questions, totalPages, currentPage } = loaderData;
@@ -26,14 +26,7 @@ const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
 
       <ul className="flex flex-col gap-2">
         {questions!.map((q) => (
-          <li key={q.id}>
-            <Link
-              to={href('/questions/:questionId', { questionId: q.id })}
-              className="inline-flex p-2 bg-olive-100 shadow rounded hover:bg-olive-200"
-            >
-              {q.title}
-            </Link>
-          </li>
+          <QuestionCard key={q.id} question={q} />
         ))}
       </ul>
 

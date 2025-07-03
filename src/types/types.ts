@@ -1,16 +1,23 @@
 import * as z from 'zod/v4';
-import type { CommentSchema, MarkSchema, QuestionSchema, SnippetSchema, UserSchema, UserStatsSchema } from '~/lib/http';
+import type {
+  CommentSchema,
+  MarkSchema,
+  QuestionSchemaWithCodeHighlighted,
+  SnippetSchemaWithLikes,
+  UserSchema,
+  UserStatsSchema,
+} from '~/lib/http';
 
 export type TUser = z.infer<typeof UserSchema>;
 export type TUserStats = z.infer<typeof UserStatsSchema>;
 
 export type UserRole = 'admin' | 'user';
 
-export type TSnippet = z.infer<typeof SnippetSchema> & { likes: number; dislikes: number; formattedCode: string };
+export type TSnippet = z.infer<typeof SnippetSchemaWithLikes>;
 
 export type TComment = z.infer<typeof CommentSchema>;
 
-export type TQuestion = z.infer<typeof QuestionSchema>;
+export type TQuestion = z.infer<typeof QuestionSchemaWithCodeHighlighted>;
 
 export type TFormErrors<FormSchema> = { [K in keyof FormSchema]?: string[] };
 

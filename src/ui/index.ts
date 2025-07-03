@@ -15,3 +15,4 @@ export * from './label.ui';
 export * from './select.ui';
 export * from './code-editor.ui';
 export * from './text-editor.ui';
+export * from './question-card.ui';

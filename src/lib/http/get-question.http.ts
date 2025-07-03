@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { QuestionSchema, QuestionSchemaWithCodeHighlighted } from './schema';
-import type { Question } from '~/types';
+import type { TQuestion } from '~/types';
 
 const GetQuestionResponse = QuestionSchema;
 
@@ -11,7 +11,7 @@ type Params = {
 
 type Result =
   | {
-      question: Question;
+      question: TQuestion;
       error: null;
     }
   | {

@@ -10,7 +10,7 @@ export type TSnippet = z.infer<typeof SnippetSchema> & { likes: number; dislikes
 
 export type TComment = z.infer<typeof CommentSchema>;
 
-export type Question = z.infer<typeof QuestionSchema>;
+export type TQuestion = z.infer<typeof QuestionSchema>;
 
 export type TFormErrors<FormSchema> = { [K in keyof FormSchema]?: string[] };
 

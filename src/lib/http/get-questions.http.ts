@@ -2,7 +2,14 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { SnippetSchema, UserSchema, QuestionSchema, QuestionSchemaWithCodeHighlighted } from './schema';
 import { appendParams } from '~/utils';
-import type { Question } from '~/types';
+import type { TQuestion, TResult } from '~/types';
+import {
+  ERROR_TYPE_EXCEPTION,
+  ERROR_TYPE_SERVER,
+  MESSAGE_EXCEPTION,
+  MESSAGE_PARSING_ERROR,
+  STATUS_SERVER,
+} from '~/app/const';
 
 const GetQuestionsResponse = z.object({
   data: QuestionSchema.array(),
@@ -57,38 +64,36 @@ type Params = {
   searchBy?: (keyof z.infer<typeof SnippetSchema>)[] | null;
 };
 
-type Result =
-  | {
-      data: {
-        questions: Question[];
-        totalItems: number;
-        totalPages: number;
-      };
-      error: null;
-    }
-  | {
-      data: null;
-      error: { message: string; e: unknown };
-    };
+type Result = TResult<{
+  questions: TQuestion[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+}>;
 
 export async function getQuestions(params?: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/questions`);
-  appendParams(url, params);
-  const response = await fetch(url);
-  const json = await response.json();
-  const { success, data, error } = GetQuestionsResponse.safeParse(json.data);
+  try {
+    const url = new URL(`${API_URL}/questions`);
+    appendParams(url, params);
+    const response = await fetch(url);
+    const json = await response.json();
+    const { success, data } = GetQuestionsResponse.safeParse(json.data);
 
-  if (success) {
-    const questions = await QuestionSchemaWithCodeHighlighted.array().parseAsync(data.data);
-    return {
-      data: {
-        questions,
-        totalItems: data.meta.totalItems,
-        totalPages: data.meta.totalPages,
-      },
-      error: null,
-    };
+    if (success) {
+      const questions = await QuestionSchemaWithCodeHighlighted.array().parseAsync(data.data);
+      return {
+        data: {
+          questions,
+          totalItems: data.meta.totalItems,
+          totalPages: data.meta.totalPages,
+          currentPage: data.meta.currentPage,
+        },
+        error: null,
+      };
+    }
+
+    return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER }, data: null };
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
   }
-
-  return { error: { message: 'Error parsing server response', e: error }, data: null };
 }

@@ -19,10 +19,10 @@ export default [
     route('/snippets/:snippetId', './modules/snippets/routes/snippet.route.tsx'),
     route('/snippets/:snippetId/edit', './modules/snippets/routes/snippet-edit.route.tsx'),
 
-    route('/questions', './modules/questions/routes/questions.route.tsx', [
-      route('new', './modules/questions/routes/questions-new.route.tsx'),
-      route(':questionId/edit', './modules/questions/routes/question-edit.route.tsx'),
-    ]),
+    route('/questions', './modules/questions/routes/questions.route.tsx', []),
+    route('/questions/new', './modules/questions/routes/questions-new.route.tsx'),
     route('/questions/:questionId', './modules/questions/routes/question.route.tsx'),
+    route('/questions/:questionId/edit', './modules/questions/routes/question-edit.route.tsx'),
+    route('/questions/:questionId/delete', './modules/questions/routes/question-delete.route.tsx'),
   ]),
 ] satisfies RouteConfig;

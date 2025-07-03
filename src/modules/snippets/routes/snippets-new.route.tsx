@@ -13,6 +13,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
+  TextEditor,
 } from '~/ui';
 import type { Route } from './+types/snippets-new.route';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -61,7 +62,7 @@ const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
 
         <div className="flex flex-col gap-2 p-2">
           <Label htmlFor={codeId}>Code</Label>
-          <textarea {...form.register('code')} id={codeId} placeholder="Your code goes here..."></textarea>
+          <TextEditor {...form.register('code')} id={codeId} placeholder="Your code goes here..."></TextEditor>
           {form.formState.errors.code && <FormError error={form.formState.errors.code.message} />}
         </div>
 

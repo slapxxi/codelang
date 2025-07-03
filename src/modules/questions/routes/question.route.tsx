@@ -1,5 +1,5 @@
 import type { Route } from './+types/question.route';
-import { Code, PageTitle } from '~/ui';
+import { Card, Code, PageTitle } from '~/ui';
 import { getQuestion } from '~/lib/http';
 import { STATUS_NOT_FOUND } from '~/app/const';
 import { data } from 'react-router';
@@ -15,9 +15,9 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
 
       <ul className="flex flex-col gap-2">
         {question.answers.map((a) => (
-          <li key={a.id} className="p-2 bg-white shadow rounded-lg border-zinc-500/30 border">
-            <p>{a.content}</p>
-          </li>
+          <Card asChild key={a.id} variant="secondary">
+            <li className="p-2">{a.content}</li>
+          </Card>
         ))}
       </ul>
     </div>

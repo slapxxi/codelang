@@ -2,7 +2,7 @@ import type { Route } from './+types/snippet.route';
 import { data, redirect, href, Link, Form, useNavigation } from 'react-router';
 import { useAuth } from '~/hooks';
 import { deleteSnippet, getSnippet } from '~/lib/http';
-import { Button, SnippetCard, Title } from '~/ui';
+import { Button, Card, CardBody, SnippetCard, Title } from '~/ui';
 import { postComment } from '~/lib/http/post-comment.http';
 import { getSession } from '~/app/session.server';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -68,9 +68,9 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
 
         <ul className="flex flex-col gap-4 pl-2">
           {snippet.comments.map((comment) => (
-            <li key={comment.id} className="bg-gray-50 shadow rounded-lg p-4 border border-gray-200">
-              {comment.content}
-            </li>
+            <Card asChild variant="secondary" key={comment.id}>
+              <li className="p-2">{comment.content}</li>
+            </Card>
           ))}
           <div className="h-32 shrink-0" />
         </ul>

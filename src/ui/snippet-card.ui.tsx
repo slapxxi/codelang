@@ -1,11 +1,10 @@
 import type { TSnippet, TMark } from '~/types';
 import { Expand, MessageCircle, ThumbsDown, ThumbsUp, User } from 'lucide-react';
 import { href, Link, useFetcher } from 'react-router';
-import { Code } from './code.ui';
+import { Code, Card, Button, CardHeader, CardBody, CardFooter } from '~/ui';
 import { useAuth } from '~/hooks';
 import { cn } from '~/utils';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { Button } from './base';
 
 type SnippetCardProps = {
   snippet: TSnippet;
@@ -20,7 +19,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
   const likeFetcher = useFetcher();
   const dislikeFetcher = useFetcher();
   const user = useAuth();
-  const codeRef = useRef<HTMLPreElement>(null);
+  const codeRef = useRef<HTMLDivElement>(null);
   let mark: TMark | undefined;
 
   if (user) {
@@ -40,31 +39,26 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
   }
 
   return (
-    <article
-      className={cn(
-        'border border-olive-200 rounded-xl shadow backdrop-blur-[1px] bg-olive-200/30 overflow-hidden',
-        className
-      )}
-    >
-      <header className="flex justify-between items-center text-xs text-olive-600 p-2 pb-0">
+    <Card className={className}>
+      <CardHeader className="flex justify-between items-center text-xs text-olive-600">
         {expand && (
           <Link to={href('/snippets/:snippetId', { snippetId: snippet.id })} className="link">
             <Expand size={16} />
           </Link>
         )}
         <span className="ml-auto">{snippet.language}</span>
-      </header>
+      </CardHeader>
 
-      <div className="my-2 m-1 flex flex-col gap-2">
+      <CardBody className="flex flex-col gap-2">
         <Code
           ref={codeRef}
           code={snippet.formattedCode}
           className={cn('w-full max-w-full min-w-0', ex ? 'max-h-[600px]' : 'max-h-[300px]')}
         />
         {showMore && <Button onClick={handleClick}>Show {ex ? 'less' : 'more'}</Button>}
-      </div>
+      </CardBody>
 
-      <footer className="flex text-sm text-olive-600 justify-between items-center p-2">
+      <CardFooter className="flex text-sm text-olive-600 justify-between items-center">
         <div className="flex items-center gap-3">
           <likeFetcher.Form action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })} method="post">
             <button
@@ -112,7 +106,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
             {snippet.user.username}
           </Link>
         </div>
-      </footer>
-    </article>
+      </CardFooter>
+    </Card>
   );
 };

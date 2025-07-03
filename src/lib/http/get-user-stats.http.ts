@@ -1,6 +1,7 @@
-import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { UserStatsSchema } from './schema';
+import type { TResult, TUserStats } from '~/types';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetUserStatsResponse = UserStatsSchema;
 
@@ -8,25 +9,32 @@ type Params = {
   id: string;
 };
 
-type Result =
-  | {
-      data: z.infer<typeof UserStatsSchema>;
-      error: null;
-    }
-  | {
-      data: null;
-      error: { message: string; e: unknown };
-    };
+type Result = TResult<TUserStats>;
 
 export async function getUserStats(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/users/${params.id}/statistic`);
-  const response = await fetch(url);
-  const json = await response.json();
-  const { success, data, error } = GetUserStatsResponse.safeParse(json.data);
+  try {
+    const url = new URL(`${API_URL}/users/${params.id}/statistic`);
+    const response = await fetch(url);
 
-  if (success) {
-    return { data, error: null };
+    if (response.ok) {
+      const json = await response.json();
+      const { success, data } = GetUserStatsResponse.safeParse(json.data);
+
+      if (success) {
+        return { data, error: null };
+      }
+
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: response.status },
+        data: null,
+      };
+    }
+
+    return {
+      error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status },
+      data: null,
+    };
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting user stats', e }, data: null };
   }
-
-  return { error: { message: 'Error parsing server response', e: error }, data: null };
 }

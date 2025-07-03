@@ -6,7 +6,7 @@ import { getUserFromSession } from '~/app/get-user-from-session.server';
 import { Avatar, PageTitle } from '~/ui';
 import { Button } from '~/ui/base';
 import { UserStats } from '../ui';
-import { STATUS_NOT_FOUND, STATUS_UNAUTHORIZED } from '~/app/const';
+import { STATUS_NOT_FOUND, STATUS_SERVER, STATUS_UNAUTHORIZED } from '~/app/const';
 
 const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
   const { stats } = loaderData;
@@ -46,7 +46,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { stats: userStatsResult.data };
   }
 
-  throw data(null, { status: STATUS_NOT_FOUND });
+  throw data(null, { status: STATUS_SERVER });
 }
 
 export default ProfileRoute;

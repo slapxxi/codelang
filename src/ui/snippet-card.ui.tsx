@@ -53,6 +53,7 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
         <Code
           ref={codeRef}
           code={snippet.formattedCode}
+          showScrollbar={showMore}
           className={cn('w-full max-w-full min-w-0', ex ? 'max-h-[600px]' : 'max-h-[300px]')}
         />
         {showMore && <Button onClick={handleClick}>Show {ex ? 'less' : 'more'}</Button>}

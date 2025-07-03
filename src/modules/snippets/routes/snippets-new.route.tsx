@@ -3,8 +3,8 @@ import { getSession } from '~/app/session.server';
 import { createSnippet, getSupportedLanguages } from '~/lib/http';
 import {
   Button,
+  CodeEditor,
   FormError,
-  Label,
   PageTitle,
   Select,
   SelectContent,
@@ -13,12 +13,11 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-  TextEditor,
 } from '~/ui';
 import type { Route } from './+types/snippets-new.route';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import * as z from 'zod/v4';
-import { useId, useMemo } from 'react';
+import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 
@@ -26,7 +25,6 @@ const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
   const { supportedLangs = [] } = loaderData ?? {};
   const schema = useMemo(() => createSchema(supportedLangs), [...supportedLangs]);
   const form = useForm({ resolver: zodResolver(schema) });
-  const codeId = useId();
   const submit = useSubmit();
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = (data) => {
@@ -58,8 +56,7 @@ const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
         </div>
 
         <div className="flex flex-col gap-2 p-2">
-          <Label htmlFor={codeId}>Code</Label>
-          <TextEditor {...form.register('code')} id={codeId} placeholder="Your code goes here..."></TextEditor>
+          <CodeEditor {...form.register('code')} placeholder="Your code goes here..."></CodeEditor>
           {form.formState.errors.code && <FormError error={form.formState.errors.code.message} />}
         </div>
 

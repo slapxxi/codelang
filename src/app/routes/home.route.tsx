@@ -6,7 +6,7 @@ import { STATUS_NOT_FOUND } from '../const';
 import { data } from 'react-router';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { snippets, totalPages, currentPage, error } = loaderData;
+  const { snippets, totalPages, currentPage } = loaderData;
 
   return (
     <div>
@@ -31,8 +31,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const snippetsResult = await getSnippets({ page });
 
   if (snippetsResult.data) {
-    const { snippets, totalPages } = snippetsResult.data;
-    return { snippets, totalPages, currentPage: page ? parseInt(page) : 1 };
+    const { snippets, totalPages, currentPage } = snippetsResult.data;
+    return { snippets, totalPages, currentPage };
   }
 
   throw data(null, { status: STATUS_NOT_FOUND });

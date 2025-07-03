@@ -1,10 +1,11 @@
-import { useSearchParams } from 'react-router';
+import { Form, useSearchParams } from 'react-router';
 import {
   Pagination as PaginationBase,
   PaginationContent,
   PaginationItem,
   PaginationLink,
   PaginationEllipsis,
+  PaginationButton,
 } from './base';
 import { clamp, replaceSearchParamsValue } from '~/utils';
 
@@ -33,56 +34,58 @@ export const Pagination: React.FC<Props> = (props) => {
   const nextPages = new Array(endPage - currentPage).fill(null).map((_, i) => currentPage + (i + 1));
 
   return (
-    <PaginationBase {...rest}>
-      <PaginationContent>
-        {prevPages.length > 0 && !prevPages.includes(1) && (
-          <>
-            <PaginationItem>
-              <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', 1) }}>
-                {startPage}
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-          </>
-        )}
+    <Form method="get">
+      <PaginationBase {...rest}>
+        <PaginationContent>
+          {prevPages.length > 0 && !prevPages.includes(1) && (
+            <>
+              <PaginationItem>
+                <PaginationButton name="page" value={startPage}>
+                  {startPage}
+                </PaginationButton>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            </>
+          )}
 
-        {prevPages.map((page) => (
-          <PaginationItem key={page}>
-            <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', page) }}>
-              {page}
-            </PaginationLink>
+          {prevPages.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationButton name="page" value={page}>
+                {page}
+              </PaginationButton>
+            </PaginationItem>
+          ))}
+
+          <PaginationItem>
+            <PaginationButton name="page" value={currentPage} isActive>
+              {currentPage}
+            </PaginationButton>
           </PaginationItem>
-        ))}
 
-        <PaginationItem>
-          <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', currentPage) }} isActive>
-            {currentPage}
-          </PaginationLink>
-        </PaginationItem>
-
-        {nextPages.map((page) => (
-          <PaginationItem key={page}>
-            <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', page) }}>
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
-
-        {nextPages.length > 0 && !nextPages.includes(numberOfPages) && (
-          <>
-            <PaginationItem>
-              <PaginationEllipsis />
+          {nextPages.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationButton name="page" value={page}>
+                {page}
+              </PaginationButton>
             </PaginationItem>
-            <PaginationItem>
-              <PaginationLink to={{ search: replaceSearchParamsValue(searchParams, 'page', numberOfPages) }}>
-                {numberOfPages}
-              </PaginationLink>
-            </PaginationItem>
-          </>
-        )}
-      </PaginationContent>
-    </PaginationBase>
+          ))}
+
+          {nextPages.length > 0 && !nextPages.includes(numberOfPages) && (
+            <>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationButton name="page" value={numberOfPages}>
+                  {numberOfPages}
+                </PaginationButton>
+              </PaginationItem>
+            </>
+          )}
+        </PaginationContent>
+      </PaginationBase>
+    </Form>
   );
 };

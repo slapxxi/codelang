@@ -31,13 +31,15 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
         <div className="flex flex-col gap-4">
           {user && snippet.user.id === user.id && (
             <div className="flex gap-2">
-              <Link
-                to={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
-                className="flex gap-2 items-center text-sm text-olive-900 hover:text-olive-600"
-              >
-                <Pencil size={16} />
-                <span>Edit Snippet</span>
-              </Link>
+              <Button variant="link" asChild>
+                <Link
+                  to={href('/snippets/:snippetId/edit', { snippetId: snippet.id })}
+                  className="flex gap-2 items-center text-sm text-olive-900 hover:text-olive-600"
+                >
+                  <Pencil size={16} />
+                  <span>Edit Snippet</span>
+                </Link>
+              </Button>
 
               <Form method="post" onSubmit={handleDelete}>
                 <input type="hidden" name="method" value="delete" />

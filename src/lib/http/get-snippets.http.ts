@@ -1,12 +1,6 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
-import {
-  SnippetSchema,
-  UserSchema,
-  SnippetSchemaWithLikes,
-  LinksSchema,
-  SnippetSchemaWithCodeHighlighted,
-} from './schema';
+import { SnippetSchema, UserSchema, SnippetSchemaWithLikes, LinksSchema } from './schema';
 import { appendParams } from '~/utils';
 import type { TSnippet } from '~/types';
 
@@ -96,6 +90,5 @@ export async function getSnippets(params?: Params): Promise<Result> {
     return { error: { message: 'Error parsing server response' }, data: null };
   }
 
-  console.log(response);
   return { error: { message: 'Something went wrong' }, data: null };
 }

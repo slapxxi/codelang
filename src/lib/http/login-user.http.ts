@@ -1,6 +1,6 @@
 import { ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK, STATUS_SERVER } from '~/app/const';
 import { API_URL } from './const';
-import { EndpointFailureSchema, UserSchema } from './schema';
+import { UserSchema } from './schema';
 import type { TResult, TUser } from '~/types';
 
 const LoginUserResponse = UserSchema;

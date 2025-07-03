@@ -31,7 +31,6 @@ export async function updateSnippet(params: Params): Promise<Result> {
     if (response.ok) {
       const json = await response.json();
       const { success, data } = UpdateSnippetResponse.safeParse(json.data);
-      console.log(response, data);
 
       if (success) {
         return {

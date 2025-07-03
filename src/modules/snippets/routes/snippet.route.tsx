@@ -1,8 +1,8 @@
 import type { Route } from './+types/snippet.route';
-import { data, redirect, href, Link, Form, useNavigation } from 'react-router';
+import { data, redirect, href, Link, Form } from 'react-router';
 import { useAuth } from '~/hooks';
 import { deleteSnippet, getSnippet } from '~/lib/http';
-import { Button, Card, CardBody, SnippetCard, Title } from '~/ui';
+import { Button, Card, SnippetCard, Title } from '~/ui';
 import { postComment } from '~/lib/http/post-comment.http';
 import { getSession } from '~/app/session.server';
 import { Pencil, Trash2 } from 'lucide-react';

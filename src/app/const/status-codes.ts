@@ -5,6 +5,7 @@ export const STATUS_PAYMENT_REQUIRED = 402;
 export const STATUS_NOT_FOUND = 404;
 export const STATUS_CONFLICT = 409;
 export const STATUS_GONE = 410;
+export const STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
 
 export const STATUS_UNPROCESSABLE_ENTITY = 422;
 export const STATUS_LOCKED = 423;

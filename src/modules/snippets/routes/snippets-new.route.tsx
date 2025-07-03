@@ -20,17 +20,14 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import * as z from 'zod/v4';
 import { useId, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 
 const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { supportedLangs = [], error } = loaderData ?? {};
+  const { supportedLangs = [] } = loaderData ?? {};
   const schema = useMemo(() => createSchema(supportedLangs), [...supportedLangs]);
   const form = useForm({ resolver: zodResolver(schema) });
   const codeId = useId();
   const submit = useSubmit();
-
-  if (error) {
-    return null;
-  }
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = (data) => {
     submit(data, { method: 'post' });
@@ -88,7 +85,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { supportedLangs: supportedLangsResult.data };
   }
 
-  return { error: supportedLangsResult.error };
+  return data(null, { status: STATUS_SERVER });
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -112,16 +109,10 @@ export async function action({ request }: Route.ActionArgs) {
       return redirect(href('/snippets/:snippetId', { snippetId: postResult.data.id }));
     }
 
-    if (postResult.error.type === 'server') {
-      const { message, status } = postResult.error;
-      return data({ error: { message: message, status: status } }, { status: status });
-    }
-
-    const { message, e } = postResult.error;
-    return data({ error: { message, e } }, { status: 400 });
+    return data(null, { status: STATUS_SERVER });
   }
 
-  return data({ error: { message: 'Invalid data submitted' } }, { status: 400 });
+  return data(null, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 function createSchema(langs: string[]) {

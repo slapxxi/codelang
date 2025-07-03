@@ -6,6 +6,8 @@ const variants = cva('border border-olive-500/30 rounded-xl shadow', {
   variants: {
     variant: {
       primary: 'bg-olive-200/30 backdrop-blur-px',
+      interactive:
+        'bg-olive-200/30 backdrop-blur-px hover:backdrop-blur-sm hover:bg-olive-200/50 hover:border-olive-500/20',
       secondary: 'bg-white',
     },
   },
@@ -18,14 +20,15 @@ type CardProps = {
   children?: React.ReactNode;
   className?: string;
   asChild?: boolean;
-} & VariantProps<typeof variants>;
+} & VariantProps<typeof variants> &
+  React.ComponentProps<'div'>;
 
 export const Card: React.FC<CardProps> = (props) => {
-  const { children, className, variant, asChild = false } = props;
+  const { children, className, variant, asChild = false, ...rest } = props;
   const Comp = asChild ? Slot : 'div';
 
   return (
-    <Comp data-slot="card" className={cn(variants({ variant, className }), className)}>
+    <Comp data-slot="card" className={cn(variants({ variant, className }), className)} {...rest}>
       {children}
     </Comp>
   );

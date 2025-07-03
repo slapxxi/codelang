@@ -2,22 +2,27 @@ import type { Route } from './+types/users.route';
 import { data, href, Link } from 'react-router';
 import { STATUS_NOT_FOUND } from '~/app/const';
 import { getUsers } from '~/lib/http';
-import { PageTitle, Pagination } from '~/ui';
+import { Avatar, Card, PageTitle, Pagination } from '~/ui';
 
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
   const { users, totalPages, currentPage } = loaderData;
 
   return (
-    <div className="flex flex-col">
-      <PageTitle>Users</PageTitle>
-      <ul>
+    <div className="flex flex-col w-full">
+      <PageTitle className="mb-4">Users</PageTitle>
+
+      <ul className="flex flex-col gap-2 md:grid grid-cols-3">
         {users.map((u) => (
-          <li key={u.id}>
-            <Link to={href('/users/:userId', { userId: u.id })}>{u.username}</Link>
-          </li>
+          <Card asChild key={u.id} variant="interactive">
+            <Link to={href('/users/:userId', { userId: u.id })} className="p-2 flex gap-2 items-center">
+              <Avatar />
+              <span>{u.username}</span>
+            </Link>
+          </Card>
         ))}
       </ul>
-      <Pagination numberOfPages={totalPages} currentPage={currentPage} maxDisplayed={10} />
+
+      <Pagination numberOfPages={totalPages} currentPage={currentPage} maxDisplayed={10} className="my-4" />
     </div>
   );
 };

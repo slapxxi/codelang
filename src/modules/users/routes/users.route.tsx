@@ -15,7 +15,7 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
         {users.map((u) => (
           <Card asChild key={u.id} variant="interactive">
             <Link to={href('/users/:userId', { userId: u.id })} className="p-2 flex gap-2 items-center">
-              <Avatar />
+              <Avatar user={u} />
               <span>{u.username}</span>
             </Link>
           </Card>

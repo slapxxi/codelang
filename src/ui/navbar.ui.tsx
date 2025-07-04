@@ -98,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
 
       {user ? (
         <Link to={href('/logout')}>
-          <Avatar className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
+          <Avatar user={user} className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
         </Link>
       ) : (
         <Link to={href('/login')}>

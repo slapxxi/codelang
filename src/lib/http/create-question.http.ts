@@ -1,6 +1,6 @@
 import { API_URL } from './const';
 import { QuestionSchema } from './schema';
-import type { TQuestion, TResult } from '~/types';
+import type { TResult } from '~/types';
 import {
   ERROR_TYPE_EXCEPTION,
   ERROR_TYPE_SERVER,

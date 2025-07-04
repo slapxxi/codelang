@@ -9,6 +9,8 @@ export * from './get-user.http';
 export * from './get-current-user.http';
 export * from './get-questions.http';
 export * from './get-question.http';
+export * from './create-question.http';
+export * from './update-question.http';
 export * from './mark-snippet.http';
 export * from './register-user.http';
 export * from './get-supported-languages.http';

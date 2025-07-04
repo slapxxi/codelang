@@ -66,7 +66,9 @@ export const QuestionSchema = z.object({
 
 export const QuestionSchemaWithCodeHighlighted = QuestionSchema.transform(async (question) => {
   const hl = await highlighter;
-  const formattedCode = hl.codeToHtml(question.attachedCode, { lang: 'text', theme: 'vitesse-dark' });
+  const formattedCode = question.attachedCode
+    ? hl.codeToHtml(question.attachedCode, { lang: 'text', theme: 'vitesse-dark' })
+    : question.attachedCode;
   return { ...question, formattedCode };
 });
 

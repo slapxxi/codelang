@@ -10,8 +10,17 @@ export const QuestionFormSchema = z.object({
   code: z.string(),
 });
 
-export const QuestionForm: React.FC = () => {
-  const form = useForm({ resolver: zodResolver(QuestionFormSchema) });
+type QuestionFormProps = {
+  defaultValues?: z.infer<typeof QuestionFormSchema>;
+  children?: React.ReactNode;
+};
+
+export const QuestionForm: React.FC<QuestionFormProps> = (props) => {
+  const { defaultValues, children } = props;
+  const form = useForm({
+    resolver: zodResolver(QuestionFormSchema),
+    defaultValues,
+  });
   const submit = useSubmit();
 
   const onSubmit: SubmitHandler<z.infer<typeof QuestionFormSchema>> = (data) => {
@@ -29,7 +38,7 @@ export const QuestionForm: React.FC = () => {
       <CodeEditor {...form.register('code')} placeholder="Code" />
       <FormError>{form.formState.errors.code?.message}</FormError>
 
-      <Button>Create</Button>
+      {children || <Button>Create</Button>}
     </Form>
   );
 };

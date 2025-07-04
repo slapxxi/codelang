@@ -41,7 +41,7 @@ export const CardHeader: React.FC<CardProps> = (props) => {
     return null;
   }
 
-  return <div className={cn('py-2 px-2', className)}>{children}</div>;
+  return <div className={cn('py-2 px-2 text-olive-900', className)}>{children}</div>;
 };
 
 export const CardBody: React.FC<CardProps> = (props) => {
@@ -61,5 +61,5 @@ export const CardFooter: React.FC<CardProps> = (props) => {
     return null;
   }
 
-  return <div className={cn('py-2 px-2', className)}>{children}</div>;
+  return <div className={cn('py-2 px-2 text-sm text-olive-900', className)}>{children}</div>;
 };

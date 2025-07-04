@@ -26,7 +26,6 @@ export async function deleteQuestion(params: Params): Promise<Result> {
 
     if (response.ok) {
       const json = await response.json();
-      console.log('response', json);
       const { success, data } = DeleteQuestionResponse.safeParse(json.data);
 
       if (success) {

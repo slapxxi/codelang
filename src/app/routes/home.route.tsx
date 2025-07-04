@@ -2,7 +2,7 @@ import type { Route } from './+types/home.route';
 import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
-import { STATUS_NOT_FOUND } from '../const';
+import { ERROR_TYPE_SERVER, STATUS_SERVER } from '../const';
 import { data } from 'react-router';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
@@ -35,7 +35,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { snippets, totalPages, currentPage };
   }
 
-  throw data(null, { status: STATUS_NOT_FOUND });
+  const { error } = snippetsResult;
+  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
 }
 
 export function meta() {

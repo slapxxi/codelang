@@ -1,4 +1,10 @@
-import { ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK, STATUS_SERVER } from '~/app/const';
+import {
+  ERROR_TYPE_EXCEPTION,
+  ERROR_TYPE_SERVER,
+  MESSAGE_EXCEPTION,
+  MESSAGE_PARSING_ERROR,
+  STATUS_SERVER,
+} from '~/app/const';
 import { API_URL } from './const';
 import { UserSchema } from './schema';
 import type { TResult, TUser } from '~/types';
@@ -15,31 +21,34 @@ type Params = {
 type Result = TResult<{ user: TUser; token: string; cookie: string }>;
 
 export async function loginUser(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/auth/login`);
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(params),
-  });
-  const json = await response.json();
+  try {
+    const url = new URL(`${API_URL}/auth/login`);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+    const json = await response.json();
 
-  if (response.ok) {
-    const responseResult = LoginUserResponse.safeParse(json.data);
-    const cookie = response.headers.get('set-cookie');
-
-    if (responseResult.success && cookie) {
+    if (response.ok) {
+      const data = LoginUserResponse.parse(json.data);
       const cookie = response.headers.get('set-cookie');
-      const token = cookie?.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
-      return { data: { user: responseResult.data, token: token!, cookie: cookie! }, error: null };
-    } else {
+
+      if (cookie) {
+        const cookie = response.headers.get('set-cookie');
+        const token = cookie?.match(new RegExp(`(?:^|; )token=([^;]*)`))?.[1];
+        return { data: { user: data, token: token!, cookie: cookie! }, error: null };
+      }
+
       return {
         error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER },
         data: null,
       };
     }
+    return { error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status }, data: null };
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
   }
-
-  return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status }, data: null };
 }

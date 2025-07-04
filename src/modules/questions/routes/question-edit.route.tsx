@@ -21,14 +21,7 @@ const QuestionEditRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ params, request }: Route.LoaderArgs) {
-  const session = await getSession(request.headers.get('Cookie'));
-  const token = session.get('token');
-
-  if (!token) {
-    return redirect('/login');
-  }
-
+export async function loader({ params }: Route.LoaderArgs) {
   const questionResult = await getQuestion({ id: params.questionId });
 
   if (questionResult.data) {

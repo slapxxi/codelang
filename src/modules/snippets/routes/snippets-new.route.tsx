@@ -20,6 +20,7 @@ import * as z from 'zod/v4';
 import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { urlToSearchParamsRef } from '~/utils';
 
 const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
   const { supportedLangs = [] } = loaderData ?? {};
@@ -71,9 +72,10 @@ const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
+  const ref = urlToSearchParamsRef(request.url);
 
   if (!token) {
-    return redirect('/login');
+    return redirect(`/login?${ref}`);
   }
 
   const supportedLangsResult = await getSupportedLanguages({ token });

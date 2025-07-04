@@ -1,15 +1,18 @@
 import type { Route } from './+types/question.route';
-import { Button, Card, Code, PageTitle } from '~/ui';
+import { Button, Card, Code, PageTitle, TextEditor } from '~/ui';
 import { deleteQuestion, getQuestion } from '~/lib/http';
 import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
-import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
-import { useAuth } from '~/hooks';
+import { data, Form, href, Link, redirect, useFetcher, useNavigation } from 'react-router';
 import { Pencil, Trash2 } from 'lucide-react';
 import { getSession } from '~/app/session.server';
+import type { TQuestion } from '~/types';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod/v4';
+import { urlToSearchParamsRef } from '~/utils';
 
 const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { question } = loaderData;
-  const user = useAuth();
+  const { question, user } = loaderData;
   const nav = useNavigation();
 
   function handleDelete(e: React.FormEvent<HTMLFormElement>) {
@@ -43,6 +46,19 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
       <p>{question.description}</p>
       <Code code={question.formattedCode} />
 
+      {user ? (
+        <AnswerForm question={question}></AnswerForm>
+      ) : (
+        <div className="flex gap-2 items-center">
+          <Form action={href('/login')} className="link">
+            <Button name="ref" value={href('/questions/:questionId', { questionId: question.id })}>
+              Login
+            </Button>
+          </Form>
+          to be able to post answers!
+        </div>
+      )}
+
       <ul className="flex flex-col gap-2">
         {question.answers.map((a) => (
           <Card asChild key={a.id} variant="secondary">
@@ -54,11 +70,41 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ params }: Route.LoaderArgs) {
+type AnswerFormProps = {
+  question: TQuestion;
+};
+
+const PostAnswerFormSchema = z.object({
+  content: z.string().nonempty('Answer is required'),
+});
+
+export const AnswerForm: React.FC<AnswerFormProps> = (props) => {
+  const { question } = props;
+  const form = useForm({ resolver: zodResolver(PostAnswerFormSchema) });
+  const fetcher = useFetcher();
+
+  const onSubmit: SubmitHandler<z.infer<typeof PostAnswerFormSchema>> = (data) => {
+    fetcher.submit(data, {
+      method: 'post',
+      action: href('/questions/:questionId/answers', { questionId: question.id }),
+    });
+  };
+
+  return (
+    <fetcher.Form onSubmit={form.handleSubmit(onSubmit)}>
+      <TextEditor placeholder="Answer" {...form.register('content')} />
+      <Button>Post Answer</Button>
+    </fetcher.Form>
+  );
+};
+
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const user = session.get('user');
   const questionResult = await getQuestion({ id: params.questionId });
 
   if (questionResult.data) {
-    return { question: questionResult.data };
+    return { question: questionResult.data, user };
   }
 
   throw data(null, { status: STATUS_NOT_FOUND });
@@ -67,9 +113,10 @@ export async function loader({ params }: Route.LoaderArgs) {
 export async function action({ params, request }: Route.ActionArgs) {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
+  const ref = urlToSearchParamsRef(request.url);
 
   if (!token) {
-    return redirect('/login');
+    return redirect(`/login?${ref}`);
   }
 
   const formData = await request.formData();

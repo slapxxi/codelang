@@ -2,7 +2,8 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { SnippetSchema, UserSchema, SnippetSchemaWithLikes, LinksSchema } from './schema';
 import { appendParams } from '~/utils';
-import type { TSnippet } from '~/types';
+import type { TResult, TSnippet } from '~/types';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
 
 const GetSnippetsResponse = z.object({
   data: z.array(SnippetSchema),
@@ -51,31 +52,23 @@ type Params = {
   searchBy?: (keyof z.infer<typeof SnippetSchema>)[] | null;
 };
 
-type Result =
-  | {
-      data: {
-        snippets: TSnippet[];
-        totalItems: number;
-        totalPages: number;
-        currentPage: number;
-      };
-      error: null;
-    }
-  | {
-      data: null;
-      error: { message: string };
-    };
+type Result = TResult<{
+  snippets: TSnippet[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+}>;
 
 export async function getSnippets(params?: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/snippets`);
-  appendParams(url, params);
-  const response = await fetch(url);
+  try {
+    const url = new URL(`${API_URL}/snippets`);
+    appendParams(url, params);
+    const response = await fetch(url);
 
-  if (response.ok) {
-    const json = await response.json();
-    const { success, data } = GetSnippetsResponse.safeParse(json.data);
+    if (response.ok) {
+      const json = await response.json();
+      const data = GetSnippetsResponse.parse(json.data);
 
-    if (success) {
       return {
         data: {
           snippets: await SnippetSchemaWithLikes.array().parseAsync(data.data),
@@ -87,8 +80,11 @@ export async function getSnippets(params?: Params): Promise<Result> {
       };
     }
 
-    return { error: { message: 'Error parsing server response' }, data: null };
+    return {
+      error: { type: ERROR_TYPE_SERVER, message: response.message, status: response.status },
+      data: null,
+    };
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting snippets', e }, data: null };
   }
-
-  return { error: { message: 'Something went wrong' }, data: null };
 }

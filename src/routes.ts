@@ -24,5 +24,8 @@ export default [
     route('/questions/:questionId', './modules/questions/routes/question.route.tsx'),
     route('/questions/:questionId/edit', './modules/questions/routes/question-edit.route.tsx'),
     route('/questions/:questionId/delete', './modules/questions/routes/question-delete.route.tsx'),
+    route('/questions/:questionId/answers', './modules/questions/routes/question-answers.route.tsx'),
   ]),
+
+  route('/api/me', './modules/api/routes/me.route.tsx'),
 ] satisfies RouteConfig;

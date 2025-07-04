@@ -51,7 +51,7 @@ function matchLang(lang: string) {
     [l]: l,
     'c/c++': 'cpp',
   };
-  return ['javascript', 'typescript', 'css', 'go', 'c/c++'].includes(l) ? map[l] : 'text';
+  return ['javascript', 'typescript', 'css', 'go', 'c/c++', 'python', 'ruby'].includes(l) ? map[l] : 'text';
 }
 
 export const QuestionSchema = z.object({

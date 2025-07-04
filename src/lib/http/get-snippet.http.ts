@@ -8,7 +8,6 @@ import {
   MESSAGE_EXCEPTION,
   MESSAGE_PARSING_ERROR,
   MESSAGE_RESPONSE_NOT_OK,
-  STATUS_SERVER,
 } from '~/app/const';
 
 const GetSnippetResponse = SnippetSchema;

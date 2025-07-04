@@ -1,4 +1,4 @@
-import { Input as BaseInput, ErrorTooltip, ErrorTooltipContent, ErrorTooltipTrigger } from '~/ui/base';
+import { Input as BaseInput } from '~/ui/base';
 import { cn } from '~/utils';
 
 type InputProps = {

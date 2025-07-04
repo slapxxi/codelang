@@ -2,7 +2,6 @@ import { getSnippet, getSupportedLanguages, markSnippet, updateSnippet } from '~
 import type { Route } from './+types/snippet-edit.route';
 import {
   Button,
-  Code,
   FormError,
   Label,
   PageTitle,

@@ -8,7 +8,7 @@
     "start": "react-router-serve ./build/server/index.js",
     "test": "vitest",
     "spec": "npx playwright test",
-    "lint": "eslint app/",
+    "lint": "eslint src/",
     "format:all": "prettier --write \"**/*\"",
     "format:src": "prettier --write \"src/**/*\"",
     "typecheck": "react-router typegen && tsc"

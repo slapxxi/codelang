@@ -4,7 +4,7 @@ import { data, href, Link } from 'react-router';
 import { STATUS_SERVER } from '~/app/const/status-codes.js';
 import { useAuth } from '~/hooks/use-auth.hook.js';
 import { getQuestions } from '~/lib/http';
-import { PageTitle, Pagination, QuestionCard } from '~/ui';
+import { Button, PageTitle, Pagination, QuestionCard } from '~/ui';
 
 const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
   const { questions, totalPages, currentPage } = loaderData;
@@ -15,12 +15,12 @@ const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
       <header className="flex gap-2 items-center mb-4">
         <PageTitle> Questions </PageTitle>
         {user && (
-          <Link
-            to={href('/questions/new')}
-            className="inline-flex gap-2 items-center border rounded-lg border-olive-300 bg-olive-300 p-2 hover:bg-olive-400 leading-none"
-          >
-            New Question <FilePlus size={16} />
-          </Link>
+          <Button asChild>
+            <Link to={href('/questions/new')}>
+              <FilePlus size={16} />
+              <span>New Question</span>
+            </Link>
+          </Button>
         )}
       </header>
 

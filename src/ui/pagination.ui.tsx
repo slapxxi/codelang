@@ -1,13 +1,12 @@
-import { Form, useSearchParams } from 'react-router';
+import { Form } from 'react-router';
 import {
   Pagination as PaginationBase,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationEllipsis,
   PaginationButton,
 } from './base';
-import { clamp, replaceSearchParamsValue } from '~/utils';
+import { clamp } from '~/utils';
 
 type Props = {
   numberOfPages: number;
@@ -18,7 +17,6 @@ type Props = {
 
 export const Pagination: React.FC<Props> = (props) => {
   const { numberOfPages, currentPage, maxDisplayed = 1, ...rest } = props;
-  const [searchParams] = useSearchParams();
 
   if (numberOfPages <= 1) {
     return null;

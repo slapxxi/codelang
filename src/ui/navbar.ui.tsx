@@ -4,16 +4,17 @@ import { Code, FileQuestionMark, Home, LogIn, User, Users } from 'lucide-react';
 import { cn } from '~/utils';
 import { useAuth, useNavbar } from '~/hooks';
 import { Avatar } from './avatar.ui';
+import type { TUser } from '~/types';
 
 type NavbarProps = {
   className?: string;
   children?: React.ReactNode;
+  user?: TUser;
 };
 
 export const Navbar: React.FC<NavbarProps> = (props) => {
-  const { className, children } = props;
+  const { className, children, user } = props;
   const { open, toggle: toggleOpen } = useNavbar();
-  const user = useAuth();
 
   return (
     <div
@@ -33,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
             user && { Icon: User, text: 'Profile', path: href('/profile') },
           ].map(
             (item, i) =>
-              item !== null && (
+              item !== undefined && (
                 <li key={i}>
                   <NavLink
                     to={item.path}

@@ -3,18 +3,18 @@ import { Suspense } from 'react';
 import { Await, data, Form, href, redirect } from 'react-router';
 import { STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { getUserFromSession } from '~/app/get-user-from-session.server';
-import { getSession } from '~/app/session.server';
-import { changePassword } from '~/lib/http';
+import { commitSession, getSession } from '~/app/session.server';
+import { changePassword, changeUsername } from '~/lib/http';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
 import type { TUser } from '~/types';
 import { Avatar, FormError, PageTitle, Spinner } from '~/ui';
 import { Button } from '~/ui/base';
 import { urlToSearchParamsRef } from '~/utils';
-import { ChangePasswordForm, ChangePasswordFormSchema } from '../forms';
+import { ChangePasswordForm, ChangePasswordFormSchema, ChangeUsernameForm, ChangeUsernameFormSchema } from '../forms';
 import { UserStats } from '../ui';
 import type { Route } from './+types/profile.route';
 
-const ProfileRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
+const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
   const { user, statsLoader } = loaderData;
 
   function handleLogout(e: React.FormEvent<HTMLFormElement>) {
@@ -51,7 +51,8 @@ const ProfileRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
         </Form>
       </PageTitle>
 
-      <ChangePasswordForm key={actionData?.passwordChanged} />
+      <ChangeUsernameForm user={user} />
+      <ChangePasswordForm />
 
       <Suspense
         fallback={
@@ -77,7 +78,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect(`/login?${ref}`);
   }
 
-  const result = { user, message: null, statsLoader: null };
+  const result = { user, message: undefined, statsLoader: undefined };
   return data({ ...result, statsLoader: getStats(user) });
 }
 
@@ -90,14 +91,14 @@ export async function action({ request }: Route.ActionArgs) {
     return redirect(`/login?${ref}`);
   }
 
+  const result = { message: undefined, passwordChanged: undefined, usernameChanged: undefined };
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
-  const parseResult = ChangePasswordFormSchema.safeParse(form);
 
-  const result = { message: null, passwordChanged: null };
+  const passwordParseResult = ChangePasswordFormSchema.safeParse(form);
 
-  if (parseResult.success) {
-    const { oldPassword, newPassword } = parseResult.data;
+  if (passwordParseResult.success) {
+    const { oldPassword, newPassword } = passwordParseResult.data;
     const changePasswordResult = await changePassword({ oldPassword, newPassword, token });
 
     if (changePasswordResult.data) {
@@ -105,6 +106,25 @@ export async function action({ request }: Route.ActionArgs) {
     }
 
     return data({ ...result, message: changePasswordResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
+  }
+
+  const usernameParseResult = ChangeUsernameFormSchema.safeParse(form);
+
+  if (usernameParseResult.success) {
+    const { username } = usernameParseResult.data;
+    const usernameResult = await changeUsername({ username, token });
+
+    if (usernameResult.data) {
+      session.set('user', usernameResult.data);
+      return data(
+        { ...result, usernameChanged: Date.now() },
+        {
+          headers: [['Set-Cookie', await commitSession(session)]],
+        }
+      );
+    }
+
+    return data({ ...result, message: usernameResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
   }
 
   return data(result, { status: STATUS_UNPROCESSABLE_ENTITY });

@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Form, useActionData, useNavigation, useSubmit } from 'react-router';
+import { useFetcher } from 'react-router';
 import * as z from 'zod/v4';
 import { Button, FormError, FormSuccess, Input } from '~/ui';
 
 export const ChangePasswordFormSchema = z
   .object({
+    type: z.literal('password'),
     oldPassword: z.string().nonempty('Old password is required'),
     newPassword: z
       .string()
@@ -23,18 +24,24 @@ export const ChangePasswordFormSchema = z
   });
 
 export const ChangePasswordForm = () => {
-  const actionData = useActionData();
   const form = useForm({ resolver: zodResolver(ChangePasswordFormSchema) });
-  const submit = useSubmit();
-  const nav = useNavigation();
+  const fetcher = useFetcher();
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit: SubmitHandler<z.infer<typeof ChangePasswordFormSchema>> = (data) => {
-    submit(data, { method: 'post' });
+    fetcher.submit(data, { method: 'post' });
   };
 
+  useEffect(() => {
+    form.resetField('oldPassword');
+    form.resetField('newPassword');
+    form.resetField('confirmNewPassword');
+  }, [fetcher.data?.passwordChanged]);
+
   return (
-    <Form method="post" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+    <fetcher.Form method="post" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+      <input type="hidden" value="password" {...form.register('type')} />
+
       <fieldset className="border p-2 rounded flex flex-col gap-2">
         <legend className="text-sm text-olive-900">Old Password</legend>
 
@@ -66,14 +73,15 @@ export const ChangePasswordForm = () => {
         />
         <FormError>{form.formState.errors.confirmNewPassword?.message}</FormError>
       </fieldset>
+
       <Button variant="link" type="button" onClick={() => setShowPassword(!showPassword)} className="justify-end">
         {showPassword ? 'Hide Password' : 'Show Password'}
       </Button>
 
-      <FormError>{actionData?.message}</FormError>
-      <FormSuccess>{actionData?.passwordChanged && 'Password changed successfully'}</FormSuccess>
+      <FormError>{fetcher.data?.message}</FormError>
+      <FormSuccess>{fetcher.data?.passwordChanged && 'Password changed successfully'}</FormSuccess>
 
-      <Button disabled={['loading', 'submitting'].includes(nav.state)}>Change Password</Button>
-    </Form>
+      <Button disabled={['loading', 'submitting'].includes(fetcher.state)}>Change Password</Button>
+    </fetcher.Form>
   );
 };

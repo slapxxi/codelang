@@ -2,31 +2,29 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import type { TResult } from '~/types';
 import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import { UserSchema } from './schema';
 
-const ChangePasswordResponse = z.object({
-  updatedCount: z.number(),
-});
+const ChangeUsernameResponse = UserSchema;
 
 type Params = {
-  oldPassword: string;
-  newPassword: string;
+  username: string;
   token: string;
 };
 
-type Result = TResult<z.infer<typeof ChangePasswordResponse>>;
+type Result = TResult<z.infer<typeof ChangeUsernameResponse>>;
 
-export async function changePassword(params: Params): Promise<Result> {
+export async function changeUsername(params: Params): Promise<Result> {
   try {
-    const url = new URL(`${API_URL}/me/password`);
+    const url = new URL(`${API_URL}/me`);
     const response = await fetch(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Cookie: `token=${params.token}` },
-      body: JSON.stringify({ oldPassword: params.oldPassword, newPassword: params.newPassword }),
+      body: JSON.stringify({ username: params.username }),
     });
 
     if (response.ok) {
       const json = await response.json();
-      const data = ChangePasswordResponse.parse(json.data);
+      const data = ChangeUsernameResponse.parse(json.data);
       return { data, error: null };
     }
 
@@ -38,6 +36,6 @@ export async function changePassword(params: Params): Promise<Result> {
       return { error: { type: ERROR_TYPE_SERVER, message: body, status: response.status }, data: null };
     }
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error changing password', e }, data: null };
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error changing username', e }, data: null };
   }
 }

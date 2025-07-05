@@ -1,10 +1,13 @@
+import type { Route } from './+types/main.layout';
 import { Code, FileQuestionMark, Home, Menu, User, Users } from 'lucide-react';
 import { LayoutContainer, Logo, Navbar } from '~/ui';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '~/ui/base';
 import { useState } from 'react';
 import { href, Link, Outlet } from 'react-router';
+import { getUserFromSession } from '../get-user-from-session.server';
 
-const MainLayout = () => {
+const MainLayout = ({ loaderData }: Route.ComponentProps) => {
+  const { user } = loaderData ?? {};
   const [open, setOpen] = useState(false);
 
   return (
@@ -41,7 +44,7 @@ const MainLayout = () => {
       </header>
 
       <div className="overflow-y-auto h-screen md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:none] relative">
-        <Navbar className="hidden self-start sticky top-0 md:flex" />
+        <Navbar className="hidden self-start sticky top-0 md:flex" user={user} />
 
         <Outlet />
 
@@ -50,5 +53,10 @@ const MainLayout = () => {
     </LayoutContainer>
   );
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getUserFromSession(request);
+  return { user: user ?? undefined };
+}
 
 export default MainLayout;

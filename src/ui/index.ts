@@ -17,3 +17,5 @@ export * from './code-editor.ui';
 export * from './text-editor.ui';
 export * from './question-card.ui';
 export * from './card.ui';
+export * from './spinner.ui';
+export * from './shimmer.ui';

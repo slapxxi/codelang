@@ -8,6 +8,7 @@
   }
 
   .shimmer {
+    --shimmer-color: hsla(0, 0%, 100%, 0.25);
     position: relative;
     overflow: hidden;
     background-color: transparent;
@@ -21,7 +22,7 @@
       width: 150%;
       height: 150%;
       transform: translateY(-40%) translateX(var(--pos));
-      background: radial-gradient(circle, hsla(0, 0%, 100%, 0.25) 10%, transparent 70%);
+      background: radial-gradient(circle, var(--shimmer-color) 10%, transparent 70%);
     }
   }
 

@@ -1,7 +1,7 @@
 import { API_URL } from './const';
 import { UserStatsSchema } from './schema';
 import type { TResult, TUserStats } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
 
 const GetUserStatsResponse = UserStatsSchema;
 
@@ -18,22 +18,23 @@ export async function getUserStats(params: Params): Promise<Result> {
 
     if (response.ok) {
       const json = await response.json();
-      const { success, data } = GetUserStatsResponse.safeParse(json.data);
+      const data = GetUserStatsResponse.parse(json.data);
+      return { data, error: null };
+    }
 
-      if (success) {
-        return { data, error: null };
-      }
-
+    try {
+      const json = await response.clone().json();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: response.status },
+        error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status },
+        data: null,
+      };
+    } catch {
+      const body = await response.text();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: body, status: response.status },
         data: null,
       };
     }
-
-    return {
-      error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status },
-      data: null,
-    };
   } catch (e) {
     return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting user stats', e }, data: null };
   }

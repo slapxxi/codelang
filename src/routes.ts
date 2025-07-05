@@ -9,6 +9,7 @@ export default [
 
   layout('./app/layouts/main.layout.tsx', [
     index('./app/routes/home.route.tsx'),
+
     route('/profile', './modules/users/routes/profile.route.tsx'),
 
     route('/users', './modules/users/routes/users.route.tsx'),

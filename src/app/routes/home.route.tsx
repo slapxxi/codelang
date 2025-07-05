@@ -40,7 +40,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta() {
-  return [{ title: 'Codelang' }, { name: 'description', content: 'Codelang' }];
+  return [{ title: 'Codelang | Home' }, { name: 'description', content: 'Codelang' }];
 }
 
 export default HomeRoute;

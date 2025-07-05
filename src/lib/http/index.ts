@@ -19,3 +19,4 @@ export * from './register-user.http';
 export * from './schema';
 export * from './update-question.http';
 export * from './update-snippet.http';
+export * from './delete-user.http';

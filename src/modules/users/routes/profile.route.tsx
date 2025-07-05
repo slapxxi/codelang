@@ -1,10 +1,10 @@
 import { LogOut, Trash2 } from 'lucide-react';
 import { Suspense } from 'react';
 import { Await, data, Form, href, redirect } from 'react-router';
-import { STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { getUserFromSession } from '~/app/get-user-from-session.server';
-import { commitSession, getSession } from '~/app/session.server';
-import { changePassword, changeUsername } from '~/lib/http';
+import { commitSession, destroySession, getSession } from '~/app/session.server';
+import { changePassword, changeUsername, deleteUser } from '~/lib/http';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
 import type { TUser } from '~/types';
 import { Avatar, FormError, PageTitle, Spinner } from '~/ui';
@@ -44,6 +44,7 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
           </Button>
         </Form>
         <Form action={href('/profile')} method="post" onSubmit={handleDelete}>
+          <input type="hidden" name="method" value="delete" />
           <Button variant="destructive">
             <Trash2 size={16} />
             <span>Delete Account</span>
@@ -94,6 +95,18 @@ export async function action({ request }: Route.ActionArgs) {
   const result = { message: undefined, passwordChanged: undefined, usernameChanged: undefined };
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
+
+  if (form.method === 'delete') {
+    const deleteResult = await deleteUser({ token });
+
+    if (deleteResult.data) {
+      return redirect(href('/'), {
+        headers: [['Set-Cookie', await destroySession(session)]],
+      });
+    }
+
+    return data({ ...result, message: deleteResult.error.message }, { status: STATUS_SERVER });
+  }
 
   const passwordParseResult = ChangePasswordFormSchema.safeParse(form);
 

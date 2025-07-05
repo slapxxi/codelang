@@ -2,7 +2,7 @@ import { href, Link, NavLink } from 'react-router';
 import { Code, FileQuestionMark, Home, LogIn, User, Users } from 'lucide-react';
 
 import { cn } from '~/utils';
-import { useAuth, useNavbar } from '~/hooks';
+import { useNavbar } from '~/hooks';
 import { Avatar } from './avatar.ui';
 import type { TUser } from '~/types';
 

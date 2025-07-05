@@ -41,9 +41,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Toaster />
         <ScrollRestoration />
         <Scripts />
-        <script>
-          {`if ("paintWorklet" in CSS) { CSS.paintWorklet.addModule( "https://www.unpkg.com/css-houdini-squircle/squircle.min.js") }`}
-        </script>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import { cn } from '~/utils';
 import { useNavbar } from '~/hooks';
 import { Avatar } from './avatar.ui';
 import type { TUser } from '~/types';
+import { useId } from 'react';
 
 type NavbarProps = {
   className?: string;
@@ -15,15 +16,25 @@ type NavbarProps = {
 export const Navbar: React.FC<NavbarProps> = (props) => {
   const { className, children, user } = props;
   const { open, toggle: toggleOpen } = useNavbar();
+  const clip1 = useId();
+  const clip2 = useId();
 
   return (
-    <div
-      className={cn(
-        'squircle squircle-fill-zinc-950/90 backdrop-blur-[1px]',
-        'flex flex-col text-zinc-50 drop-shadow-lg drop-shadow-zinc-500/30 ',
-        className
-      )}
-    >
+    <div className={cn('flex flex-col   text-zinc-50 filter drop-shadow-zinc-800/30 drop-shadow-md', className)}>
+      <div
+        className={cn('bg-zinc-900 absolute inset-0 pointer-events-none -z-10')}
+        style={{ clipPath: open ? `url(#${clip2})` : `url(#${clip1})` }}
+      />
+
+      <svg className="w-0 h-0 absolute pointer-events-none" aria-hidden>
+        <clipPath id={clip1} clipPathUnits="objectBoundingBox">
+          <path d="M.643 0C.925.001 1.003.018 1 .078V.922C1.003.982.925.999.643 1H.357C.075.999-.003.982 0 .922V.078C-.003.018.075.001.357 0H.643Z" />
+        </clipPath>
+        <clipPath id={clip2} clipPathUnits="objectBoundingBox">
+          <path d="M.821 0C.991.001 1.001.008 1 .078V.922C1.001.992.991.999.821 1H.179C.009.999-.001.992 0 .922V.078C-.001.008.009.001.179 0H.821Z" />
+        </clipPath>
+      </svg>
+
       <nav>
         <ul className="flex p-2 gap-4 flex-col">
           {[

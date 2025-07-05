@@ -6,19 +6,6 @@
   stroke-linejoin: round;
 }
 
-@utility squircle-smooth-* {
-  --squircle-smooth: --value(integer);
-}
-
-@utility squircle-radius-* {
-  --squircle-radius: calc(--value(integer) * 1px);
-}
-
-@utility squircle-fill-* {
-  --squircle-fill: --value(--color-*, [*]);
-  --squircle-fill: color-mix(in oklch, --value(--color-*, [*]) calc(--modifier(integer) * 1%), transparent);
-}
-
 @utility shimmer-color-* {
   --shimmer-color: --value(--color-*, [*]);
   --shimmer-color: color-mix(in oklch, --value(--color-*, [*]) calc(--modifier(integer) * 1%), transparent);

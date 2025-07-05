@@ -1,12 +1,4 @@
 @layer components {
-  .squircle {
-    @apply bg-zinc-950 rounded-lg;
-    --squircle-smooth: 1;
-    --squircle-radius: 16px;
-    --squircle-fill: var(--foreground);
-    background: paint(squircle);
-  }
-
   .shimmer {
     --shimmer-color: hsla(0, 0%, 100%, 0.25);
     position: relative;

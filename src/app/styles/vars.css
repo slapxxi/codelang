@@ -15,6 +15,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
+  --success: var(--color-lime-700);
   --border: oklch(0.922 0 0);
   --input: var(--color-olive-50);
   --ring: oklch(0.708 0 0);

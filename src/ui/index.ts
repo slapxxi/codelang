@@ -6,6 +6,7 @@ export * from './avatar.ui';
 export * from './pagination.ui';
 export * from './page-title.ui';
 export * from './input.ui';
+export * from './form-success.ui';
 export * from './form-error.ui';
 export * from './toaster.ui';
 export * from './code.ui';

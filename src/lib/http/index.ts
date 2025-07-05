@@ -17,4 +17,5 @@ export * from './register-user.http';
 export * from './get-supported-languages.http';
 export * from './login-user.http';
 export * from './post-answer.http';
+export * from './change-password.http';
 export * from './schema';

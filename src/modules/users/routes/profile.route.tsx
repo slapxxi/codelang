@@ -1,17 +1,21 @@
-import type { Route } from './+types/profile.route';
-import { Await, data, Form, href, redirect } from 'react-router';
 import { LogOut, Trash2 } from 'lucide-react';
-import { getUserStats } from '~/lib/http/get-user-stats.http';
+import { Suspense } from 'react';
+import { Await, data, Form, href, redirect } from 'react-router';
+import { STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { getUserFromSession } from '~/app/get-user-from-session.server';
+import { getSession } from '~/app/session.server';
+import { changePassword } from '~/lib/http';
+import { getUserStats } from '~/lib/http/get-user-stats.http';
+import type { TUser } from '~/types';
 import { Avatar, FormError, PageTitle, Spinner } from '~/ui';
 import { Button } from '~/ui/base';
-import { UserStats } from '../ui';
 import { urlToSearchParamsRef } from '~/utils';
-import { Suspense } from 'react';
-import type { TUser } from '~/types';
+import { ChangePasswordForm, ChangePasswordFormSchema } from '../forms';
+import { UserStats } from '../ui';
+import type { Route } from './+types/profile.route';
 
-const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { user, statsLoader, message } = loaderData;
+const ProfileRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
+  const { user, statsLoader } = loaderData;
 
   function handleLogout(e: React.FormEvent<HTMLFormElement>) {
     if (!confirm('Are you sure you want to logout?')) {
@@ -47,7 +51,7 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
         </Form>
       </PageTitle>
 
-      <FormError>{message}</FormError>
+      <ChangePasswordForm key={actionData?.passwordChanged} />
 
       <Suspense
         fallback={
@@ -75,6 +79,35 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const result = { user, message: null, statsLoader: null };
   return data({ ...result, statsLoader: getStats(user) });
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const token = session.get('token');
+  const ref = urlToSearchParamsRef(request.url);
+
+  if (!token) {
+    return redirect(`/login?${ref}`);
+  }
+
+  const formData = await request.formData();
+  const form = Object.fromEntries(formData);
+  const parseResult = ChangePasswordFormSchema.safeParse(form);
+
+  const result = { message: null, passwordChanged: null };
+
+  if (parseResult.success) {
+    const { oldPassword, newPassword } = parseResult.data;
+    const changePasswordResult = await changePassword({ oldPassword, newPassword, token });
+
+    if (changePasswordResult.data) {
+      return { ...result, passwordChanged: Date.now() };
+    }
+
+    return data({ ...result, message: changePasswordResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
+  }
+
+  return data(result, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 async function getStats(user: TUser) {

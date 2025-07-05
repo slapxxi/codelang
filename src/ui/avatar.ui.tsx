@@ -1,5 +1,4 @@
 import { useId } from 'react';
-import { useAuth } from '~/hooks';
 import type { TUser } from '~/types';
 import { cn } from '~/utils';
 

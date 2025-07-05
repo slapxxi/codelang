@@ -1,17 +1,14 @@
 import type { Route } from './+types/question.route';
-import { Button, Card, Code, PageTitle, TextEditor } from '~/ui';
-import { deleteQuestion, getQuestion } from '~/lib/http';
-import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
-import { data, Form, href, Link, redirect, useFetcher, useNavigation } from 'react-router';
+import { Button, Card, Code, PageTitle } from '~/ui';
+import { deleteQuestion, getQuestion, postAnswer } from '~/lib/http';
+import { ERROR_TYPE_SERVER, STATUS_NOT_FOUND, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
 import { Pencil, Trash2 } from 'lucide-react';
 import { getSession } from '~/app/session.server';
-import type { TQuestion } from '~/types';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod/v4';
 import { urlToSearchParamsRef } from '~/utils';
+import { AnswerForm, PostAnswerFormSchema } from '../forms';
 
-const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
+const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { question, user } = loaderData;
   const nav = useNavigation();
 
@@ -47,7 +44,7 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
       <Code code={question.formattedCode} />
 
       {user ? (
-        <AnswerForm question={question}></AnswerForm>
+        <AnswerForm question={question} key={actionData?.postedAnswer?.id}></AnswerForm>
       ) : (
         <div className="flex gap-2 items-center">
           <Form action={href('/login')} className="link">
@@ -59,42 +56,14 @@ const QuestionRoute = ({ loaderData }: Route.ComponentProps) => {
         </div>
       )}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-4">
         {question.answers.map((a) => (
           <Card asChild key={a.id} variant="secondary">
-            <li className="p-2">{a.content}</li>
+            <li className="p-2 max-w-prose">{a.content}</li>
           </Card>
         ))}
       </ul>
     </div>
-  );
-};
-
-type AnswerFormProps = {
-  question: TQuestion;
-};
-
-const PostAnswerFormSchema = z.object({
-  content: z.string().nonempty('Answer is required'),
-});
-
-export const AnswerForm: React.FC<AnswerFormProps> = (props) => {
-  const { question } = props;
-  const form = useForm({ resolver: zodResolver(PostAnswerFormSchema) });
-  const fetcher = useFetcher();
-
-  const onSubmit: SubmitHandler<z.infer<typeof PostAnswerFormSchema>> = (data) => {
-    fetcher.submit(data, {
-      method: 'post',
-      action: href('/questions/:questionId/answers', { questionId: question.id }),
-    });
-  };
-
-  return (
-    <fetcher.Form onSubmit={form.handleSubmit(onSubmit)}>
-      <TextEditor placeholder="Answer" {...form.register('content')} />
-      <Button>Post Answer</Button>
-    </fetcher.Form>
   );
 };
 
@@ -119,6 +88,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     return redirect(`/login?${ref}`);
   }
 
+  const result = { postedAnswer: null, errors: null, message: null };
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
 
@@ -130,10 +100,27 @@ export async function action({ params, request }: Route.ActionArgs) {
     }
 
     const { error } = deleteResult;
-    return data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
+    return data(result, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
   }
 
-  return data(null, { status: STATUS_BAD_REQUEST });
+  const parseResult = PostAnswerFormSchema.safeParse(form);
+
+  if (parseResult.success) {
+    const { content } = parseResult.data;
+    const postResult = await postAnswer({ questionId: params.questionId, content, token });
+
+    if (postResult.data) {
+      return { ...result, postedAnswer: postResult.data };
+    }
+
+    const { error } = postResult;
+    return data(
+      { ...result, errors: error.e, message: error.message },
+      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+    );
+  }
+
+  return data({ ...result, errors: parseResult.error.flatten() }, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 export default QuestionRoute;

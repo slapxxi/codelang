@@ -1,5 +1,6 @@
 import * as z from 'zod/v4';
 import type {
+  AnswerSchema,
   CommentSchema,
   MarkSchema,
   QuestionSchemaWithCodeHighlighted,
@@ -16,6 +17,8 @@ export type UserRole = 'admin' | 'user';
 export type TSnippet = z.infer<typeof SnippetSchemaWithLikes>;
 
 export type TComment = z.infer<typeof CommentSchema>;
+
+export type TAnswer = z.infer<typeof AnswerSchema>;
 
 export type TQuestion = z.infer<typeof QuestionSchemaWithCodeHighlighted>;
 

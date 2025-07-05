@@ -22,6 +22,8 @@ export const MarkSchema = z.object({ id: z.string(), type: z.enum(['like', 'disl
 
 export const CommentSchema = z.object({ id: z.string(), content: z.string() });
 
+export const AnswerSchema = z.object({ id: z.string(), content: z.string() });
+
 export const SnippetSchema = z.object({
   id: z.string(),
   code: z.string(),
@@ -60,7 +62,7 @@ export const QuestionSchema = z.object({
   description: z.string(),
   attachedCode: z.string(),
   user: UserSchema,
-  answers: CommentSchema.array(),
+  answers: AnswerSchema.array(),
   isResolved: z.boolean(),
 });
 

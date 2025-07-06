@@ -37,18 +37,17 @@ export async function postComment(params: Params): Promise<Result> {
 
     if (response.ok) {
       const json = await response.json();
-      const { success, data } = PostCommentResponse.safeParse(json.data);
-      if (success) {
-        return { data, error: null };
-      }
-
-      return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER },
-        data: null,
-      };
+      const data = PostCommentResponse.parse(json.data);
+      return { data, error: null };
     }
 
-    return { error: { type: ERROR_TYPE_SERVER, message: response.statusText, status: response.status }, data: null };
+    try {
+      const json = await response.clone().json();
+      return { error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status }, data: null };
+    } catch {
+      const body = await response.text();
+      return { error: { type: ERROR_TYPE_SERVER, message: body, status: response.status }, data: null };
+    }
   } catch (e) {
     return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
   }

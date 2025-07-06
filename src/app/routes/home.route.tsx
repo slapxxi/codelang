@@ -14,7 +14,7 @@ const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
         {intoColumns(snippets, 2).map((col, i) => (
           <div key={i} className="contents md:flex flex-col gap-4 pb-12">
             {col.map((s) => (
-              <SnippetCard snippet={s} key={s.id} expand />
+              <SnippetCard snippet={s} key={s.id} />
             ))}
           </div>
         ))}

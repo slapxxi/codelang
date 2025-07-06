@@ -7,13 +7,8 @@ import { postComment } from '~/lib/http/post-comment.http';
 import { getSession } from '~/app/session.server';
 import { Pencil, Trash2 } from 'lucide-react';
 import { PostCommentForm, PostCommentFormSchema } from '../forms';
-import {
-  ERROR_TYPE_SERVER,
-  MESSAGE_INVALID_DATA,
-  STATUS_BAD_REQUEST,
-  STATUS_NOT_FOUND,
-  STATUS_SERVER,
-} from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
+import type { TComment, TSnippet } from '~/types';
 
 const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { snippet } = loaderData;
@@ -59,7 +54,7 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
 
         {user && (
           <section className="flex flex-col gap-2">
-            <PostCommentForm key={actionData?.data?.id} />
+            <PostCommentForm key={actionData?.postedComment?.id} />
           </section>
         )}
       </div>
@@ -95,7 +90,13 @@ export async function loader({ params }: Route.LoaderArgs) {
   throw data(null, { status: STATUS_NOT_FOUND });
 }
 
+type ActionResult = {
+  errorMessage?: string;
+  postedComment?: TComment;
+};
+
 export async function action({ request, params }: Route.ActionArgs) {
+  const result: ActionResult = { errorMessage: undefined, postedComment: undefined };
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
 
@@ -105,7 +106,6 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
-  const parseResult = PostCommentFormSchema.safeParse(form);
 
   if (form.method === 'delete') {
     const deleteResult = await deleteSnippet({ id: params.snippetId, token });
@@ -114,27 +114,27 @@ export async function action({ request, params }: Route.ActionArgs) {
       return redirect(href('/snippets'));
     }
 
-    return data(null, { status: STATUS_SERVER });
+    return data(result, { status: STATUS_SERVER });
   }
+
+  const parseResult = PostCommentFormSchema.safeParse(form);
 
   if (parseResult.success) {
     const { comment } = parseResult.data;
     const postResult = await postComment({ snippetId: params.snippetId, comment, token });
 
     if (postResult.data) {
-      return { data: postResult.data, error: null };
+      return { ...result, postedComment: postResult.data };
     }
 
-    if (postResult.error.type === ERROR_TYPE_SERVER) {
-      const { message, status } = postResult.error;
-      return data({ error: { message: message, status: status } }, { status: status });
-    }
-
-    const { message, e } = postResult.error;
-    return data({ error: { message, e } }, { status: STATUS_BAD_REQUEST });
+    const { error } = postResult;
+    return data(
+      { ...result, errorMessage: error.message },
+      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+    );
   }
 
-  return data({ error: { message: MESSAGE_INVALID_DATA } }, { status: STATUS_BAD_REQUEST });
+  return data({ ...result, errorMessage: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
 }
 
 export function meta() {

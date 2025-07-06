@@ -25,6 +25,8 @@ export default [
     route('/questions/:questionId', './modules/questions/routes/question.route.tsx'),
     route('/questions/:questionId/edit', './modules/questions/routes/question-edit.route.tsx'),
     route('/questions/:questionId/delete', './modules/questions/routes/question-delete.route.tsx'),
+
+    route('/questions/:questionId/sse', './modules/questions/routes/questions.sse.route.tsx', []),
   ]),
 
   route('/api/me', './modules/api/routes/me.route.tsx'),

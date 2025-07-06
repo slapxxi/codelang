@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '~/ui/base';
 import { useState } from 'react';
 import { href, Link, Outlet } from 'react-router';
 import { getUserFromSession } from '../get-user-from-session.server';
+import { cn } from '~/utils';
 
 const MainLayout = ({ loaderData }: Route.ComponentProps) => {
   const { user } = loaderData ?? {};
@@ -43,8 +44,8 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
         </Dialog>
       </header>
 
-      <div className="overflow-y-auto h-screen md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:thin] relative">
-        <Navbar className="hidden self-start sticky top-0 md:flex" user={user} />
+      <div className={cn('md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:thin] relative')}>
+        <Navbar className="hidden self-start sticky left-2 top-2 md:flex" user={user} />
         <Outlet />
         <Logo className="fixed bottom-0 right-0 hidden md:flex p-2" size="sm" />
       </div>

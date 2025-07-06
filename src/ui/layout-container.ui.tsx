@@ -14,10 +14,7 @@ export const LayoutContainer: React.FC<LayoutContainerProps> = (props) => {
   return (
     <div
       ref={ref}
-      className={cn(
-        "relative min-h-screen bg-[url('/circle.svg')] bg-position-[var(--x)_var(--y)] overflow-hidden",
-        className
-      )}
+      className={cn("relative min-h-screen bg-[url('/circle.svg')] bg-position-[var(--x)_var(--y)]", className)}
     >
       {children}
 

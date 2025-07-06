@@ -117,7 +117,7 @@ export async function action({ request }: Route.ActionArgs) {
 function createSchema(langs: string[]) {
   const CreateSnippetFormSchema = z.object({
     language: z.enum(langs, 'The language must be selected'),
-    code: z.string().nonempty(),
+    code: z.string().trim().nonempty(),
   });
   return CreateSnippetFormSchema;
 }

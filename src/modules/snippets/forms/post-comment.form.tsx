@@ -5,7 +5,7 @@ import { useSubmit, useNavigation, Form } from 'react-router';
 import { Label, Button } from '~/ui';
 import * as z from 'zod/v4';
 
-export const PostCommentFormSchema = z.object({ comment: z.string().nonempty() });
+export const PostCommentFormSchema = z.object({ comment: z.string().trim().nonempty() });
 
 type TPostCommentForm = z.infer<typeof PostCommentFormSchema>;
 

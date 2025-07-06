@@ -2,13 +2,7 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { QuestionSchema, QuestionSchemaWithCodeHighlighted } from './schema';
 import type { TQuestion, TResult } from '~/types';
-import {
-  ERROR_TYPE_EXCEPTION,
-  ERROR_TYPE_SERVER,
-  MESSAGE_EXCEPTION,
-  MESSAGE_PARSING_ERROR,
-  MESSAGE_RESPONSE_NOT_OK,
-} from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetQuestionResponse = QuestionSchema;
 
@@ -25,23 +19,24 @@ export async function getQuestion(params: Params): Promise<Result> {
 
     if (response.ok) {
       const json = await response.json();
-      const { success, data } = GetQuestionResponse.safeParse(json.data);
+      const data = GetQuestionResponse.parse(json.data);
+      const question = await QuestionSchemaWithCodeHighlighted.parseAsync(data);
+      return { data: question, error: null };
+    }
 
-      if (success) {
-        const question = await QuestionSchemaWithCodeHighlighted.parseAsync(data);
-        return { data: question, error: null };
-      }
-
+    try {
+      const json = await response.clone().json();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: response.status },
+        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    } catch {
+      const body = await response.text();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: body || MESSAGE_RESPONSE_NOT_OK, status: response.status },
         data: null,
       };
     }
-
-    return {
-      error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status },
-      data: null,
-    };
   } catch (e) {
     return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
   }

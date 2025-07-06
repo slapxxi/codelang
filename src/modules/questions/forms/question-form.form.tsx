@@ -5,9 +5,9 @@ import * as z from 'zod/v4';
 import { Input, FormError, CodeEditor, Button } from '~/ui';
 
 export const QuestionFormSchema = z.object({
-  title: z.string().nonempty('Title is required'),
-  description: z.string().nonempty('Description is required'),
-  code: z.string(),
+  title: z.string().trim().nonempty('Title is required'),
+  description: z.string().trim().nonempty('Description is required'),
+  code: z.string().trim(),
 });
 
 type QuestionFormProps = {

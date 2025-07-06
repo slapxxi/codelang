@@ -7,10 +7,16 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { getSession } from '~/app/session.server';
 import { urlToSearchParamsRef } from '~/utils';
 import { AnswerForm, PostAnswerFormSchema } from '../forms';
+import { useEventSource } from 'remix-utils/sse/react';
+import type { TAnswer } from '~/types';
 
 const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { question, user } = loaderData;
   const nav = useNavigation();
+  const answers = useEventSource(href('/questions/:questionId/sse', { questionId: question.id }), {
+    event: 'answers',
+  });
+  const renderedAnswers = answers ? (JSON.parse(answers) as TAnswer[]) : question.answers;
 
   function handleDelete(e: React.FormEvent<HTMLFormElement>) {
     if (!confirm('Are you sure you want to delete this question?')) {
@@ -57,9 +63,9 @@ const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
       )}
 
       <ul className="flex flex-col gap-4">
-        {question.answers.map((a) => (
+        {renderedAnswers.map((a) => (
           <Card asChild key={a.id} variant="secondary">
-            <li className="p-2 max-w-prose">{a.content}</li>
+            <li className="p-2 max-w-prose break-words">{a.content}</li>
           </Card>
         ))}
       </ul>

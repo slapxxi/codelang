@@ -23,7 +23,7 @@ export const AnswerForm: React.FC<AnswerFormProps> = () => {
   };
 
   return (
-    <Form onSubmit={form.handleSubmit(onSubmit)}>
+    <Form onSubmit={form.handleSubmit(onSubmit)} method="post">
       <TextEditor placeholder="Answer" {...form.register('content')} />
       <FormError>{form.formState.errors.content?.message}</FormError>
       <FormError>{actionData?.message}</FormError>

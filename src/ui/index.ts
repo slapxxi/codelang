@@ -1,7 +1,6 @@
 export * from './logo.ui';
 export * from './layout-container.ui';
 export * from './navbar.ui';
-export * from './snippet-card.ui';
 export * from './avatar.ui';
 export * from './pagination.ui';
 export * from './page-title.ui';
@@ -20,3 +19,5 @@ export * from './question-card.ui';
 export * from './card.ui';
 export * from './spinner.ui';
 export * from './shimmer.ui';
+
+export * from './snippet-card';

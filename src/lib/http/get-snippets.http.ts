@@ -3,7 +3,7 @@ import { API_URL } from './const';
 import { SnippetSchema, UserSchema, SnippetSchemaWithLikes, LinksSchema } from './schema';
 import { appendParams } from '~/utils';
 import type { TResult, TSnippet } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetSnippetsResponse = z.object({
   data: z.array(SnippetSchema),
@@ -80,10 +80,19 @@ export async function getSnippets(params?: Params): Promise<Result> {
       };
     }
 
-    return {
-      error: { type: ERROR_TYPE_SERVER, message: response.message, status: response.status },
-      data: null,
-    };
+    try {
+      const json = await response.json();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    } catch {
+      const body = await response.text();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: body, status: response.status },
+        data: null,
+      };
+    }
   } catch (e) {
     return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting snippets', e }, data: null };
   }

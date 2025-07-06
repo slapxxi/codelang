@@ -1,64 +1,27 @@
-import type { TSnippet, TMark } from '~/types';
-import { Expand, MessageCircle, ThumbsDown, ThumbsUp, User } from 'lucide-react';
+import { MessageCircle, ThumbsDown, ThumbsUp, User } from 'lucide-react';
 import { href, Link, useFetcher } from 'react-router';
-import { Code, Card, Button, CardHeader, CardBody, CardFooter } from '~/ui';
-import { useAuth } from '~/hooks';
+import { CardFooter } from '~/ui';
+import { useSnippetContext } from './snippet-card.provider';
 import { cn } from '~/utils';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useAuth } from '~/hooks';
+import type { TMark } from '~/types';
 
-type SnippetCardProps = {
-  snippet: TSnippet;
-  expand?: boolean;
-  className?: string;
-};
-
-export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
-  const { snippet, expand = false, className } = props;
-  const [showMore, setShowMore] = useState(false);
-  const [ex, setExpand] = useState(false);
+export const SnippetCardFooter: React.FC = () => {
+  const ctx = useSnippetContext();
   const likeFetcher = useFetcher();
   const dislikeFetcher = useFetcher();
   const user = useAuth();
-  const codeRef = useRef<HTMLDivElement>(null);
+
   let mark: TMark | undefined;
 
-  if (user) {
-    mark = snippet.marks.find((m) => m.user.id === user.id);
-  }
+  if (ctx) {
+    const { snippet } = ctx;
 
-  useLayoutEffect(() => {
-    const rect = codeRef.current?.getBoundingClientRect();
-
-    if (rect && rect.height >= 300) {
-      setShowMore(true);
+    if (user) {
+      mark = snippet.marks.find((m) => m.user.id === user.id);
     }
-  });
 
-  function handleClick() {
-    setExpand((e) => !e);
-  }
-
-  return (
-    <Card className={className}>
-      <CardHeader className="flex justify-between items-center text-xs text-olive-600">
-        {expand && (
-          <Link to={href('/snippets/:snippetId', { snippetId: snippet.id })} className="link">
-            <Expand size={16} />
-          </Link>
-        )}
-        <span className="ml-auto">{snippet.language}</span>
-      </CardHeader>
-
-      <CardBody className="flex flex-col gap-2">
-        <Code
-          ref={codeRef}
-          code={snippet.formattedCode}
-          showScrollbar={showMore}
-          className={cn('w-full max-w-full min-w-0', ex ? 'max-h-[600px]' : 'max-h-[300px]')}
-        />
-        {showMore && <Button onClick={handleClick}>Show {ex ? 'less' : 'more'}</Button>}
-      </CardBody>
-
+    return (
       <CardFooter className="flex text-sm text-olive-600 justify-between items-center">
         <div className="flex items-center gap-3">
           <likeFetcher.Form action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })} method="post">
@@ -108,6 +71,8 @@ export const SnippetCard: React.FC<SnippetCardProps> = (props) => {
           </Link>
         </div>
       </CardFooter>
-    </Card>
-  );
+    );
+  }
+
+  return null;
 };

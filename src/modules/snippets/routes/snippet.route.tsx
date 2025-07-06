@@ -2,7 +2,7 @@ import type { Route } from './+types/snippet.route';
 import { data, redirect, href, Link, Form } from 'react-router';
 import { useAuth } from '~/hooks';
 import { deleteSnippet, getSnippet } from '~/lib/http';
-import { Button, Card, SnippetCard, Title } from '~/ui';
+import { Button, Card, SnippetCard, SnippetCardBody, SnippetCardFooter, SnippetCardHeader, Title } from '~/ui';
 import { postComment } from '~/lib/http/post-comment.http';
 import { getSession } from '~/app/session.server';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -50,7 +50,11 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
             </div>
           )}
 
-          <SnippetCard snippet={snippet} expand={false} className="max-w-full min-w-0" />
+          <SnippetCard snippet={snippet} className="max-w-full min-w-0">
+            <SnippetCardHeader iconLeft={null} />
+            <SnippetCardBody />
+            <SnippetCardFooter />
+          </SnippetCard>
         </div>
 
         {user && (

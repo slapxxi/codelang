@@ -1,9 +1,5 @@
-import type { TSnippet, TMark } from '~/types';
-import { MessageCircle, ThumbsDown, ThumbsUp, User } from 'lucide-react';
-import { href, Link, useFetcher } from 'react-router';
-import { Code, Card, Button, CardBody, CardFooter, SnippetCardHeader, SnippetCardFooter } from '~/ui';
-import { useAuth } from '~/hooks';
-import { cn } from '~/utils';
+import type { TSnippet } from '~/types';
+import { Card, SnippetCardHeader, SnippetCardFooter } from '~/ui';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { SnippetCardBody } from './snippet-card-body.ui';
 import { SnippetProvider } from './snippet-card.provider';

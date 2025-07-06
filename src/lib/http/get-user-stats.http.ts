@@ -1,7 +1,7 @@
 import { API_URL } from './const';
 import { UserStatsSchema } from './schema';
 import type { TResult, TUserStats } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetUserStatsResponse = UserStatsSchema;
 
@@ -25,7 +25,7 @@ export async function getUserStats(params: Params): Promise<Result> {
     try {
       const json = await response.clone().json();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status },
+        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
         data: null,
       };
     } catch {

@@ -43,11 +43,9 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
         </Dialog>
       </header>
 
-      <div className="overflow-y-auto h-screen md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:none] relative">
+      <div className="overflow-y-auto h-screen md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:thin] relative">
         <Navbar className="hidden self-start sticky top-0 md:flex" user={user} />
-
         <Outlet />
-
         <Logo className="fixed bottom-0 right-0 hidden md:flex p-2" size="sm" />
       </div>
     </LayoutContainer>

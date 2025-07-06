@@ -2,7 +2,8 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { LinksSchema, UserSchema } from './schema';
 import { appendParams } from '~/utils';
-import type { TUser } from '~/types';
+import type { TResult, TUser } from '~/types';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetUsersResponse = z.object({
   data: z.array(UserSchema),
@@ -47,32 +48,38 @@ type Params = {
   searchBy?: (keyof z.infer<typeof UserSchema>)[] | null;
 };
 
-type Result =
-  | {
-      data: {
-        users: TUser[];
-        totalItems: number;
-        totalPages: number;
-      };
-      error: null;
-    }
-  | {
-      data: null;
-      error: { message: string; e: unknown };
-    };
+type Result = TResult<{
+  users: TUser[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+}>;
 
 export async function getUsers(params?: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/users`);
-  appendParams(url, params);
-  const response = await fetch(url);
-  const json = await response.json();
-  const { success, data, error } = GetUsersResponse.safeParse(json.data);
+  try {
+    const url = new URL(`${API_URL}/users`);
+    appendParams(url, params);
+    const response = await fetch(url);
 
-  if (success) {
-    const users = data.data;
-    const { totalItems, totalPages } = data.meta;
-    return { data: { users, totalItems, totalPages }, error: null };
+    if (response.ok) {
+      const json = await response.json();
+      const data = GetUsersResponse.parse(json.data);
+      const users = data.data;
+      const { totalItems, totalPages, currentPage } = data.meta;
+      return { data: { users, totalItems, totalPages, currentPage }, error: null };
+    }
+
+    try {
+      const json = await response.clone().json();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    } catch {
+      const body = await response.text();
+      return { error: { type: ERROR_TYPE_SERVER, message: body, status: response.status }, data: null };
+    }
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting users', e }, data: null };
   }
-
-  return { error: { message: 'Error parsing server response', e: error }, data: null };
 }

@@ -1,12 +1,13 @@
-import { Avatar, PageTitle } from '~/ui';
+import { Avatar, FormError, PageTitle } from '~/ui';
 import type { Route } from './+types/user.route';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
 import { data } from 'react-router';
-import { STATUS_NOT_FOUND } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_NOT_FOUND } from '~/app/const';
 import { UserStats } from '../ui';
+import type { TUserStats } from '~/types';
 
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { stats } = loaderData;
+  const { stats, errorMessage } = loaderData;
 
   if (stats) {
     return (
@@ -21,17 +22,26 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
     );
   }
 
-  return null;
+  return <FormError>{errorMessage}</FormError>;
+};
+
+type LoaderResult = {
+  stats?: TUserStats;
+  errorMessage?: string;
 };
 
 export async function loader({ params }: Route.LoaderArgs) {
+  const result: LoaderResult = { stats: undefined };
   const userStatsResult = await getUserStats({ id: params.userId });
 
   if (userStatsResult.data) {
-    return { stats: userStatsResult.data };
+    return { ...result, stats: userStatsResult.data } as LoaderResult;
   }
 
-  throw data(null, { status: STATUS_NOT_FOUND });
+  const { error } = userStatsResult;
+  return data({ ...result, errorMessage: error.message } as LoaderResult, {
+    status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_NOT_FOUND,
+  });
 }
 
 export default UserRoute;

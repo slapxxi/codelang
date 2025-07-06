@@ -81,7 +81,7 @@ export async function getSnippets(params?: Params): Promise<Result> {
     }
 
     try {
-      const json = await response.json();
+      const json = await response.clone().json();
       return {
         error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
         data: null,

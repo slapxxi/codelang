@@ -1,8 +1,8 @@
 import type { Route } from './+types/users.route';
-import { data, href, Link } from 'react-router';
+import { data, href, NavLink } from 'react-router';
 import { STATUS_NOT_FOUND } from '~/app/const';
 import { getUsers } from '~/lib/http';
-import { Avatar, Card, PageTitle, Pagination } from '~/ui';
+import { Avatar, Card, PageTitle, Pagination, Spinner } from '~/ui';
 
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
   const { users, totalPages, currentPage } = loaderData;
@@ -14,10 +14,15 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
       <ul className="flex flex-col gap-2 md:grid grid-cols-3">
         {users.map((u) => (
           <Card asChild key={u.id} variant="interactive">
-            <Link to={href('/users/:userId', { userId: u.id })} className="p-2 flex gap-2 items-center">
-              <Avatar user={u} />
-              <span>{u.username}</span>
-            </Link>
+            <NavLink to={href('/users/:userId', { userId: u.id })} className="p-2 flex gap-2 items-center">
+              {({ isPending }) => (
+                <>
+                  <Avatar user={u} />
+                  <span>{u.username}</span>
+                  {isPending && <Spinner className="ml-auto text-olive-600" />}
+                </>
+              )}
+            </NavLink>
           </Card>
         ))}
       </ul>

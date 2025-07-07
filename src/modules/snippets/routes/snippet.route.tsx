@@ -1,28 +1,30 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { data, Form, href, Link, redirect } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_CREATED, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
 import { getSession } from '~/app/session.server';
 import { useAuth } from '~/hooks';
 import { deleteSnippet, getSnippet } from '~/lib/http';
 import { postComment } from '~/lib/http/post-comment.http';
 import type { TComment } from '~/types';
 import {
-  Badge,
   Button,
-  Card,
+  CommentsSection,
   LoginMessage,
   SnippetCard,
   SnippetCardBody,
   SnippetCardFooter,
   SnippetCardHeader,
-  Title,
 } from '~/ui';
 import { PostCommentForm, PostCommentFormSchema } from '../forms';
+import { useCommentEvents } from '../hooks/useCommentEvents';
 import type { Route } from './+types/snippet.route';
+import { emitter } from '~/app/emitter.server';
 
 const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { snippet } = loaderData;
   const user = useAuth();
+
+  useCommentEvents();
 
   function handleDelete(e: React.FormEvent<HTMLFormElement>) {
     if (!confirm('Are you sure you want to delete this snippet?')) {
@@ -47,7 +49,7 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
               </Button>
 
               <Form method="post" onSubmit={handleDelete}>
-                <input type="hidden" name="method" value="delete" />
+                <input type="hidden" name="intent" value="delete-snippet" />
                 <Button variant="destructive">
                   Delete Snippet <Trash2 size={16} />
                 </Button>
@@ -71,21 +73,9 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
         )}
       </div>
 
-      <section className="flex-1 mt-8 md:mt-0 flex flex-col gap-4 max-w-prose mx-auto md:mx-0 w-full">
-        <Title level={3} className="font-bold font-mono text-lg text-olive-900 flex gap-2">
-          <span>Comments</span>
-          <Badge>{snippet.comments.length}</Badge>
-        </Title>
-
-        <ul className="flex flex-col gap-4 pl-2">
-          {snippet.comments.map((comment) => (
-            <Card asChild variant="secondary" key={comment.id}>
-              <li className="p-2">{comment.content}</li>
-            </Card>
-          ))}
-          <div className="h-32 shrink-0" />
-        </ul>
-      </section>
+      <CommentsSection title="Comments" data={snippet.comments}>
+        {(comment) => comment.content}
+      </CommentsSection>
     </div>
   );
 };
@@ -117,7 +107,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
 
-  if (form.method === 'delete') {
+  if (form.intent === 'delete-snippet') {
     const deleteResult = await deleteSnippet({ id: params.snippetId, token });
 
     if (deleteResult.data) {
@@ -127,24 +117,29 @@ export async function action({ request, params }: Route.ActionArgs) {
     return data(result, { status: STATUS_SERVER });
   }
 
-  const parseResult = PostCommentFormSchema.safeParse(form);
+  if (form.intent === 'create-comment') {
+    const parseResult = PostCommentFormSchema.safeParse(form);
 
-  if (parseResult.success) {
-    const { comment } = parseResult.data;
-    const postResult = await postComment({ snippetId: params.snippetId, comment, token });
+    if (parseResult.success) {
+      const { comment } = parseResult.data;
+      const postResult = await postComment({ snippetId: params.snippetId, comment, token });
 
-    if (postResult.data) {
-      return { ...result, postedComment: postResult.data };
+      if (postResult.data) {
+        emitter.emit('comment', postResult.data);
+        return data({ ...result, postedComment: postResult.data }, { status: STATUS_CREATED });
+      }
+
+      const { error } = postResult;
+      return data(
+        { ...result, errorMessage: error.message },
+        { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+      );
     }
 
-    const { error } = postResult;
-    return data(
-      { ...result, errorMessage: error.message },
-      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
-    );
+    return data({ ...result, errorMessage: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
   }
 
-  return data({ ...result, errorMessage: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
+  return result;
 }
 
 export function meta() {

@@ -5,7 +5,10 @@ import { useSubmit, useNavigation, Form } from 'react-router';
 import { Label, Button } from '~/ui';
 import * as z from 'zod/v4';
 
-export const PostCommentFormSchema = z.object({ comment: z.string().trim().nonempty() });
+export const PostCommentFormSchema = z.object({
+  intent: z.literal('create-comment'),
+  comment: z.string().trim().nonempty(),
+});
 
 type TPostCommentForm = z.infer<typeof PostCommentFormSchema>;
 
@@ -21,6 +24,7 @@ export function PostCommentForm() {
 
   return (
     <Form method="post" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+      <input type="hidden" value="create-comment" {...register('intent')} />
       <Label htmlFor={commentId}>Leave a Comment</Label>
       <textarea
         id={commentId}

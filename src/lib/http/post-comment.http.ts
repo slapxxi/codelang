@@ -2,13 +2,7 @@ import * as z from 'zod/v4';
 import { API_URL } from './const';
 import { CommentSchema, UserSchema } from './schema';
 import type { TResult, TComment } from '~/types';
-import {
-  ERROR_TYPE_EXCEPTION,
-  ERROR_TYPE_SERVER,
-  MESSAGE_EXCEPTION,
-  MESSAGE_PARSING_ERROR,
-  STATUS_SERVER,
-} from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION } from '~/app/const';
 
 const PostCommentResponse = z.object({
   ...CommentSchema.shape,

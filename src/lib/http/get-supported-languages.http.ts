@@ -1,6 +1,7 @@
 import * as z from 'zod/v4';
 import { API_URL } from './const';
 import type { TResult } from '~/types';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
 
 const GetSupportedLanguagesResponse = z.array(z.string());
 
@@ -11,24 +12,30 @@ type Params = {
 type Result = TResult<string[]>;
 
 export async function getSupportedLanguages(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/snippets/languages`);
-  const response = await fetch(url, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: `token=${params.token}`,
-    },
-  });
-  const json = await response.json();
-  const { success, data } = GetSupportedLanguagesResponse.safeParse(json.data);
+  try {
+    const url = new URL(`${API_URL}/snippets/languages`);
+    const response = await fetch(url, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `token=${params.token}`,
+      },
+    });
 
-  if (response.ok) {
-    if (success) {
+    if (response.ok) {
+      const json = await response.json();
+      const data = GetSupportedLanguagesResponse.parse(json.data);
       return { data, error: null };
     }
 
-    return { error: { type: 'server', message: 'Error parsing server response', status: response.status }, data: null };
+    try {
+      const json = await response.clone().json();
+      return { error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status }, data: null };
+    } catch {
+      const body = await response.text();
+      return { error: { type: ERROR_TYPE_SERVER, message: body, status: response.status }, data: null };
+    }
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting supported languages', e }, data: null };
   }
-
-  return { error: { type: 'unknown', message: 'Error getting supported languages', e: response }, data: null };
 }

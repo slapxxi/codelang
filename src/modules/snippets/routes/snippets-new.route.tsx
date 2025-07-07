@@ -81,7 +81,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const supportedLangsResult = await getSupportedLanguages({ token });
 
   if (supportedLangsResult.data) {
-    return { supportedLangs: supportedLangsResult.data };
+    return data({ supportedLangs: supportedLangsResult.data });
   }
 
   return data(null, { status: STATUS_SERVER });

@@ -19,5 +19,7 @@ export * from './question-card.ui';
 export * from './card.ui';
 export * from './spinner.ui';
 export * from './shimmer.ui';
+export * from './login-message.ui';
+export * from './badge.ui';
 
 export * from './snippet-card';

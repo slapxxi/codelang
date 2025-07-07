@@ -1,14 +1,24 @@
-import type { Route } from './+types/snippet.route';
-import { data, redirect, href, Link, Form } from 'react-router';
+import { Pencil, Trash2 } from 'lucide-react';
+import { data, Form, href, Link, redirect } from 'react-router';
+import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
+import { getSession } from '~/app/session.server';
 import { useAuth } from '~/hooks';
 import { deleteSnippet, getSnippet } from '~/lib/http';
-import { Button, Card, SnippetCard, SnippetCardBody, SnippetCardFooter, SnippetCardHeader, Title } from '~/ui';
 import { postComment } from '~/lib/http/post-comment.http';
-import { getSession } from '~/app/session.server';
-import { Pencil, Trash2 } from 'lucide-react';
+import type { TComment } from '~/types';
+import {
+  Badge,
+  Button,
+  Card,
+  LoginMessage,
+  SnippetCard,
+  SnippetCardBody,
+  SnippetCardFooter,
+  SnippetCardHeader,
+  Title,
+} from '~/ui';
 import { PostCommentForm, PostCommentFormSchema } from '../forms';
-import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
-import type { TComment, TSnippet } from '~/types';
+import type { Route } from './+types/snippet.route';
 
 const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { snippet } = loaderData;
@@ -52,19 +62,19 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
           </SnippetCard>
         </div>
 
-        {user && (
+        {user ? (
           <section className="flex flex-col gap-2">
             <PostCommentForm key={actionData?.postedComment?.id} />
           </section>
+        ) : (
+          <LoginMessage>to be able to post a comment</LoginMessage>
         )}
       </div>
 
       <section className="flex-1 mt-8 md:mt-0 flex flex-col gap-4 max-w-prose mx-auto md:mx-0 w-full">
         <Title level={3} className="font-bold font-mono text-lg text-olive-900 flex gap-2">
           <span>Comments</span>
-          <span className="leading-none p-1.5 bg-olive-700 text-white rounded-sm px-2 inline-flex items-center justify-center text-sm">
-            {snippet.comments.length}
-          </span>
+          <Badge>{snippet.comments.length}</Badge>
         </Title>
 
         <ul className="flex flex-col gap-4 pl-2">

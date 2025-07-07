@@ -1,5 +1,5 @@
 import type { Route } from './+types/question.route';
-import { Button, Card, Code, PageTitle } from '~/ui';
+import { Badge, Button, Card, Code, LoginMessage, PageTitle, Title } from '~/ui';
 import { deleteQuestion, getQuestion, postAnswer } from '~/lib/http';
 import { ERROR_TYPE_SERVER, STATUS_NOT_FOUND, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
@@ -25,9 +25,10 @@ const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <PageTitle className="flex gap-2 items-center">
         <span>Question: {question.title}</span>
+
         {user && question.user.id === user.id && (
           <>
             <Button asChild size="sm" variant="link">
@@ -52,23 +53,23 @@ const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
       {user ? (
         <AnswerForm question={question} key={actionData?.postedAnswer?.id}></AnswerForm>
       ) : (
-        <div className="flex gap-2 items-center">
-          <Form action={href('/login')} className="link">
-            <Button name="ref" value={href('/questions/:questionId', { questionId: question.id })}>
-              Login
-            </Button>
-          </Form>
-          to be able to post answers!
-        </div>
+        <LoginMessage>to be able to post an answer</LoginMessage>
       )}
 
-      <ul className="flex flex-col gap-4">
-        {renderedAnswers.map((a) => (
-          <Card asChild key={a.id} variant="secondary">
-            <li className="p-2 max-w-prose break-words">{a.content}</li>
-          </Card>
-        ))}
-      </ul>
+      <section>
+        <header className="flex gap-2 items-center mb-4">
+          <Title level={4}>Answers</Title>
+          <Badge>{renderedAnswers.length}</Badge>
+        </header>
+
+        <ul className="flex flex-col gap-4">
+          {renderedAnswers.map((a) => (
+            <Card asChild key={a.id} variant="secondary">
+              <li className="p-2 max-w-prose break-words">{a.content}</li>
+            </Card>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 };

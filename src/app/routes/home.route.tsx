@@ -4,6 +4,7 @@ import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
 import type { Route } from './+types/home.route';
+import type { TSnippet } from '~/types';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;
@@ -25,7 +26,13 @@ const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
+type LoaderResult = {
+  snippets: TSnippet[];
+  totalPages: number;
+  currentPage: number;
+};
+
+export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResult> {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
   const snippetsResult = await getSnippets({ page });

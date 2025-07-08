@@ -22,7 +22,7 @@ export const SnippetCardFooter: React.FC = () => {
     }
 
     return (
-      <CardFooter className="flex text-sm text-olive-600 justify-between items-center">
+      <CardFooter className="flex items-center justify-between text-sm text-olive-600">
         <div className="flex items-center gap-3">
           <likeFetcher.Form action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })} method="post">
             <button
@@ -55,7 +55,7 @@ export const SnippetCardFooter: React.FC = () => {
           </dislikeFetcher.Form>
         </div>
 
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           {snippet.comments.length > 0 && (
             <Link to={href(`/snippets/:snippetId`, { snippetId: snippet.id })} className="link flex items-center gap-1">
               <span>

@@ -18,8 +18,8 @@ const SnippetsRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;
 
   return (
-    <div className="w-full max-w-prose flex flex-col gap-4">
-      <PageTitle className="flex gap-4 items-center mb-4">
+    <div className="flex w-full max-w-prose flex-col gap-4">
+      <PageTitle className="mb-4 flex items-center gap-4">
         Snippets
         <Button asChild>
           <Link to={href('/snippets/new')}>

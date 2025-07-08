@@ -35,7 +35,7 @@ const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-2 max-w-prose">
+    <div className="flex w-full max-w-prose flex-col gap-2">
       <PageTitle>Create New Snippet</PageTitle>
 
       <Form method="post" onSubmit={form.handleSubmit(onSubmit)}>

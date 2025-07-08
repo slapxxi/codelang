@@ -6,7 +6,7 @@ import type { Route } from './+types/logout.route';
 
 const LogoutRoute = () => {
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-zinc-500">Are you sure you want to log out?</div>
 
       <Form method="post">

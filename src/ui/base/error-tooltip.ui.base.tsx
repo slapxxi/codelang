@@ -37,7 +37,7 @@ function ErrorTooltipContent({
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow className="bg-destructive fill-destructive z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" />
+        <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-destructive fill-destructive" />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );

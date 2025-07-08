@@ -11,7 +11,7 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
 
   if (stats) {
     return (
-      <div className="w-full flex flex-col gap-4">
+      <div className="flex w-full flex-col gap-4">
         <PageTitle className="flex items-center gap-2">
           <Avatar />
           <span>{stats.username}</span>

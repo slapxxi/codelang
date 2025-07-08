@@ -32,7 +32,7 @@ const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageTitle className="flex gap-2 items-center">
+      <PageTitle className="flex items-center gap-2">
         <span>Question: {question.title}</span>
 
         {user && question.user.id === user.id && (

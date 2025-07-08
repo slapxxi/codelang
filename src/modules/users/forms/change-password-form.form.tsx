@@ -42,7 +42,7 @@ export const ChangePasswordForm = () => {
     <fetcher.Form method="post" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
       <input type="hidden" value="password" {...form.register('type')} />
 
-      <fieldset className="border p-2 rounded flex flex-col gap-2">
+      <fieldset className="flex flex-col gap-2 rounded border p-2">
         <legend className="text-sm text-olive-900">Old Password</legend>
 
         <Input
@@ -54,7 +54,7 @@ export const ChangePasswordForm = () => {
         <FormError>{form.formState.errors.oldPassword?.message}</FormError>
       </fieldset>
 
-      <fieldset className="border p-2 rounded flex flex-col gap-2">
+      <fieldset className="flex flex-col gap-2 rounded border p-2">
         <legend className="text-sm text-olive-900">New Password</legend>
 
         <Input

@@ -11,7 +11,7 @@ export const CommentsSection = <T extends { id: string }>(props: CommentsSection
 
   return (
     <section className={className}>
-      <header className="flex gap-2 items-center mb-4">
+      <header className="mb-4 flex items-center gap-2">
         <Title level={4}>{title}</Title>
         <Badge>{data.length}</Badge>
       </header>
@@ -19,7 +19,7 @@ export const CommentsSection = <T extends { id: string }>(props: CommentsSection
       <ul className="flex flex-col gap-4 pl-2">
         {data.map((item) => (
           <Card asChild key={item.id} variant="secondary">
-            <li className="p-2 max-w-prose break-words self-start">{children(item)}</li>
+            <li className="max-w-prose self-start p-2 break-words">{children(item)}</li>
           </Card>
         ))}
       </ul>

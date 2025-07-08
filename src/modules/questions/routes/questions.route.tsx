@@ -12,7 +12,7 @@ const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
 
   return (
     <section className="flex flex-col">
-      <header className="flex gap-4 items-center mb-4">
+      <header className="mb-4 flex items-center gap-4">
         <PageTitle> Questions </PageTitle>
         {user && (
           <Button asChild>

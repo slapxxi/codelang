@@ -13,7 +13,7 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
 
   return (
     <LayoutContainer disableMotion>
-      <header className="pl-4 bg-zinc-900 text-white flex items-center justify-between md:hidden">
+      <header className="flex items-center justify-between bg-zinc-900 pl-4 text-white md:hidden">
         <Logo light />
 
         <Dialog open={open} onOpenChange={setOpen}>
@@ -33,7 +33,7 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
                 { path: href('/profile'), Icon: User, text: 'Profile' },
               ].map((p, i) => (
                 <li key={i}>
-                  <Link to={p.path} className="flex gap-2 items-center">
+                  <Link to={p.path} className="flex items-center gap-2">
                     <p.Icon />
                     {p.text}
                   </Link>
@@ -45,9 +45,9 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
       </header>
 
       <div className={cn('md:flex gap-4 md:p-2 max-w-[1500px] mx-auto [scrollbar-width:thin] relative')}>
-        <Navbar className="hidden self-start sticky left-2 top-2 md:flex" user={user} />
+        <Navbar className="sticky top-2 left-2 hidden self-start md:flex" user={user} />
         <Outlet />
-        <Logo className="fixed bottom-0 right-0 hidden md:flex p-2" size="sm" />
+        <Logo className="fixed right-0 bottom-0 hidden p-2 md:flex" size="sm" />
       </div>
     </LayoutContainer>
   );

@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
         style={{ clipPath: open ? `url(#${clip2})` : `url(#${clip1})` }}
       />
 
-      <svg className="w-0 h-0 absolute pointer-events-none" aria-hidden>
+      <svg className="pointer-events-none absolute h-0 w-0" aria-hidden>
         <clipPath id={clip1} clipPathUnits="objectBoundingBox">
           <path d="M.643 0C.925.001 1.003.018 1 .078V.922C1.003.982.925.999.643 1H.357C.075.999-.003.982 0 .922V.078C-.003.018.075.001.357 0H.643Z" />
         </clipPath>
@@ -33,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
       </svg>
 
       <nav>
-        <ul className="flex p-2 gap-4 flex-col">
+        <ul className="flex flex-col gap-4 p-2">
           {[
             { Icon: Home, text: 'Home', path: href('/') },
             { Icon: FileQuestionMark, text: 'Questions', path: href('/questions') },
@@ -69,10 +69,10 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
       <div className="h-8" />
 
       <button
-        className="inline-flex gap-2 p-2 rounded-lg group cursor-pointer text-zinc-400 hover:text-zinc-50 mt-auto mb-2"
+        className="group mt-auto mb-2 inline-flex cursor-pointer gap-2 rounded-lg p-2 text-zinc-400 hover:text-zinc-50"
         onClick={() => toggleOpen()}
       >
-        <span className="p-2 rounded-lg group-hover:bg-zinc-800 group-active:bg-zinc-900 w-full">
+        <span className="w-full rounded-lg p-2 group-hover:bg-zinc-800 group-active:bg-zinc-900">
           <svg viewBox="0 0 24 24" className="size-6 cap-round join-round stroke-2 stroke-current fill-none">
             {open ? (
               <>
@@ -107,11 +107,11 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
 
       {user ? (
         <Link to={href('/logout')}>
-          <Avatar user={user} className="absolute top-full left-1/2 -translate-x-1/2 mt-4" />
+          <Avatar user={user} className="absolute top-full left-1/2 mt-4 -translate-x-1/2" />
         </Link>
       ) : (
         <Link to={href('/login')}>
-          <LogIn className="absolute top-full left-1/2 -translate-x-1/2 mt-4 text-zinc-600" />
+          <LogIn className="absolute top-full left-1/2 mt-4 -translate-x-1/2 text-zinc-600" />
         </Link>
       )}
 

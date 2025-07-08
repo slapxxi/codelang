@@ -10,15 +10,15 @@ export const UserStats: React.FC<UserStatsProps> = (props) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full table-auto border border-olive-200 max-w-prose bg-olive-100/40 backdrop-blur-px mb-4">
-        <thead className="bg-olive-200 text-olive-700 text-sm uppercase">
+      <table className="mb-4 w-full max-w-prose table-auto border border-olive-200 bg-olive-100/40 backdrop-blur-px">
+        <thead className="bg-olive-200 text-sm text-olive-700 uppercase">
           <tr>
             <th className="px-6 py-3 text-left">Stat</th>
             <th className="px-6 py-3 text-left">Value</th>
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-olive-200 text-olive-800 text-sm *:even:bg-olive-100/40">
+        <tbody className="divide-y divide-olive-200 text-sm text-olive-800 *:even:bg-olive-100/40">
           {Object.entries(stats.statistic).map(([key, value]) => (
             <tr className="hover:bg-olive-100/50" key={key}>
               <td className="px-6 py-4 font-medium">

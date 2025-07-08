@@ -19,7 +19,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
         <CardFooter>
           {answers.length > 0 && (
             <footer className="flex gap-2">
-              <span className="inline-flex gap-1 items-center ml-auto">
+              <span className="ml-auto inline-flex items-center gap-1">
                 <MessageCircleQuestionMark size={16} />
                 <span>{question.answers.length}</span>
               </span>

@@ -41,7 +41,7 @@ const SnippetEditRoute = ({ loaderData }: Route.ComponentProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-2 max-w-prose">
+    <div className="flex w-full max-w-prose flex-col gap-2">
       <PageTitle>Update Snippet</PageTitle>
 
       <Form method="post" onSubmit={form.handleSubmit(onSubmit)}>
@@ -70,7 +70,7 @@ const SnippetEditRoute = ({ loaderData }: Route.ComponentProps) => {
             {...form.register('code')}
             id={codeId}
             placeholder="Your code goes here..."
-            className="p-2 min-h-[150px]"
+            className="min-h-[150px] p-2"
           ></textarea>
           {form.formState.errors.code && <FormError error={form.formState.errors.code.message} />}
         </div>

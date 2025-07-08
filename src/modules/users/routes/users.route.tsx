@@ -9,13 +9,13 @@ const UserRoute = ({ loaderData }: Route.ComponentProps) => {
   const { users, totalPages, currentPage } = loaderData;
 
   return (
-    <div className="flex flex-col w-full @container">
+    <div className="@container flex w-full flex-col">
       <PageTitle className="mb-4">Users</PageTitle>
 
-      <ul className="flex flex-col gap-2 md:grid grid-cols-3 @max-3xl:grid-cols-2">
+      <ul className="flex grid-cols-3 flex-col gap-2 md:grid @max-3xl:grid-cols-2">
         {users.map((u) => (
           <Card asChild key={u.id} variant="interactive">
-            <NavLink to={href('/users/:userId', { userId: u.id })} className="p-2 flex gap-2 items-center">
+            <NavLink to={href('/users/:userId', { userId: u.id })} className="flex items-center gap-2 p-2">
               {({ isPending }) => (
                 <>
                   <Avatar user={u} />

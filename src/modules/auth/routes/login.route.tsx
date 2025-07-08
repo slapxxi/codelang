@@ -34,14 +34,14 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
       <Form
         action={href('/login')}
         method="POST"
-        className="flex flex-col gap-2 max-w-prose mx-auto"
+        className="mx-auto flex max-w-prose flex-col gap-2"
         onSubmit={handleSubmit(onSubmit)}
       >
         <Input
           type="text"
           placeholder="Username"
           error={!!formState.errors.username}
-          className="self-center w-60"
+          className="w-60 self-center"
           disabled={nav.state === 'submitting'}
           {...register('username')}
         />
@@ -51,14 +51,14 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
           type={showPassword ? 'text' : 'password'}
           placeholder="Password"
           error={!!formState.errors.password}
-          className="self-center w-60"
+          className="w-60 self-center"
           disabled={nav.state === 'submitting'}
           {...register('password')}
         />
         <FormError error={formState.errors.password?.message} />
 
         <button
-          className="text-sm text-zinc-500 hover:text-zinc-800 text-right w-60 self-center"
+          className="w-60 self-center text-right text-sm text-zinc-500 hover:text-zinc-800"
           type="button"
           onClick={() => setShowPassword((sp) => !sp)}
         >
@@ -70,9 +70,9 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
         </Button>
       </Form>
 
-      {errorMessage && <div className="text-destructive text-sm text-center">{errorMessage}</div>}
+      {errorMessage && <div className="text-center text-sm text-destructive">{errorMessage}</div>}
 
-      <div className="flex-1 max-h-4" />
+      <div className="max-h-4 flex-1" />
 
       <Link to={href('/register')} className="self-center text-sm text-zinc-500 hover:text-zinc-800">
         Don&apos;t have an account? Register

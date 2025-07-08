@@ -20,7 +20,7 @@ export const LayoutContainer: React.FC<LayoutContainerProps> = (props) => {
 
       <img
         src="/corner.svg"
-        className="pointer-events-none fixed top-0 left-0 z-0 opacity-40 pointer-none"
+        className="pointer-none pointer-events-none fixed top-0 left-0 z-0 opacity-40"
         aria-hidden
       />
       <img
@@ -30,7 +30,7 @@ export const LayoutContainer: React.FC<LayoutContainerProps> = (props) => {
       />
       <img
         src="/corner.svg"
-        className="pointer-events-none fixed bottom-0 right-0 z-0 rotate-180 opacity-40"
+        className="pointer-events-none fixed right-0 bottom-0 z-0 rotate-180 opacity-40"
         aria-hidden
       />
       <img

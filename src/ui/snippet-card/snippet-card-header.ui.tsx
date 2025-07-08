@@ -15,7 +15,7 @@ export const SnippetCardHeader: React.FC<SnippetCardHeaderProps> = (props) => {
     const { snippet } = ctx;
 
     return (
-      <CardHeader className="flex justify-between items-center text-xs text-olive-600">
+      <CardHeader className="flex items-center justify-between text-xs text-olive-600">
         {iconLeft === null
           ? null
           : iconLeft || (

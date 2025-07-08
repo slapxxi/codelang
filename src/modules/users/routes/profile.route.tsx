@@ -33,7 +33,7 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
   }
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <PageTitle className="flex items-center gap-2 filter-[url('#shimmer')]">
         <Avatar />
         <span>{user.username}</span>
@@ -58,7 +58,7 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
 
       <Suspense
         fallback={
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <Spinner />
             Loading stats...
           </div>

@@ -31,7 +31,7 @@ export function PostCommentForm() {
       <textarea
         id={commentId}
         placeholder="Comment..."
-        className="border rounded bg-white p-2"
+        className="rounded border bg-white p-2"
         {...register('comment')}
       ></textarea>
       <Button disabled={nav.state === 'loading' || nav.state === 'submitting'}>Post</Button>

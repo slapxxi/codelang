@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useId } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { useSubmit, useNavigation, Form } from 'react-router';
-import { Label, Button } from '~/ui';
+import { Form, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
+import { Button, Label } from '~/ui';
+
+const INTENT = 'create-comment';
 
 export const PostCommentFormSchema = z.object({
-  intent: z.literal('create-comment'),
+  intent: z.literal(INTENT),
   comment: z.string().trim().nonempty(),
 });
 
@@ -24,7 +26,7 @@ export function PostCommentForm() {
 
   return (
     <Form method="post" onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-      <input type="hidden" value="create-comment" {...register('intent')} />
+      <input type="hidden" value={INTENT} {...register('intent')} />
       <Label htmlFor={commentId}>Leave a Comment</Label>
       <textarea
         id={commentId}

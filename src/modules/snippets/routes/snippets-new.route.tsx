@@ -1,6 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { data, Form, href, redirect, useSubmit } from 'react-router';
+import * as z from 'zod/v4';
+import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { getSession } from '~/app/session.server';
 import { createSnippet, getSupportedLanguages } from '~/lib/http';
+import type { DataWithResponseInit } from '~/types';
 import {
   Button,
   CodeEditor,
@@ -14,17 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/ui';
-import type { Route } from './+types/snippets-new.route';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import * as z from 'zod/v4';
-import { useMemo } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { urlToSearchParamsRef } from '~/utils';
+import type { Route } from './+types/snippets-new.route';
 
 const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
   const { supportedLangs = [] } = loaderData ?? {};
   const schema = useMemo(() => createSchema(supportedLangs), [...supportedLangs]);
+  // todo: separate form
   const form = useForm({ resolver: zodResolver(schema) });
   const submit = useSubmit();
 
@@ -69,7 +71,11 @@ const SnippetsNewRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
+type LoaderResult = {
+  supportedLangs?: string[];
+};
+
+export async function loader({ request }: Route.LoaderArgs): Promise<Response | DataWithResponseInit<LoaderResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
   const ref = urlToSearchParamsRef(request.url);
@@ -84,10 +90,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     return data({ supportedLangs: supportedLangsResult.data });
   }
 
-  return data(null, { status: STATUS_SERVER });
+  return data({}, { status: STATUS_SERVER });
 }
 
-export async function action({ request }: Route.ActionArgs) {
+type ActionResult = {
+  errorMessage?: string;
+};
+
+export async function action({ request }: Route.ActionArgs): Promise<Response | DataWithResponseInit<ActionResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
 
@@ -108,10 +118,10 @@ export async function action({ request }: Route.ActionArgs) {
       return redirect(href('/snippets/:snippetId', { snippetId: postResult.data.id }));
     }
 
-    return data(null, { status: STATUS_SERVER });
+    return data({}, { status: STATUS_SERVER });
   }
 
-  return data(null, { status: STATUS_UNPROCESSABLE_ENTITY });
+  return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 function createSchema(langs: string[]) {

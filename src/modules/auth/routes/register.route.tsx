@@ -1,14 +1,14 @@
-import type { Route } from './+types/register.route';
-import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
-import * as z from 'zod/v4';
-import { registerUser } from '~/lib/http';
-import { Input, FormError } from '~/ui';
-import { Button } from '~/ui/base';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
+import * as z from 'zod/v4';
+import { ERROR_TYPE_SERVER, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { getSession } from '~/app/session.server';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_SERVER } from '~/app/const';
+import { registerUser } from '~/lib/http';
+import { Button, FormError, Input } from '~/ui';
+import type { Route } from './+types/register.route';
+import type { DataWithResponseInit } from '~/types';
 
 const RegisterUserSchema = z.object({
   username: z.string('Username is required').min(5),
@@ -34,7 +34,8 @@ const RegisterFormSchema = z
 type TRegisterForm = z.infer<typeof RegisterFormSchema>;
 
 const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
-  const { message } = actionData ?? {};
+  const { errorMessage } = actionData ?? {};
+  // todo: move to separate form
   const { register, handleSubmit, formState } = useForm<TRegisterForm>({ resolver: zodResolver(RegisterFormSchema) });
   const [showPassword, setShowPassword] = useState(false);
   const submit = useSubmit();
@@ -94,7 +95,7 @@ const RegisterRoute = ({ actionData }: Route.ComponentProps) => {
         </Button>
       </Form>
 
-      {message && <div className="text-destructive text-sm text-center">{message}</div>}
+      {errorMessage && <div className="text-destructive text-sm text-center">{errorMessage}</div>}
 
       <div className="flex-1 max-h-4" />
 
@@ -113,27 +114,32 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
-export async function action({ request }: Route.ActionArgs) {
+type ActionResult = {
+  errorMessage?: string;
+};
+
+export async function action({ request }: Route.ActionArgs): Promise<Response | DataWithResponseInit<ActionResult>> {
   const form = await request.formData();
   const username = form.get('username');
   const password = form.get('password');
-  const { success, data: parseData } = RegisterUserSchema.safeParse({ username, password });
+  const parseResult = RegisterUserSchema.safeParse({ username, password });
 
-  if (success) {
-    const { error } = await registerUser({ username: parseData.username, password: parseData.password });
+  if (parseResult.success) {
+    const { username, password } = parseResult.data;
+    const registerResult = await registerUser({ username, password });
 
-    if (error && error.type === ERROR_TYPE_SERVER) {
-      return data({ message: error.message }, { status: error.status });
+    if (registerResult.data) {
+      return redirect('/login');
     }
 
-    if (error && error.type === ERROR_TYPE_EXCEPTION) {
-      return data({ message: error.message }, { status: STATUS_SERVER });
-    }
-
-    return redirect('/login');
+    const { error } = registerResult;
+    return data(
+      { errorMessage: error.message },
+      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+    );
   }
 
-  return data({ message: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
+  return data({ errorMessage: 'Invalid data submitted' }, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 export default RegisterRoute;

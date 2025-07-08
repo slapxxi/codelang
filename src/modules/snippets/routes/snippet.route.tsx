@@ -1,11 +1,12 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { data, Form, href, Link, redirect } from 'react-router';
 import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_CREATED, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
+import { emitter } from '~/app/emitter.server';
 import { getSession } from '~/app/session.server';
 import { useAuth } from '~/hooks';
 import { deleteSnippet, getSnippet } from '~/lib/http';
 import { postComment } from '~/lib/http/post-comment.http';
-import type { TComment } from '~/types';
+import type { DataWithResponseInit, TComment, TSnippet } from '~/types';
 import {
   Button,
   CommentsSection,
@@ -18,7 +19,6 @@ import {
 import { PostCommentForm, PostCommentFormSchema } from '../forms';
 import { useCommentEvents } from '../hooks/useCommentEvents';
 import type { Route } from './+types/snippet.route';
-import { emitter } from '~/app/emitter.server';
 
 const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { snippet } = loaderData;
@@ -80,7 +80,11 @@ const SnippetRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ params }: Route.LoaderArgs) {
+type LoaderResult = {
+  snippet: TSnippet;
+};
+
+export async function loader({ params }: Route.LoaderArgs): Promise<LoaderResult> {
   const snippetResult = await getSnippet({ id: params.snippetId });
 
   if (snippetResult.data) {
@@ -95,8 +99,10 @@ type ActionResult = {
   postedComment?: TComment;
 };
 
-export async function action({ request, params }: Route.ActionArgs) {
-  const result: ActionResult = { errorMessage: undefined, postedComment: undefined };
+export async function action({
+  request,
+  params,
+}: Route.ActionArgs): Promise<Response | ActionResult | DataWithResponseInit<ActionResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
 
@@ -114,7 +120,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       return redirect(href('/snippets'));
     }
 
-    return data(result, { status: STATUS_SERVER });
+    return data({}, { status: STATUS_SERVER });
   }
 
   if (form.intent === 'create-comment') {
@@ -126,20 +132,20 @@ export async function action({ request, params }: Route.ActionArgs) {
 
       if (postResult.data) {
         emitter.emit('comment', postResult.data);
-        return data({ ...result, postedComment: postResult.data }, { status: STATUS_CREATED });
+        return data({ postedComment: postResult.data }, { status: STATUS_CREATED });
       }
 
       const { error } = postResult;
       return data(
-        { ...result, errorMessage: error.message },
+        { errorMessage: error.message },
         { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
       );
     }
 
-    return data({ ...result, errorMessage: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
+    return data({ errorMessage: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
   }
 
-  return result;
+  return {};
 }
 
 export function meta() {

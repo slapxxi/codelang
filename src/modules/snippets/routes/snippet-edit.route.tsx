@@ -1,5 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useId, useMemo } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { data, Form, href, redirect, useSubmit } from 'react-router';
+import * as z from 'zod/v4';
+import { ERROR_TYPE_SERVER, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { getSession } from '~/app/session.server';
 import { getSnippet, getSupportedLanguages, markSnippet, updateSnippet } from '~/lib/http';
-import type { Route } from './+types/snippet-edit.route';
+import type { DataWithResponseInit, TMark, TSnippet } from '~/types';
 import {
   Button,
   FormError,
@@ -13,17 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/ui';
-import { getSession } from '~/app/session.server';
-import type { TMark } from '~/types';
-import { data, Form, href, redirect, useSubmit } from 'react-router';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useId } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import * as z from 'zod/v4';
+import type { Route } from './+types/snippet-edit.route';
 
 const SnippetEditRoute = ({ loaderData }: Route.ComponentProps) => {
   const { supportedLangs = [], snippet } = loaderData ?? {};
   const schema = useMemo(() => createSchema(supportedLangs), [...supportedLangs]);
+  // todo: separate form
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -81,7 +83,12 @@ const SnippetEditRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+type LoaderResult = {
+  snippet: TSnippet;
+  supportedLangs: string[];
+};
+
+export async function loader({ params, request }: Route.LoaderArgs): Promise<Response | LoaderResult> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
   const user = session.get('user');
@@ -98,16 +105,24 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     const supportedLangs = supportedLangsResult.data;
 
     if (snippet.user.id !== user?.id) {
-      return redirect(href('/snippets/:snippetId', { snippetId: params.snippetId }));
+      throw redirect(href('/snippets/:snippetId', { snippetId: params.snippetId }));
     }
 
     return { snippet, supportedLangs };
   }
 
-  return redirect(href('/snippets/:snippetId', { snippetId: params.snippetId }));
+  throw redirect(href('/snippets/:snippetId', { snippetId: params.snippetId }));
 }
 
-export async function action({ request, params }: Route.ActionArgs) {
+type ActionResult = {
+  mark?: TMark['type'];
+  errorMessage?: string;
+};
+
+export async function action({
+  request,
+  params,
+}: Route.ActionArgs): Promise<Response | DataWithResponseInit<ActionResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const formData = await request.formData();
   const mark = formData.get('mark') as TMark['type'] | null;
@@ -118,20 +133,24 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 
   if (mark) {
-    const { data, error } = await markSnippet({ id: params.snippetId, token, mark });
+    const markSnippetResult = await markSnippet({ id: params.snippetId, token, mark });
 
-    if (data) {
-      return data;
+    if (markSnippetResult.data) {
+      return data({ ...markSnippetResult.data });
     }
 
-    return { error };
+    return data({ errorMessage: markSnippetResult.error.message });
   }
 
   const form = Object.fromEntries(formData);
   const supportedLangsResult = await getSupportedLanguages({ token });
 
   if (!supportedLangsResult.data) {
-    return data({}, { status: 400 });
+    const { error } = supportedLangsResult;
+    return data(
+      { errorMessage: error.message },
+      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+    );
   }
 
   const parseResult = createSchema(supportedLangsResult.data).safeParse(form);
@@ -141,11 +160,11 @@ export async function action({ request, params }: Route.ActionArgs) {
     const postResult = await updateSnippet({ id: params.snippetId, language, code, token });
 
     if (postResult.data) {
-      return redirect(href('/snippets/:snippetId', { snippetId: params.snippetId }));
+      throw redirect(href('/snippets/:snippetId', { snippetId: params.snippetId }));
     }
   }
 
-  return data({}, { status: 400 });
+  return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 function createSchema(langs: string[]) {

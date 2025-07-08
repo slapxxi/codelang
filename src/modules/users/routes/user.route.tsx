@@ -1,10 +1,10 @@
-import { Avatar, FormError, PageTitle } from '~/ui';
-import type { Route } from './+types/user.route';
-import { getUserStats } from '~/lib/http/get-user-stats.http';
 import { data } from 'react-router';
 import { ERROR_TYPE_SERVER, STATUS_NOT_FOUND } from '~/app/const';
-import { UserStats } from '../ui';
+import { getUserStats } from '~/lib/http/get-user-stats.http';
 import type { TUserStats } from '~/types';
+import { Avatar, FormError, PageTitle } from '~/ui';
+import { UserStats } from '../ui';
+import type { Route } from './+types/user.route';
 
 const UserRoute = ({ loaderData }: Route.ComponentProps) => {
   const { stats, errorMessage } = loaderData;

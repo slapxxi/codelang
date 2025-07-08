@@ -2,7 +2,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '~/utils';
 
-const variants = cva('border border-olive-500/30 rounded-xl shadow', {
+const variants = cva('border border-olive-500/30 rounded-xl shadow break-all', {
   variants: {
     variant: {
       primary: 'bg-olive-200/30 backdrop-blur-px',

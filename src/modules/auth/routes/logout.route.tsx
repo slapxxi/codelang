@@ -1,18 +1,21 @@
-import { destroySession, getSession } from '~/app/session.server';
-import type { Route } from './+types/logout.route';
 import { Form, href, Link, redirect } from 'react-router';
+import { destroySession, getSession } from '~/app/session.server';
+import { FormSuccess } from '~/ui';
 import { Button } from '~/ui/base';
+import type { Route } from './+types/logout.route';
 
 const LogoutRoute = () => {
   return (
     <div className="flex flex-col gap-4 items-center">
-      <p>Are you sure you want to log out?</p>
+      <div className="text-sm text-zinc-500">Are you sure you want to log out?</div>
 
       <Form method="post">
-        <Button>Logout</Button>
+        <Button variant="destructive">Logout</Button>
       </Form>
 
-      <Link to={href('/')}>Never mind</Link>
+      <FormSuccess asChild className="hover:underline">
+        <Link to={href('/')}>Never mind</Link>
+      </FormSuccess>
     </div>
   );
 };

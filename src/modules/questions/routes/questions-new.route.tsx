@@ -1,10 +1,11 @@
-import type { Route } from './+types/questions-new.route';
 import { data, href, redirect } from 'react-router';
-import { STATUS_BAD_REQUEST, STATUS_SERVER } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
 import { getSession } from '~/app/session.server';
 import { createQuestion } from '~/lib/http';
 import { PageTitle } from '~/ui';
 import { QuestionForm, QuestionFormSchema } from '../forms';
+import type { Route } from './+types/questions-new.route';
+import type { DataWithResponseInit } from '~/types';
 
 const QuestionsNewRoute = () => {
   return (
@@ -24,7 +25,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 }
 
-export async function action({ request }: Route.ActionArgs) {
+type ActionResult = {
+  errorMessage?: string;
+};
+
+export async function action({ request }: Route.ActionArgs): Promise<Response | DataWithResponseInit<ActionResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
 
@@ -44,10 +49,14 @@ export async function action({ request }: Route.ActionArgs) {
       return redirect(href('/questions/:questionId', { questionId: questionResult.data.id }));
     }
 
-    return data(null, { status: STATUS_SERVER });
+    const { error } = questionResult;
+    return data(
+      { errorMessage: error.message },
+      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+    );
   }
 
-  return data(null, { status: STATUS_BAD_REQUEST });
+  return data({ errorMessage: 'Invalid data submitted' }, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 export default QuestionsNewRoute;

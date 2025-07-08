@@ -1,4 +1,4 @@
-import { ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK, STATUS_SERVER } from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 import { API_URL } from './const';
 import { UserSchema } from './schema';
 import type { TResult, TUser } from '~/types';
@@ -13,28 +13,36 @@ type Params = {
 type Result = TResult<TUser>;
 
 export async function registerUser(params: Params): Promise<Result> {
-  const url = new URL(`${API_URL}/register`);
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(params),
-  });
+  try {
+    const url = new URL(`${API_URL}/register`);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
 
-  if (response.ok) {
-    const json = await response.json();
-    const responseResult = RegisterUserResponse.safeParse(json.data);
-
-    if (responseResult.success) {
-      return {
-        data: responseResult.data,
-        error: null,
-      };
+    if (response.ok) {
+      const json = await response.json();
+      const data = RegisterUserResponse.parse(json.data);
+      return { data, error: null };
     }
 
-    return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER }, data: null };
+    try {
+      const json = await response.clone().json();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    } catch {
+      const body = await response.text();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: body || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    }
+  } catch (e) {
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
   }
-
-  return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status }, data: null };
 }

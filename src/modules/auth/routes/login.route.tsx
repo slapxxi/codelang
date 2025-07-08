@@ -1,14 +1,14 @@
-import type { Route } from './+types/login.route';
-import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
-import { Button } from '~/ui/base';
-import { Input, FormError } from '~/ui';
-import { loginUser } from '~/lib/http';
-import { commitSession, getSession } from '~/app/session.server';
 import { MESSAGE_INVALID_DATA, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { commitSession, getSession } from '~/app/session.server';
+import { loginUser } from '~/lib/http';
+import { FormError, Input } from '~/ui';
+import { Button } from '~/ui/base';
+import type { Route } from './+types/login.route';
 
 const LoginFormSchema = z.object({
   username: z.string().nonempty('Username is required'),
@@ -18,7 +18,8 @@ const LoginFormSchema = z.object({
 type TLoginForm = z.infer<typeof LoginFormSchema>;
 
 const LoginRoute = ({ actionData }: Route.ComponentProps) => {
-  const { message } = actionData ?? {};
+  const { errorMessage } = actionData ?? {};
+  // todo: use separate form
   const { register, handleSubmit, formState } = useForm<TLoginForm>({ resolver: zodResolver(LoginFormSchema) });
   const [showPassword, setShowPassword] = useState(false);
   const submit = useSubmit();
@@ -69,7 +70,7 @@ const LoginRoute = ({ actionData }: Route.ComponentProps) => {
         </Button>
       </Form>
 
-      {message && <div className="text-destructive text-sm text-center">{message}</div>}
+      {errorMessage && <div className="text-destructive text-sm text-center">{errorMessage}</div>}
 
       <div className="flex-1 max-h-4" />
 
@@ -92,10 +93,9 @@ export async function action({ request }: Route.ActionArgs) {
   const session = await getSession(request.headers.get('Cookie'));
   const url = new URL(request.url);
   const ref = url.searchParams.get('ref') || '/';
-  const form = await request.formData();
-  const username = form.get('username');
-  const password = form.get('password');
-  const formDataParsingResult = LoginFormSchema.safeParse({ username, password });
+  const formData = await request.formData();
+  const form = Object.fromEntries(formData);
+  const formDataParsingResult = LoginFormSchema.safeParse(form);
 
   if (formDataParsingResult.success) {
     const { username, password } = formDataParsingResult.data;
@@ -112,10 +112,10 @@ export async function action({ request }: Route.ActionArgs) {
       });
     }
 
-    return data({ message: loginResult.error.message }, { status: STATUS_SERVER });
+    return data({ errorMessage: loginResult.error.message }, { status: STATUS_SERVER });
   }
 
-  return data({ message: MESSAGE_INVALID_DATA }, { status: STATUS_UNPROCESSABLE_ENTITY });
+  return data({ errorMessage: MESSAGE_INVALID_DATA }, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 export default LoginRoute;

@@ -1,5 +1,5 @@
-import './use-pointer-position.css';
 import { useEffect, useRef } from 'react';
+import './use-pointer-position.css';
 
 type Params = { disabled: boolean };
 

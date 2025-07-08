@@ -1,9 +1,9 @@
-import type { Route } from './+types/home.route';
+import { data } from 'react-router';
+import { ERROR_TYPE_SERVER, STATUS_SERVER } from '~/app/const';
 import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
-import { ERROR_TYPE_SERVER, STATUS_SERVER } from '../const';
-import { data } from 'react-router';
+import type { Route } from './+types/home.route';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;

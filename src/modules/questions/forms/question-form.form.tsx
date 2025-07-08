@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { useSubmit, Form } from 'react-router';
+import { Form, useActionData, useLoaderData, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
-import { Input, FormError, CodeEditor, Button } from '~/ui';
+import { Button, CodeEditor, FormError, Input } from '~/ui';
+import type { LoaderResult } from '../routes/question-edit.route';
 
 export const QuestionFormSchema = z.object({
   title: z.string().trim().nonempty('Title is required'),
@@ -11,15 +12,20 @@ export const QuestionFormSchema = z.object({
 });
 
 type QuestionFormProps = {
-  defaultValues?: z.infer<typeof QuestionFormSchema>;
   children?: React.ReactNode;
 };
 
 export const QuestionForm: React.FC<QuestionFormProps> = (props) => {
-  const { defaultValues, children } = props;
+  const { children } = props;
+  const actionData = useActionData();
+  const loaderData = useLoaderData<LoaderResult>();
   const form = useForm({
     resolver: zodResolver(QuestionFormSchema),
-    defaultValues,
+    defaultValues: {
+      title: loaderData?.question.title,
+      description: loaderData?.question.description,
+      code: loaderData?.question.attachedCode,
+    },
   });
   const submit = useSubmit();
 
@@ -37,6 +43,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = (props) => {
 
       <CodeEditor {...form.register('code')} placeholder="Code" />
       <FormError>{form.formState.errors.code?.message}</FormError>
+
+      <FormError>{actionData?.errorMessage}</FormError>
 
       {children || <Button>Create</Button>}
     </Form>

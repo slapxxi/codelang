@@ -1,25 +1,26 @@
-import type { Route } from './+types/question.route';
-import { Button, Code, LoginMessage, PageTitle, CommentsSection } from '~/ui';
-import { deleteQuestion, getQuestion, postAnswer } from '~/lib/http';
+import { Pencil, Trash2 } from 'lucide-react';
+import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
 import {
   ERROR_TYPE_SERVER,
+  STATUS_BAD_REQUEST,
   STATUS_CREATED,
   STATUS_NOT_FOUND,
   STATUS_SERVER,
   STATUS_UNPROCESSABLE_ENTITY,
 } from '~/app/const';
-import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
-import { Pencil, Trash2 } from 'lucide-react';
+import { emitter } from '~/app/emitter.server';
 import { getSession } from '~/app/session.server';
+import { deleteQuestion, getQuestion, postAnswer } from '~/lib/http';
+import type { DataWithResponseInit, TQuestion, TUser } from '~/types';
+import { Button, Code, CommentsSection, LoginMessage, PageTitle } from '~/ui';
 import { urlToSearchParamsRef } from '~/utils';
 import { AnswerForm, PostAnswerFormSchema } from '../forms';
-import { emitter } from '~/app/emitter.server';
 import { useAnswerEvents } from '../hooks';
+import type { Route } from './+types/question.route';
 
 const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
   const { question, user } = loaderData;
   const nav = useNavigation();
-  const renderedAnswers = question.answers;
 
   useAnswerEvents();
 
@@ -52,7 +53,9 @@ const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
           </>
         )}
       </PageTitle>
+
       <p>{question.description}</p>
+
       <Code code={question.formattedCode} />
 
       {user ? (
@@ -61,14 +64,19 @@ const QuestionRoute = ({ loaderData, actionData }: Route.ComponentProps) => {
         <LoginMessage>to be able to post an answer</LoginMessage>
       )}
 
-      <CommentsSection title="Answers" data={renderedAnswers}>
+      <CommentsSection title="Answers" data={question.answers}>
         {(answer) => answer.content}
       </CommentsSection>
     </div>
   );
 };
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+type LoaderResult = {
+  question: TQuestion;
+  user?: TUser;
+};
+
+export async function loader({ params, request }: Route.LoaderArgs): Promise<LoaderResult> {
   const session = await getSession(request.headers.get('Cookie'));
   const user = session.get('user');
   const questionResult = await getQuestion({ id: params.questionId });
@@ -80,7 +88,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   throw data(null, { status: STATUS_NOT_FOUND });
 }
 
-export async function action({ params, request }: Route.ActionArgs) {
+export type ActionResult = {
+  postedAnswer?: TQuestion['answers'][0];
+  errorMessage?: string;
+};
+
+export async function action({
+  params,
+  request,
+}: Route.ActionArgs): Promise<Response | DataWithResponseInit<ActionResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
   const ref = urlToSearchParamsRef(request.url);
@@ -89,7 +105,6 @@ export async function action({ params, request }: Route.ActionArgs) {
     return redirect(`/login?${ref}`);
   }
 
-  const result = { postedAnswer: null, errors: null, message: null };
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
 
@@ -101,7 +116,7 @@ export async function action({ params, request }: Route.ActionArgs) {
     }
 
     const { error } = deleteResult;
-    return data(result, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
+    return data({}, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
   }
 
   if (form.intent === 'create-answer') {
@@ -113,20 +128,20 @@ export async function action({ params, request }: Route.ActionArgs) {
 
       if (postResult.data) {
         emitter.emit('answer', postResult.data);
-        return data({ ...result, postedAnswer: postResult.data }, { status: STATUS_CREATED });
+        return data({ postedAnswer: postResult.data }, { status: STATUS_CREATED });
       }
 
       const { error } = postResult;
       return data(
-        { ...result, errors: error.e, message: error.message },
+        { errorMessage: error.message },
         { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
       );
     }
 
-    return data({ ...result, errors: parseResult.error.flatten() }, { status: STATUS_UNPROCESSABLE_ENTITY });
+    return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
   }
 
-  return result;
+  return data({}, { status: STATUS_BAD_REQUEST });
 }
 
 export default QuestionRoute;

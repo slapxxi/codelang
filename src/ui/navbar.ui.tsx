@@ -1,17 +1,14 @@
-import { href, Link, NavLink } from 'react-router';
 import { Code, FileQuestionMark, Home, LogIn, User, Users } from 'lucide-react';
-
-import { cn } from '~/utils';
-import { useNavbar } from '~/hooks';
-import { Avatar } from './avatar.ui';
-import type { TUser } from '~/types';
 import { useId } from 'react';
+import { href, Link, NavLink } from 'react-router';
+import { useNavbar } from '~/hooks';
+import type { TUser } from '~/types';
+import { Avatar } from '~/ui';
+import { cn } from '~/utils';
 
 type NavbarProps = {
-  className?: string;
-  children?: React.ReactNode;
   user?: TUser;
-};
+} & React.ComponentProps<'nav'>;
 
 export const Navbar: React.FC<NavbarProps> = (props) => {
   const { className, children, user } = props;

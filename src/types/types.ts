@@ -1,3 +1,4 @@
+import type { data } from 'react-router';
 import * as z from 'zod/v4';
 import type {
   AnswerSchema,
@@ -10,6 +11,7 @@ import type {
 } from '~/lib/http';
 
 export type TUser = z.infer<typeof UserSchema>;
+
 export type TUserStats = z.infer<typeof UserStatsSchema>;
 
 export type UserRole = 'admin' | 'user';
@@ -48,3 +50,5 @@ export type TExceptionError = {
   message: string;
   e: unknown;
 };
+
+export type DataWithResponseInit<D> = ReturnType<typeof data<D>>;

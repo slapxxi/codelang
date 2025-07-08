@@ -1,14 +1,14 @@
 import { FilePlus } from 'lucide-react';
-import type { Route } from './+types/questions.route.tsx';
 import { data, href, Link } from 'react-router';
 import { STATUS_SERVER } from '~/app/const/status-codes.js';
-import { useAuth } from '~/hooks/use-auth.hook.js';
+import { getSession } from '~/app/session.server.js';
 import { getQuestions } from '~/lib/http';
+import type { TQuestion, TUser } from '~/types/types.js';
 import { Button, PageTitle, Pagination, QuestionCard } from '~/ui';
+import type { Route } from './+types/questions.route.tsx';
 
 const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
-  const { questions, totalPages, currentPage } = loaderData;
-  const user = useAuth();
+  const { user, questions, totalPages, currentPage } = loaderData;
 
   return (
     <section className="flex flex-col">
@@ -35,14 +35,24 @@ const QuestionsRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
+type LoaderResult = {
+  questions: TQuestion[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  user?: TUser;
+};
+
+export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResult> {
+  const session = await getSession(request.headers.get('Cookie'));
+  const user = session.get('user');
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
   const questionsResult = await getQuestions({ page });
 
   if (questionsResult.data) {
     const { questions, totalItems, totalPages, currentPage } = questionsResult.data;
-    return { questions, totalItems, totalPages, currentPage };
+    return { user, questions, totalItems, totalPages, currentPage };
   }
 
   throw data(null, { status: STATUS_SERVER });

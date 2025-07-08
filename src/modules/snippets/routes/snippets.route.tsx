@@ -12,6 +12,7 @@ import {
   SnippetCardHeader,
 } from '~/ui';
 import type { Route } from './+types/snippets.route';
+import type { TSnippet } from '~/types';
 
 const SnippetsRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;
@@ -45,7 +46,13 @@ const SnippetsRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
+type LoaderResult = {
+  snippets: TSnippet[];
+  totalPages: number;
+  currentPage: number;
+};
+
+export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResult> {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
   const snippetsResult = await getSnippets({ page });

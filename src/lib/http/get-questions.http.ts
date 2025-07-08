@@ -3,13 +3,7 @@ import { API_URL } from './const';
 import { SnippetSchema, UserSchema, QuestionSchema, QuestionSchemaWithCodeHighlighted } from './schema';
 import { appendParams } from '~/utils';
 import type { TQuestion, TResult } from '~/types';
-import {
-  ERROR_TYPE_EXCEPTION,
-  ERROR_TYPE_SERVER,
-  MESSAGE_EXCEPTION,
-  MESSAGE_PARSING_ERROR,
-  STATUS_SERVER,
-} from '~/app/const';
+import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetQuestionsResponse = z.object({
   data: QuestionSchema.array(),
@@ -76,10 +70,10 @@ export async function getQuestions(params?: Params): Promise<Result> {
     const url = new URL(`${API_URL}/questions`);
     appendParams(url, params);
     const response = await fetch(url);
-    const json = await response.json();
-    const { success, data } = GetQuestionsResponse.safeParse(json.data);
 
-    if (success) {
+    if (response.ok) {
+      const json = await response.json();
+      const data = GetQuestionsResponse.parse(json.data);
       const questions = await QuestionSchemaWithCodeHighlighted.array().parseAsync(data.data);
       return {
         data: {
@@ -92,7 +86,19 @@ export async function getQuestions(params?: Params): Promise<Result> {
       };
     }
 
-    return { error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER }, data: null };
+    try {
+      const json = await response.clone().json();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    } catch {
+      const body = await response.text();
+      return {
+        error: { type: ERROR_TYPE_SERVER, message: body || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        data: null,
+      };
+    }
   } catch (e) {
     return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
   }

@@ -25,9 +25,6 @@ export default [
     route('/questions/new', './modules/questions/routes/questions-new.route.tsx'),
     route('/questions/:questionId', './modules/questions/routes/question.route.tsx'),
     route('/questions/:questionId/edit', './modules/questions/routes/question-edit.route.tsx'),
-    route('/questions/:questionId/delete', './modules/questions/routes/question-delete.route.tsx'),
     route('/questions/:questionId/subscribe', './modules/questions/routes/question-subscribe.route.tsx', []),
   ]),
-
-  route('/api/me', './modules/api/routes/me.route.tsx'),
 ] satisfies RouteConfig;

@@ -6,7 +6,7 @@ import { getUserFromSession } from '~/app/get-user-from-session.server';
 import { commitSession, destroySession, getSession } from '~/app/session.server';
 import { changePassword, changeUsername, deleteUser } from '~/lib/http';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
-import type { TUser } from '~/types';
+import type { DataWithResponseInit, TUser } from '~/types';
 import { Avatar, FormError, PageTitle, Spinner } from '~/ui';
 import { Button } from '~/ui/base';
 import { urlToSearchParamsRef } from '~/utils';
@@ -53,6 +53,7 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
       </PageTitle>
 
       <ChangeUsernameForm user={user} />
+
       <ChangePasswordForm />
 
       <Suspense
@@ -71,7 +72,12 @@ const ProfileRoute = ({ loaderData }: Route.ComponentProps) => {
   );
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
+type LoaderResult = {
+  user: TUser;
+  statsLoader: ReturnType<typeof getStats>;
+};
+
+export async function loader({ request }: Route.LoaderArgs): Promise<Response | DataWithResponseInit<LoaderResult>> {
   const user = await getUserFromSession(request);
 
   if (user === null) {
@@ -79,11 +85,26 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect(`/login?${ref}`);
   }
 
-  const result = { user, message: undefined, statsLoader: undefined };
-  return data({ ...result, statsLoader: getStats(user) });
+  return data({ user, statsLoader: getStats(user) });
 }
 
-export async function action({ request }: Route.ActionArgs) {
+async function getStats(user: TUser) {
+  const result = await getUserStats({ id: user.id });
+  if (result.data) {
+    return { stats: result.data, message: null };
+  }
+  return { stats: null, message: result.error.message };
+}
+
+type ActionResult = {
+  message?: string;
+  passwordChanged?: number;
+  usernameChanged?: number;
+};
+
+export async function action({
+  request,
+}: Route.ActionArgs): Promise<Response | ActionResult | DataWithResponseInit<ActionResult>> {
   const session = await getSession(request.headers.get('Cookie'));
   const token = session.get('token');
   const ref = urlToSearchParamsRef(request.url);
@@ -92,7 +113,6 @@ export async function action({ request }: Route.ActionArgs) {
     return redirect(`/login?${ref}`);
   }
 
-  const result = { message: undefined, passwordChanged: undefined, usernameChanged: undefined };
   const formData = await request.formData();
   const form = Object.fromEntries(formData);
 
@@ -105,7 +125,7 @@ export async function action({ request }: Route.ActionArgs) {
       });
     }
 
-    return data({ ...result, message: deleteResult.error.message }, { status: STATUS_SERVER });
+    return data({ message: deleteResult.error.message }, { status: STATUS_SERVER });
   }
 
   const passwordParseResult = ChangePasswordFormSchema.safeParse(form);
@@ -115,10 +135,10 @@ export async function action({ request }: Route.ActionArgs) {
     const changePasswordResult = await changePassword({ oldPassword, newPassword, token });
 
     if (changePasswordResult.data) {
-      return { ...result, passwordChanged: Date.now() };
+      return { passwordChanged: Date.now() };
     }
 
-    return data({ ...result, message: changePasswordResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
+    return data({ message: changePasswordResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
   }
 
   const usernameParseResult = ChangeUsernameFormSchema.safeParse(form);
@@ -130,27 +150,17 @@ export async function action({ request }: Route.ActionArgs) {
     if (usernameResult.data) {
       session.set('user', usernameResult.data);
       return data(
-        { ...result, usernameChanged: Date.now() },
+        { usernameChanged: Date.now() },
         {
           headers: [['Set-Cookie', await commitSession(session)]],
         }
       );
     }
 
-    return data({ ...result, message: usernameResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
+    return data({ message: usernameResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
   }
 
-  return data(result, { status: STATUS_UNPROCESSABLE_ENTITY });
-}
-
-async function getStats(user: TUser) {
-  const result = await getUserStats({ id: user.id });
-
-  if (result.data) {
-    return { stats: result.data, message: null };
-  }
-
-  return { stats: null, message: result.error.message };
+  return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
 }
 
 export default ProfileRoute;

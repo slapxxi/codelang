@@ -28,7 +28,7 @@ export const Title = (props: TitleProps) => {
   return (
     <HeadingLevel
       className={cn(
-        'font-semibold text-olive-800 font-mono',
+        'font-semibold text-olive-800 font-mono break-all',
         level === 1 && 'text-2xl',
         level === 2 && 'text-xl',
         level === 3 && 'text-lg',

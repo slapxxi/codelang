@@ -22,14 +22,15 @@ export const Pagination: React.FC<Props> = (props) => {
     return null;
   }
 
-  const startPage = clamp(currentPage - Math.floor(maxDisplayed / 2), 1, numberOfPages);
-  const endPage = clamp(currentPage + Math.floor(maxDisplayed / 2), 1, numberOfPages);
-  const prevPages = new Array(currentPage - startPage)
+  const cPage = clamp(currentPage, 1, numberOfPages);
+  const startPage = clamp(cPage - Math.floor(maxDisplayed / 2), 1, numberOfPages);
+  const endPage = clamp(cPage + Math.floor(maxDisplayed / 2), 1, numberOfPages);
+  const prevPages = new Array(cPage - startPage)
     .fill(null)
     .reverse()
-    .map((_, i) => currentPage - (i + 1))
+    .map((_, i) => cPage - (i + 1))
     .reverse();
-  const nextPages = new Array(endPage - currentPage).fill(null).map((_, i) => currentPage + (i + 1));
+  const nextPages = new Array(endPage - cPage).fill(null).map((_, i) => cPage + (i + 1));
 
   return (
     <Form method="get">
@@ -57,8 +58,8 @@ export const Pagination: React.FC<Props> = (props) => {
           ))}
 
           <PaginationItem>
-            <PaginationButton name="page" value={currentPage} isActive>
-              {currentPage}
+            <PaginationButton name="page" value={cPage} isActive>
+              {cPage}
             </PaginationButton>
           </PaginationItem>
 

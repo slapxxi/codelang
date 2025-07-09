@@ -105,10 +105,7 @@ export async function action({ request }: Route.ActionArgs) {
       session.set('token', loginResult.data.token);
       session.set('user', loginResult.data.user);
       return redirect(ref, {
-        headers: [
-          ['Set-Cookie', await commitSession(session)],
-          ['Set-Cookie', loginResult.data.cookie],
-        ],
+        headers: [['Set-Cookie', await commitSession(session)]],
       });
     }
 

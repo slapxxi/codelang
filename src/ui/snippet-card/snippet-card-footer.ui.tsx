@@ -12,6 +12,9 @@ export const SnippetCardFooter: React.FC = () => {
   const dislikeFetcher = useFetcher();
   const user = useAuth();
 
+  const likeMark = likeFetcher.formData?.get('mark');
+  const dislikeMark = dislikeFetcher.formData?.get('mark');
+
   let mark: TMark | undefined;
 
   if (ctx) {
@@ -28,29 +31,41 @@ export const SnippetCardFooter: React.FC = () => {
             <button
               name="mark"
               value={mark && mark.type === 'like' ? 'none' : 'like'}
-              disabled={likeFetcher.state !== 'idle'}
+              disabled={likeFetcher.state !== 'idle' || dislikeFetcher.state !== 'idle'}
               className={cn(
-                mark && mark.type === 'like' ? 'text-lime-600 hover:text-lime-700' : '',
+                (mark?.type === 'like' && dislikeMark !== 'dislike' && likeMark !== 'none') || likeMark === 'like'
+                  ? 'text-lime-600 hover:text-lime-700'
+                  : '',
                 'interactive flex items-center gap-1'
               )}
             >
               <ThumbsUp size={16} />
-              <span>{snippet.likes}</span>
+              <span>
+                {snippet.likes +
+                  (likeMark === 'like' ? 1 : likeMark === 'none' ? -1 : 0) +
+                  (dislikeMark === 'dislike' && mark?.type === 'like' ? -1 : 0)}
+              </span>
             </button>
           </likeFetcher.Form>
 
           <dislikeFetcher.Form action={href('/snippets/:snippetId/edit', { snippetId: snippet.id })} method="post">
             <button
               name="mark"
-              value={mark && mark.type === 'dislike' ? 'none' : 'dislike'}
-              disabled={dislikeFetcher.state !== 'idle'}
+              value={mark?.type === 'dislike' ? 'none' : 'dislike'}
+              disabled={dislikeFetcher.state !== 'idle' || likeFetcher.state !== 'idle'}
               className={cn(
-                mark && mark.type === 'dislike' ? 'text-red-600 hover:text-red-700' : '',
+                (mark?.type === 'dislike' && likeMark !== 'like' && dislikeMark !== 'none') || dislikeMark === 'dislike'
+                  ? 'text-red-600 hover:text-red-700'
+                  : '',
                 'interactive flex items-center gap-1'
               )}
             >
               <ThumbsDown size={16} />
-              <span>{snippet.dislikes}</span>
+              <span>
+                {snippet.dislikes +
+                  (dislikeMark === 'dislike' ? 1 : dislikeMark === 'none' ? -1 : 0) +
+                  (likeMark === 'like' && mark?.type === 'dislike' ? -1 : 0)}
+              </span>
             </button>
           </dislikeFetcher.Form>
         </div>

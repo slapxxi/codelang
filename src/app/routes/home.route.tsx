@@ -4,7 +4,7 @@ import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
 import type { Route } from './+types/home.route';
-import type { TSnippet } from '~/types';
+import type { DataWithResponseInit, TSnippet } from '~/types';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;
@@ -32,14 +32,16 @@ type LoaderResult = {
   currentPage: number;
 };
 
-export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResult> {
+export async function loader({
+  request,
+}: Route.LoaderArgs): Promise<LoaderResult | DataWithResponseInit<LoaderResult>> {
   const url = new URL(request.url);
   const page = url.searchParams.get('page');
   const snippetsResult = await getSnippets({ page });
 
   if (snippetsResult.data) {
     const { snippets, totalPages, currentPage } = snippetsResult.data;
-    return { snippets, totalPages, currentPage };
+    return data({ snippets, totalPages, currentPage });
   }
 
   const { error } = snippetsResult;

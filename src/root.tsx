@@ -1,4 +1,5 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import type { Route } from './+types/root';
 import '~/app/styles/app.css';
@@ -51,6 +52,8 @@ export default function App({ loaderData }: Route.ComponentProps) {
 
   return (
     <QueryProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+
       <AuthProvider user={user}>
         <Outlet />
       </AuthProvider>

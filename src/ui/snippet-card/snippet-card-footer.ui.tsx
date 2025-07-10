@@ -19,9 +19,21 @@ export const SnippetCardFooter: React.FC = () => {
 
   if (ctx) {
     const { snippet } = ctx;
+    let optimisticLikes = snippet.likes;
+    let optimisticDislikes = snippet.dislikes;
 
     if (user) {
       mark = snippet.marks.find((m) => m.user.id === user.id);
+
+      optimisticLikes =
+        snippet.likes +
+        (likeMark === 'like' ? 1 : likeMark === 'none' ? -1 : 0) +
+        (dislikeMark === 'dislike' && mark?.type === 'like' ? -1 : 0);
+
+      optimisticDislikes =
+        snippet.dislikes +
+        (dislikeMark === 'dislike' ? 1 : dislikeMark === 'none' ? -1 : 0) +
+        (likeMark === 'like' && mark?.type === 'dislike' ? -1 : 0);
     }
 
     return (
@@ -40,11 +52,7 @@ export const SnippetCardFooter: React.FC = () => {
               )}
             >
               <ThumbsUp size={16} />
-              <span>
-                {snippet.likes +
-                  (likeMark === 'like' ? 1 : likeMark === 'none' ? -1 : 0) +
-                  (dislikeMark === 'dislike' && mark?.type === 'like' ? -1 : 0)}
-              </span>
+              <span>{optimisticLikes}</span>
             </button>
           </likeFetcher.Form>
 
@@ -61,11 +69,7 @@ export const SnippetCardFooter: React.FC = () => {
               )}
             >
               <ThumbsDown size={16} />
-              <span>
-                {snippet.dislikes +
-                  (dislikeMark === 'dislike' ? 1 : dislikeMark === 'none' ? -1 : 0) +
-                  (likeMark === 'like' && mark?.type === 'dislike' ? -1 : 0)}
-              </span>
+              <span>{optimisticDislikes}</span>
             </button>
           </dislikeFetcher.Form>
         </div>

@@ -85,7 +85,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get('Cookie'));
 
   if (session.has('token')) {
-    return redirect('/');
+    const url = new URL(request.url);
+    const ref = url.searchParams.get('ref') || '/';
+    return redirect(ref);
   }
 }
 

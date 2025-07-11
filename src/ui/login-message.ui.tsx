@@ -10,7 +10,7 @@ export const LoginMessage: React.FC<LoginMessageProps> = (props) => {
   return (
     <div className={cn('flex items-center gap-1', className)}>
       <Form method="get" action="/login">
-        <button name="page" value={currentHref} className="link">
+        <button name="ref" value={currentHref} className="link">
           Login
         </button>
       </Form>

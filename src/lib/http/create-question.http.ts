@@ -1,14 +1,8 @@
+import * as z from 'zod/v4';
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import type { TResult } from '~/types';
 import { API_URL } from './const';
 import { QuestionSchema } from './schema';
-import type { TResult } from '~/types';
-import {
-  ERROR_TYPE_EXCEPTION,
-  ERROR_TYPE_SERVER,
-  MESSAGE_EXCEPTION,
-  MESSAGE_PARSING_ERROR,
-  MESSAGE_RESPONSE_NOT_OK,
-} from '~/app/const';
-import * as z from 'zod/v4';
 
 const CreateQuestionResponse = QuestionSchema.omit({ answers: true, isResolved: true });
 
@@ -39,16 +33,16 @@ export async function createQuestion(params: Params): Promise<Result> {
       }
 
       return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: response.status },
+        error: { type: ERROR_TYPE_SERVER, message: ERROR_MESSAGES.PARSING_ERROR, status: response.status },
         data: null,
       };
     }
 
     return {
-      error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status },
+      error: { type: ERROR_TYPE_SERVER, message: ERROR_MESSAGES.RESPONSE_NOT_OK, status: response.status },
       data: null,
     };
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: ERROR_MESSAGES.EXCEPTION, e }, data: null };
   }
 }

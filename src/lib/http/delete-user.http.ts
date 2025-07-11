@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
-import { API_URL } from './const';
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
 import type { TResult } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION } from '~/app/const';
+import { API_URL } from './const';
 import { UserSchema } from './schema';
 
 const DeleteUserResponse = UserSchema.pick({ username: true, role: true });
@@ -37,6 +37,6 @@ export async function deleteUser(params: Params): Promise<Result> {
       return { error: { type: ERROR_TYPE_SERVER, message: body, status: response.status }, data: null };
     }
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: ERROR_MESSAGES.EXCEPTION, e }, data: null };
   }
 }

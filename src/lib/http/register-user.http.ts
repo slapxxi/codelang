@@ -1,7 +1,7 @@
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import type { TResult, TUser } from '~/types';
 import { API_URL } from './const';
 import { UserSchema } from './schema';
-import type { TResult, TUser } from '~/types';
 
 const RegisterUserResponse = UserSchema;
 
@@ -32,17 +32,21 @@ export async function registerUser(params: Params): Promise<Result> {
     try {
       const json = await response.clone().json();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        error: {
+          type: ERROR_TYPE_SERVER,
+          message: json.message || ERROR_MESSAGES.RESPONSE_NOT_OK,
+          status: response.status,
+        },
         data: null,
       };
     } catch {
       const body = await response.text();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: body || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        error: { type: ERROR_TYPE_SERVER, message: body || ERROR_MESSAGES.RESPONSE_NOT_OK, status: response.status },
         data: null,
       };
     }
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: ERROR_MESSAGES.EXCEPTION, e }, data: null };
   }
 }

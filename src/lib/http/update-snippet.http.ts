@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
-import { API_URL } from './const';
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
 import type { TResult, TSnippet } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_PARSING_ERROR, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
+import { API_URL } from './const';
 
 const UpdateSnippetResponse = z.object({
   updatedCount: z.number(),
@@ -40,12 +40,12 @@ export async function updateSnippet(params: Params): Promise<Result> {
       }
 
       return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: response.status },
+        error: { type: ERROR_TYPE_SERVER, message: ERROR_MESSAGES.PARSING_ERROR, status: response.status },
         data: null,
       };
     }
     return {
-      error: { type: ERROR_TYPE_SERVER, message: MESSAGE_RESPONSE_NOT_OK, status: response.status },
+      error: { type: ERROR_TYPE_SERVER, message: ERROR_MESSAGES.RESPONSE_NOT_OK, status: response.status },
       data: null,
     };
   } catch (e) {

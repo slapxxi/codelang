@@ -1,9 +1,9 @@
 import * as z from 'zod/v4';
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import type { TResult, TUser } from '~/types';
+import { appendParams } from '~/utils';
 import { API_URL } from './const';
 import { LinksSchema, UserSchema } from './schema';
-import { appendParams } from '~/utils';
-import type { TResult, TUser } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_RESPONSE_NOT_OK } from '~/app/const';
 
 const GetUsersResponse = z.object({
   data: z.array(UserSchema),
@@ -72,7 +72,11 @@ export async function getUsers(params?: Params): Promise<Result> {
     try {
       const json = await response.clone().json();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: json.message || MESSAGE_RESPONSE_NOT_OK, status: response.status },
+        error: {
+          type: ERROR_TYPE_SERVER,
+          message: json.message || ERROR_MESSAGES.RESPONSE_NOT_OK,
+          status: response.status,
+        },
         data: null,
       };
     } catch {

@@ -1,13 +1,7 @@
-import {
-  ERROR_TYPE_EXCEPTION,
-  ERROR_TYPE_SERVER,
-  MESSAGE_EXCEPTION,
-  MESSAGE_PARSING_ERROR,
-  STATUS_CODES,
-} from '~/app/const';
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
+import type { TResult, TUser } from '~/types';
 import { API_URL } from './const';
 import { UserSchema } from './schema';
-import type { TResult, TUser } from '~/types';
 
 const LoginUserResponse = UserSchema;
 
@@ -43,12 +37,12 @@ export async function loginUser(params: Params): Promise<Result> {
       }
 
       return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_CODES.SERVER },
+        error: { type: ERROR_TYPE_SERVER, message: ERROR_MESSAGES.PARSING_ERROR, status: STATUS_CODES.SERVER },
         data: null,
       };
     }
     return { error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status }, data: null };
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: ERROR_MESSAGES.EXCEPTION, e }, data: null };
   }
 }

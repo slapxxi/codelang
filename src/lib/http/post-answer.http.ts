@@ -1,7 +1,7 @@
+import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import type { TAnswer, TResult } from '~/types';
 import { API_URL } from './const';
 import { AnswerSchema } from './schema';
-import type { TResult, TAnswer } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER, MESSAGE_EXCEPTION } from '~/app/const';
 
 const PostAnswerResponse = AnswerSchema;
 
@@ -33,6 +33,6 @@ export async function postAnswer(params: Params): Promise<Result> {
 
     return { error: { type: ERROR_TYPE_SERVER, message: response.statusText, status: response.status }, data: null };
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: MESSAGE_EXCEPTION, e }, data: null };
+    return { error: { type: ERROR_TYPE_EXCEPTION, message: ERROR_MESSAGES.EXCEPTION, e }, data: null };
   }
 }

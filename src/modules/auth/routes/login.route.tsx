@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
-import { MESSAGE_INVALID_DATA, STATUS_CODES } from '~/app/const';
+import { ERROR_MESSAGES, STATUS_CODES } from '~/app/const';
 import { commitSession, getSession } from '~/app/session.server';
 import { loginUser } from '~/lib/http';
 import { FormError, Input } from '~/ui';
@@ -114,7 +114,7 @@ export async function action({ request }: Route.ActionArgs) {
     return data({ errorMessage: loginResult.error.message }, { status: STATUS_CODES.SERVER });
   }
 
-  return data({ errorMessage: MESSAGE_INVALID_DATA }, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
+  return data({ errorMessage: ERROR_MESSAGES.INVALID_DATA }, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
 }
 
 export default LoginRoute;

@@ -1,11 +1,11 @@
 import { data, href, redirect } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
+import { ERROR_TYPES, STATUS_CODES } from '~/app/const';
 import { getSession } from '~/app/session.server';
 import { createQuestion } from '~/lib/http';
+import type { DataWithResponseInit } from '~/types';
 import { PageTitle } from '~/ui';
 import { QuestionForm, QuestionFormSchema } from '../forms';
 import type { Route } from './+types/questions-new.route';
-import type { DataWithResponseInit } from '~/types';
 
 const QuestionsNewRoute = () => {
   return (
@@ -52,7 +52,7 @@ export async function action({ request }: Route.ActionArgs): Promise<Response | 
     const { error } = questionResult;
     return data(
       { errorMessage: error.message },
-      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER }
+      { status: error.type === ERROR_TYPES.SERVER ? error.status : STATUS_CODES.SERVER }
     );
   }
 

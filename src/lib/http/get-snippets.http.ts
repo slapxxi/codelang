@@ -1,5 +1,5 @@
 import * as z from 'zod/v4';
-import { ERROR_MESSAGES, ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import { ERROR_MESSAGES, ERROR_TYPES } from '~/app/const';
 import type { TResult, TSnippet } from '~/types';
 import { appendParams } from '~/utils';
 import { API_URL } from './const';
@@ -84,7 +84,7 @@ export async function getSnippets(params?: Params): Promise<Result> {
       const json = await response.clone().json();
       return {
         error: {
-          type: ERROR_TYPE_SERVER,
+          type: ERROR_TYPES.SERVER,
           message: json.message || ERROR_MESSAGES.RESPONSE_NOT_OK,
           status: response.status,
         },
@@ -93,11 +93,11 @@ export async function getSnippets(params?: Params): Promise<Result> {
     } catch {
       const body = await response.text();
       return {
-        error: { type: ERROR_TYPE_SERVER, message: body, status: response.status },
+        error: { type: ERROR_TYPES.SERVER, message: body, status: response.status },
         data: null,
       };
     }
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error getting snippets', e }, data: null };
+    return { error: { type: ERROR_TYPES.EXCEPTION, message: 'Error getting snippets', e }, data: null };
   }
 }

@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
-import { API_URL } from './const';
+import { ERROR_TYPES } from '~/app/const';
 import type { TResult } from '~/types';
-import { ERROR_TYPE_EXCEPTION, ERROR_TYPE_SERVER } from '~/app/const';
+import { API_URL } from './const';
 
 const ChangePasswordResponse = z.object({
   updatedCount: z.number(),
@@ -32,12 +32,12 @@ export async function changePassword(params: Params): Promise<Result> {
 
     try {
       const json = await response.clone().json();
-      return { error: { type: ERROR_TYPE_SERVER, message: json.message, status: response.status }, data: null };
+      return { error: { type: ERROR_TYPES.SERVER, message: json.message, status: response.status }, data: null };
     } catch {
       const body = await response.text();
-      return { error: { type: ERROR_TYPE_SERVER, message: body, status: response.status }, data: null };
+      return { error: { type: ERROR_TYPES.SERVER, message: body, status: response.status }, data: null };
     }
   } catch (e) {
-    return { error: { type: ERROR_TYPE_EXCEPTION, message: 'Error changing password', e }, data: null };
+    return { error: { type: ERROR_TYPES.EXCEPTION, message: 'Error changing password', e }, data: null };
   }
 }

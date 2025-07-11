@@ -1,10 +1,10 @@
 import { data } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
+import { ERROR_TYPES, STATUS_CODES } from '~/app/const';
 import { getSnippets } from '~/lib/http';
+import type { DataWithResponseInit, TSnippet } from '~/types';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
 import type { Route } from './+types/home.route';
-import type { DataWithResponseInit, TSnippet } from '~/types';
 
 const HomeRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;
@@ -45,7 +45,7 @@ export async function loader({
   }
 
   const { error } = snippetsResult;
-  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER });
+  throw data(null, { status: error.type === ERROR_TYPES.SERVER ? error.status : STATUS_CODES.SERVER });
 }
 
 export function meta() {

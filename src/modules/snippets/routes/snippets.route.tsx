@@ -1,7 +1,8 @@
 import { FilePlus } from 'lucide-react';
 import { data, href, Link } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
+import { ERROR_TYPES, STATUS_CODES } from '~/app/const';
 import { getSnippets } from '~/lib/http';
+import type { TSnippet } from '~/types';
 import {
   Button,
   PageTitle,
@@ -12,7 +13,6 @@ import {
   SnippetCardHeader,
 } from '~/ui';
 import type { Route } from './+types/snippets.route';
-import type { TSnippet } from '~/types';
 
 const SnippetsRoute = ({ loaderData }: Route.ComponentProps) => {
   const { snippets, totalPages, currentPage } = loaderData;
@@ -63,7 +63,7 @@ export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResul
   }
 
   const { error } = snippetsResult;
-  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.NOT_FOUND });
+  throw data(null, { status: error.type === ERROR_TYPES.SERVER ? error.status : STATUS_CODES.NOT_FOUND });
 }
 
 export default SnippetsRoute;

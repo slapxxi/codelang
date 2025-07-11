@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
+import { ERROR_TYPES, STATUS_CODES } from '~/app/const';
 import { emitter } from '~/app/emitter.server';
 import { getSession } from '~/app/session.server';
 import { deleteQuestion, getQuestion, postAnswer } from '~/lib/http';
@@ -109,7 +109,7 @@ export async function action({
     }
 
     const { error } = deleteResult;
-    return data({}, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER });
+    return data({}, { status: error.type === ERROR_TYPES.SERVER ? error.status : STATUS_CODES.SERVER });
   }
 
   if (form.intent === 'create-answer') {
@@ -127,7 +127,7 @@ export async function action({
       const { error } = postResult;
       return data(
         { errorMessage: error.message },
-        { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER }
+        { status: error.type === ERROR_TYPES.SERVER ? error.status : STATUS_CODES.SERVER }
       );
     }
 

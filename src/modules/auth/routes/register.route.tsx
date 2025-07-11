@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { data, Form, href, Link, redirect, useNavigation, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
-import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
+import { ERROR_TYPES, STATUS_CODES } from '~/app/const';
 import { getSession } from '~/app/session.server';
 import { registerUser } from '~/lib/http';
+import type { DataWithResponseInit } from '~/types';
 import { Button, FormError, Input } from '~/ui';
 import type { Route } from './+types/register.route';
-import type { DataWithResponseInit } from '~/types';
 
 const RegisterUserSchema = z.object({
   username: z.string('Username is required').min(5),
@@ -135,7 +135,7 @@ export async function action({ request }: Route.ActionArgs): Promise<Response | 
     const { error } = registerResult;
     return data(
       { errorMessage: error.message },
-      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER }
+      { status: error.type === ERROR_TYPES.SERVER ? error.status : STATUS_CODES.SERVER }
     );
   }
 

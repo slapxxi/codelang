@@ -1,6 +1,6 @@
 import { FilePlus } from 'lucide-react';
 import { data, href, Link } from 'react-router';
-import { STATUS_SERVER } from '~/app/const/status-codes.js';
+import { STATUS_CODES } from '~/app/const/status-codes.js';
 import { getSession } from '~/app/session.server.js';
 import { getQuestions } from '~/lib/http';
 import type { TQuestion, TUser } from '~/types/types.js';
@@ -55,7 +55,7 @@ export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResul
     return { user, questions, totalItems, totalPages, currentPage };
   }
 
-  throw data(null, { status: STATUS_SERVER });
+  throw data(null, { status: STATUS_CODES.SERVER });
 }
 
 export default QuestionsRoute;

@@ -1,13 +1,6 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { data, Form, href, Link, redirect, useNavigation } from 'react-router';
-import {
-  ERROR_TYPE_SERVER,
-  STATUS_BAD_REQUEST,
-  STATUS_CREATED,
-  STATUS_NOT_FOUND,
-  STATUS_SERVER,
-  STATUS_UNPROCESSABLE_ENTITY,
-} from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
 import { emitter } from '~/app/emitter.server';
 import { getSession } from '~/app/session.server';
 import { deleteQuestion, getQuestion, postAnswer } from '~/lib/http';
@@ -85,7 +78,7 @@ export async function loader({ params, request }: Route.LoaderArgs): Promise<Loa
     return { question: questionResult.data, user };
   }
 
-  throw data(null, { status: STATUS_NOT_FOUND });
+  throw data(null, { status: STATUS_CODES.NOT_FOUND });
 }
 
 export type ActionResult = {
@@ -116,7 +109,7 @@ export async function action({
     }
 
     const { error } = deleteResult;
-    return data({}, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
+    return data({}, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER });
   }
 
   if (form.intent === 'create-answer') {
@@ -128,20 +121,20 @@ export async function action({
 
       if (postResult.data) {
         emitter.emit('answer', postResult.data);
-        return data({ postedAnswer: postResult.data }, { status: STATUS_CREATED });
+        return data({ postedAnswer: postResult.data }, { status: STATUS_CODES.CREATED });
       }
 
       const { error } = postResult;
       return data(
         { errorMessage: error.message },
-        { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+        { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER }
       );
     }
 
-    return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
+    return data({}, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
   }
 
-  return data({}, { status: STATUS_BAD_REQUEST });
+  return data({}, { status: STATUS_CODES.BAD_REQUEST });
 }
 
 export default QuestionRoute;

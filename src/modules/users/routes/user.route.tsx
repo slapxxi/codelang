@@ -1,5 +1,5 @@
 import { data } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_NOT_FOUND } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
 import { getUserStats } from '~/lib/http/get-user-stats.http';
 import type { TUserStats } from '~/types';
 import { Avatar, FormError, PageTitle } from '~/ui';
@@ -40,7 +40,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   const { error } = userStatsResult;
   return data({ ...result, errorMessage: error.message } as LoaderResult, {
-    status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_NOT_FOUND,
+    status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.NOT_FOUND,
   });
 }
 

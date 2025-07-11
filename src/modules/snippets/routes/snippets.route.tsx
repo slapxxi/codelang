@@ -1,6 +1,6 @@
 import { FilePlus } from 'lucide-react';
 import { data, href, Link } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_NOT_FOUND } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
 import { getSnippets } from '~/lib/http';
 import {
   Button,
@@ -63,7 +63,7 @@ export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResul
   }
 
   const { error } = snippetsResult;
-  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_NOT_FOUND });
+  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.NOT_FOUND });
 }
 
 export default SnippetsRoute;

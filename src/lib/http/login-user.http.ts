@@ -3,7 +3,7 @@ import {
   ERROR_TYPE_SERVER,
   MESSAGE_EXCEPTION,
   MESSAGE_PARSING_ERROR,
-  STATUS_SERVER,
+  STATUS_CODES,
 } from '~/app/const';
 import { API_URL } from './const';
 import { UserSchema } from './schema';
@@ -43,7 +43,7 @@ export async function loginUser(params: Params): Promise<Result> {
       }
 
       return {
-        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_SERVER },
+        error: { type: ERROR_TYPE_SERVER, message: MESSAGE_PARSING_ERROR, status: STATUS_CODES.SERVER },
         data: null,
       };
     }

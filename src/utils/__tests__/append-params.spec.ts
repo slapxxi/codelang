@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { appendParams } from '../append-params';
+import { appendParams } from '../append-params.util';
 
 describe('appendParams', () => {
   let url: URL;

@@ -3,7 +3,7 @@ import { useId, useMemo } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { data, Form, href, redirect, useSubmit } from 'react-router';
 import * as z from 'zod/v4';
-import { ERROR_TYPE_SERVER, STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
 import { getSession } from '~/app/session.server';
 import { getSnippet, getSupportedLanguages, markSnippet, updateSnippet } from '~/lib/http';
 import type { DataWithResponseInit, TMark, TSnippet } from '~/types';
@@ -149,7 +149,7 @@ export async function action({
     const { error } = supportedLangsResult;
     return data(
       { errorMessage: error.message },
-      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+      { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER }
     );
   }
 
@@ -164,7 +164,7 @@ export async function action({
     }
   }
 
-  return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
+  return data({}, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
 }
 
 function createSchema(langs: string[]) {

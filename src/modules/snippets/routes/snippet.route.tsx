@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { data, Form, href, Link, redirect } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_BAD_REQUEST, STATUS_CREATED, STATUS_NOT_FOUND, STATUS_SERVER } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
 import { emitter } from '~/app/emitter.server';
 import { getSession } from '~/app/session.server';
 import { useAuth } from '~/hooks';
@@ -91,7 +91,7 @@ export async function loader({ params }: Route.LoaderArgs): Promise<LoaderResult
     return { snippet: snippetResult.data };
   }
 
-  throw data(null, { status: STATUS_NOT_FOUND });
+  throw data(null, { status: STATUS_CODES.NOT_FOUND });
 }
 
 type ActionResult = {
@@ -120,7 +120,7 @@ export async function action({
       return redirect(href('/snippets'));
     }
 
-    return data({}, { status: STATUS_SERVER });
+    return data({}, { status: STATUS_CODES.SERVER });
   }
 
   if (form.intent === 'create-comment') {
@@ -132,17 +132,17 @@ export async function action({
 
       if (postResult.data) {
         emitter.emit('comment', postResult.data);
-        return data({ postedComment: postResult.data }, { status: STATUS_CREATED });
+        return data({ postedComment: postResult.data }, { status: STATUS_CODES.CREATED });
       }
 
       const { error } = postResult;
       return data(
         { errorMessage: error.message },
-        { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER }
+        { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER }
       );
     }
 
-    return data({ errorMessage: 'Invalid data submitted' }, { status: STATUS_BAD_REQUEST });
+    return data({ errorMessage: 'Invalid data submitted' }, { status: STATUS_CODES.BAD_REQUEST });
   }
 
   return {};

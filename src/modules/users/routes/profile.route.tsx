@@ -1,7 +1,7 @@
 import { LogOut, Trash2 } from 'lucide-react';
 import { Suspense } from 'react';
 import { Await, data, Form, href, redirect } from 'react-router';
-import { STATUS_SERVER, STATUS_UNPROCESSABLE_ENTITY } from '~/app/const';
+import { STATUS_CODES } from '~/app/const';
 import { getUserFromSession } from '~/app/get-user-from-session.server';
 import { commitSession, destroySession, getSession } from '~/app/session.server';
 import { changePassword, changeUsername, deleteUser } from '~/lib/http';
@@ -125,7 +125,7 @@ export async function action({
       });
     }
 
-    return data({ message: deleteResult.error.message }, { status: STATUS_SERVER });
+    return data({ message: deleteResult.error.message }, { status: STATUS_CODES.SERVER });
   }
 
   const passwordParseResult = ChangePasswordFormSchema.safeParse(form);
@@ -138,7 +138,7 @@ export async function action({
       return { passwordChanged: Date.now() };
     }
 
-    return data({ message: changePasswordResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
+    return data({ message: changePasswordResult.error.message }, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
   }
 
   const usernameParseResult = ChangeUsernameFormSchema.safeParse(form);
@@ -157,10 +157,10 @@ export async function action({
       );
     }
 
-    return data({ message: usernameResult.error.message }, { status: STATUS_UNPROCESSABLE_ENTITY });
+    return data({ message: usernameResult.error.message }, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
   }
 
-  return data({}, { status: STATUS_UNPROCESSABLE_ENTITY });
+  return data({}, { status: STATUS_CODES.UNPROCESSABLE_ENTITY });
 }
 
 export default ProfileRoute;

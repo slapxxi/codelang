@@ -1,5 +1,5 @@
 import { data } from 'react-router';
-import { ERROR_TYPE_SERVER, STATUS_SERVER } from '~/app/const';
+import { ERROR_TYPE_SERVER, STATUS_CODES } from '~/app/const';
 import { getSnippets } from '~/lib/http';
 import { Pagination, SnippetCard } from '~/ui';
 import { intoColumns } from '~/utils';
@@ -45,7 +45,7 @@ export async function loader({
   }
 
   const { error } = snippetsResult;
-  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_SERVER });
+  throw data(null, { status: error.type === ERROR_TYPE_SERVER ? error.status : STATUS_CODES.SERVER });
 }
 
 export function meta() {

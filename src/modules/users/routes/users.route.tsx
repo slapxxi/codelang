@@ -1,5 +1,5 @@
 import { data, href, NavLink } from 'react-router';
-import { STATUS_NOT_FOUND } from '~/app/const';
+import { STATUS_CODES } from '~/app/const';
 import { getUsers } from '~/lib/http';
 import type { TUser } from '~/types';
 import { Avatar, Card, PageTitle, Pagination, Spinner } from '~/ui';
@@ -50,7 +50,7 @@ export async function loader({ request }: Route.LoaderArgs): Promise<LoaderResul
     return { users, totalItems, totalPages, currentPage };
   }
 
-  throw data(null, { status: STATUS_NOT_FOUND });
+  throw data(null, { status: STATUS_CODES.NOT_FOUND });
 }
 
 export default UserRoute;

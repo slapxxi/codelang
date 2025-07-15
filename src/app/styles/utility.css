@@ -1,0 +1,12 @@
+@utility cap-round {
+  stroke-linecap: round;
+}
+
+@utility join-round {
+  stroke-linejoin: round;
+}
+
+@utility shimmer-color-* {
+  --shimmer-color: --value(--color-*, [*]);
+  --shimmer-color: color-mix(in oklch, --value(--color-*, [*]) calc(--modifier(integer) * 1%), transparent);
+}

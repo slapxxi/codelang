@@ -1,10 +1,13 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import type { Route } from './+types/root';
 import '~/app/styles/app.css';
+import '~/lib/shiki';
+import { Toaster } from '~/ui';
 
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '~/lib';
+import { AuthProvider, QueryProvider } from './app/providers';
+import { getSession } from './app/session.server';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -19,6 +22,12 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request.headers.get('Cookie'));
+  const user = session.get('user');
+  return { user: user ?? null };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -30,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -37,11 +47,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData;
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <QueryProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+
+      <AuthProvider user={user}>
+        <Outlet />
+      </AuthProvider>
+    </QueryProvider>
   );
 }
 

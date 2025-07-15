@@ -1,0 +1,48 @@
+@layer components {
+  .shimmer {
+    --shimmer-color: hsla(0, 0%, 100%, 0.25);
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+
+    &:before {
+      @apply animate-shimmer filter blur-lg;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150%;
+      height: 150%;
+      transform: translateY(-40%) translateX(var(--pos));
+      background: radial-gradient(circle, var(--shimmer-color) 10%, transparent 70%);
+    }
+  }
+
+  .link {
+    @apply text-zinc-500 cursor-pointer;
+
+    @variant hover {
+      @apply text-zinc-800;
+    }
+
+    @variant active {
+      @apply text-zinc-400;
+    }
+  }
+
+  .interactive {
+    @apply text-zinc-500;
+
+    @variant hover {
+      @apply text-zinc-800;
+    }
+
+    @variant active {
+      @apply text-zinc-400;
+    }
+
+    @variant disabled {
+      @apply text-zinc-400 cursor-not-allowed;
+    }
+  }
+}

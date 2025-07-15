@@ -1,0 +1,41 @@
+import * as z from 'zod/v4';
+import { ERROR_TYPES } from '~/app/const';
+import type { TResult } from '~/types';
+import { API_URL } from './const';
+
+const GetSupportedLanguagesResponse = z.array(z.string());
+
+type Params = {
+  token: string;
+};
+
+type Result = TResult<string[]>;
+
+export async function getSupportedLanguages(params: Params): Promise<Result> {
+  try {
+    const url = new URL(`${API_URL}/snippets/languages`);
+    const response = await fetch(url, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `token=${params.token}`,
+      },
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      const data = GetSupportedLanguagesResponse.parse(json.data);
+      return { data, error: null };
+    }
+
+    try {
+      const json = await response.clone().json();
+      return { error: { type: ERROR_TYPES.SERVER, message: json.message, status: response.status }, data: null };
+    } catch {
+      const body = await response.text();
+      return { error: { type: ERROR_TYPES.SERVER, message: body, status: response.status }, data: null };
+    }
+  } catch (e) {
+    return { error: { type: ERROR_TYPES.EXCEPTION, message: 'Error getting supported languages', e }, data: null };
+  }
+}
